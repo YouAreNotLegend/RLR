@@ -1,0 +1,83 @@
+const fixed SLOP = 0.25;
+
+trigger gt_BounceV3 = TriggerCreate("gt_BounceV3_Func");
+void gf_spawnRed (int NumberOfDrones, fixed DroneSpeed, fixed DroneAcceleration);
+
+bool gt_BounceV3_Func (bool testConds, bool runActions) {
+
+    //refelcts drone movement upon leaving it's bouncing region so long as it's in the unit group GreyDrones
+
+    point max = RegionGetBoundsMax(EventUnitRegion());
+    point min = RegionGetBoundsMin(EventUnitRegion());
+    point unitPosition = UnitGetPosition(EventUnit());
+    fixed angle = UnitGetFacing(EventUnit());
+    int i = 0;
+
+    if (testConds) {
+        if (!((UnitGroupHasUnit(gv_greyDrones, EventUnit())) == true)) {
+            return false;
+        }
+    }
+
+    if (!runActions) {
+        return true;
+    }
+
+    if (PointGetX(unitPosition) > PointGetX(max) - SLOP || PointGetX(unitPosition) < PointGetX(min) + SLOP){
+        angle = 180 - angle;
+    }
+
+    if (PointGetY(unitPosition) > PointGetY(max) - SLOP || PointGetY(unitPosition) < PointGetY(min) + SLOP){
+        angle = angle * -1;
+    }
+
+    UnitCreate(1, "PointDefenseDrone", 0, 15, unitPosition, angle);
+    UnitGroupAdd(gv_greyDrones, UnitLastCreated());
+    UnitSetScale(UnitLastCreated(), 300, 300, 300);
+    UnitSetPropertyFixed(UnitLastCreated(), c_unitPropMovementSpeed, UnitGetPropertyFixed(EventUnit(), c_unitPropMovementSpeed, true));
+    UnitRemove(EventUnit());
+
+    for (; i < 5; i+=1) {
+        UnitIssueOrder(UnitLastCreated(), OrderTargetingPoint(AbilityCommand("move", 0), PointWithOffsetPolar((unitPosition), 25 * i, angle)), c_orderQueueReplace);
+    }
+    
+    return true;
+}
+
+void gf_spawnRed (int NumberOfDrones, fixed DroneSpeed, fixed DroneAcceleration) {
+    point RandomPoint;
+    int i = 0;
+
+    for (; i < NumberOfDrones; i+=1) {
+        RandomPoint = RegionRandomPoint(RegionFromName("SightRegion"));
+        UnitCreate(1, "PointDefenseDrone", 0, 15, RegionRandomPoint(RegionFromName("SightRegion")), 0);
+        UnitSetScale(UnitLastCreated(), 300, 300, 300);
+        UnitSetPropertyFixed(UnitLastCreated(), c_unitPropAcceleration, DroneAcceleration);
+        UnitGroupAdd(gv_redDrones, UnitLastCreated());
+        UnitGroupAdd(gv_dronesToMoveIfIdle, UnitLastCreated());
+        UnitIssueOrder(UnitLastCreated(), OrderTargetingPoint(AbilityCommand("move", 0), RandomPoint), c_orderQueueReplace);
+    }
+}
+
+void main() {
+    TriggerAddEventUnitRegion(gt_BounceV3, null, RegionFromName("Lane001"), false);
+    TriggerAddEventUnitRegion(gt_BounceV3, null, RegionFromName("Lane002"), false);
+    TriggerAddEventUnitRegion(gt_BounceV3, null, RegionFromName("Lane003"), false);
+    TriggerAddEventUnitRegion(gt_BounceV3, null, RegionFromName("Lane004"), false);
+    TriggerAddEventUnitRegion(gt_BounceV3, null, RegionFromName("Lane005"), false);
+    TriggerAddEventUnitRegion(gt_BounceV3, null, RegionFromName("Lane006"), false);
+    TriggerAddEventUnitRegion(gt_BounceV3, null, RegionFromName("Lane007"), false);
+    TriggerAddEventUnitRegion(gt_BounceV3, null, RegionFromName("Lane008"), false);
+    TriggerAddEventUnitRegion(gt_BounceV3, null, RegionFromName("Lane009"), false);
+    TriggerAddEventUnitRegion(gt_BounceV3, null, RegionFromName("Lane010"), false);
+    TriggerAddEventUnitRegion(gt_BounceV3, null, RegionFromName("Lane011"), false);
+    TriggerAddEventUnitRegion(gt_BounceV3, null, RegionFromName("Lane012"), false);
+    TriggerAddEventUnitRegion(gt_BounceV3, null, RegionFromName("Lane013"), false);
+    TriggerAddEventUnitRegion(gt_BounceV3, null, RegionFromName("Lane014"), false);
+    TriggerAddEventUnitRegion(gt_BounceV3, null, RegionFromName("Lane015"), false);
+    TriggerAddEventUnitRegion(gt_BounceV3, null, RegionFromName("Lane016"), false);
+    TriggerAddEventUnitRegion(gt_BounceV3, null, RegionFromName("Lane017"), false);
+    TriggerAddEventUnitRegion(gt_BounceV3, null, RegionFromName("Lane018"), false);
+    //TriggerAddEventUnitRegion(gt_BounceV3, null, RegionFromName("Lane019"), false);
+}
+

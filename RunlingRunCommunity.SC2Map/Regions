@@ -1,0 +1,855 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Regions>
+    <region id="1">
+        <name value="CircleSurroundingStandardPlayArea"/>
+        <invisible/>
+        <shape type="circle">
+            <center value="87.373,71.7314"/>
+            <radius value="7.9997"/>
+        </shape>
+        <shape type="circle">
+            <negative/>
+            <center value="87.373,71.7314"/>
+            <radius value="7.7497"/>
+        </shape>
+    </region>
+    <region id="2">
+        <name value="HorizontalBouncingRegion"/>
+        <invisible/>
+        <shape type="rect">
+            <quad value="17.9218,132.286,137.9216,135.286"/>
+        </shape>
+        <shape type="rect">
+            <quad value="23.6281,22.762,138.628,25.762"/>
+        </shape>
+        <shape type="rect">
+            <quad value="14.338,122.2375,129.3376,125.7373"/>
+        </shape>
+        <shape type="rect">
+            <quad value="32.9587,32.27,128.9584,35.77"/>
+        </shape>
+        <shape type="rect">
+            <quad value="40.9213,40.2441,120.9211,43.7441"/>
+        </shape>
+        <shape type="rect">
+            <quad value="51.0996,50.2602,111.0996,53.76"/>
+        </shape>
+        <shape type="rect">
+            <quad value="59.1052,58.2675,103.1052,61.7675"/>
+        </shape>
+        <shape type="rect">
+            <quad value="33.3051,114.253,120.305,117.7526"/>
+        </shape>
+        <shape type="rect">
+            <quad value="41.1665,104.2712,111.1665,107.7712"/>
+        </shape>
+        <shape type="rect">
+            <quad value="51.0754,96.2094,103.0754,99.7092"/>
+        </shape>
+        <shape type="rect">
+            <quad value="59.4724,86.2617,92.4721,89.7617"/>
+        </shape>
+        <shape type="rect">
+            <quad value="69.7353,68.2578,92.735,71.7575"/>
+        </shape>
+        <shape type="rect">
+            <quad value="128.616,123.4316,138.526,124.8122"/>
+        </shape>
+        <shape type="rect">
+            <quad value="127.9101,33.1401,137.82,34.5207"/>
+        </shape>
+        <shape type="rect">
+            <quad value="23.6877,33.3056,33.5976,34.6862"/>
+        </shape>
+        <shape type="rect">
+            <quad value="23.4616,115.2941,33.3715,116.6748"/>
+        </shape>
+        <shape type="rect">
+            <quad value="109.8596,105.2014,119.7695,106.582"/>
+        </shape>
+        <shape type="rect">
+            <quad value="42.3483,97.4421,52.2583,98.8227"/>
+        </shape>
+        <shape type="rect">
+            <quad value="41.9956,51.1994,51.9055,52.58"/>
+        </shape>
+        <shape type="rect">
+            <quad value="110.234,51.3146,120.1437,52.6953"/>
+        </shape>
+        <shape type="rect">
+            <quad value="91.909,69.5146,101.8188,70.8952"/>
+        </shape>
+        <shape type="rect">
+            <quad value="91.8574,87.368,101.7673,88.7485"/>
+        </shape>
+        <shape type="rect">
+            <quad value="34.5805,105.445,41.5803,106.8256"/>
+        </shape>
+        <shape type="rect">
+            <quad value="120.5373,115.3095,127.537,116.6901"/>
+        </shape>
+        <shape type="rect">
+            <quad value="120.6047,41.375,127.6044,42.7556"/>
+        </shape>
+        <shape type="rect">
+            <quad value="34.6464,41.3247,41.6462,42.7053"/>
+        </shape>
+        <shape type="rect">
+            <quad value="102.6472,97.321,109.647,98.7016"/>
+        </shape>
+        <shape type="rect">
+            <quad value="102.6186,59.3305,109.6184,60.7111"/>
+        </shape>
+        <shape type="rect">
+            <quad value="52.7902,59.2543,59.79,60.635"/>
+        </shape>
+        <shape type="rect">
+            <quad value="52.6096,87.4453,59.6093,88.826"/>
+        </shape>
+    </region>
+    <region id="4">
+        <name value="LaneRegion"/>
+        <invisible/>
+        <shape type="rect">
+            <quad value="25.8417,25.6164,136.1123,131.2976"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="136.1984,22.1413,139.6982,137.1413"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="126.2238,32.9963,129.7236,124.9963"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="22.2663,24.6923,25.766,122.6923"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="32.2355,32.9172,35.7353,116.9172"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="40.2424,41.1894,43.7421,106.1894"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="118.2478,41.3854,121.7475,116.3854"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="108.208,51.364,111.7077,106.364"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="50.2346,51.187,53.7343,99.187"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="100.2126,59.0854,103.7124,99.0854"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="58.232,58.904,61.7316,88.904"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="90.2702,69.6242,93.77,88.6242"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="68.217,70.0034,71.7167,78.0034"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="69.126,78.9182,70.6257,86.9182"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="91.2915,60.9797,92.7912,68.9797"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="91.215,88.9682,92.7148,96.9682"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="59.3203,89.0717,60.82,97.0717"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="51.111,43.107,52.6108,51.107"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="109.4152,43.1625,110.915,51.1625"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="109.3627,107.1618,110.8625,115.1618"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="41.1518,107.1418,42.6516,115.1418"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="33.1325,24.9245,34.6323,32.9245"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="127.3073,25.0644,128.8071,33.0644"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="127.3293,124.975,128.829,132.975"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="25.663,125.0256,27.1628,133.0256"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="33.044,117.0297,34.5437,123.0297"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="119.0976,117.0253,120.5974,123.0253"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="119.3994,35.1013,120.8991,41.1013"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="41.0952,34.9997,42.595,40.9997"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="51.0876,99.2131,52.5874,105.2131"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="101.0307,99.1232,102.5305,105.1232"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="101.29,53.1743,102.7897,59.1743"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="59.3852,53.2355,60.885,59.2355"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="17.9182,132.287,137.918,135.287"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="23.6245,22.7631,138.6242,25.7631"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="14.3342,122.2387,129.334,125.7385"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="32.955,32.2712,128.9548,35.7712"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="40.9177,40.2453,120.9174,43.7453"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="51.096,50.2614,111.096,53.7612"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="59.1015,58.2687,103.1015,61.7687"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="33.3015,114.2541,120.3012,117.754"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="41.1628,104.2724,111.1628,107.7724"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="51.0717,96.2106,103.0717,99.7104"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="59.4687,86.263,92.4685,89.763"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="69.7316,68.259,92.7314,71.7587"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="128.6123,123.4328,138.5222,124.8134"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="127.9064,33.1413,137.8164,34.522"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="23.684,33.307,33.594,34.6875"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="23.458,115.2954,33.368,116.676"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="109.856,105.2026,119.7658,106.5832"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="42.3447,97.4433,52.2546,98.824"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="41.992,51.2006,51.9018,52.5812"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="110.2302,51.316,120.1401,52.6965"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="91.9052,69.5158,101.8151,70.8964"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="91.8537,87.3691,101.7636,88.7497"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="34.577,105.4462,41.5766,106.827"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="120.5336,115.3107,127.5334,116.6914"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="120.601,41.3762,127.6008,42.7568"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="34.6428,41.326,41.6425,42.7065"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="102.6435,97.3222,109.6433,98.703"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="102.615,59.3317,109.6147,60.7124"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="52.7866,59.2556,59.7863,60.6362"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="52.606,87.4465,59.6057,88.8271"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="24.9814,25.1892,33.8103,33.9941"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="128.067,25.1428,136.8703,33.8142"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="127.8854,124.156,136.9311,132.884"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="16.4814,125.216,26.31,133.0388"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="25.028,116.1054,33.8315,122.9926"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="119.8171,116.027,126.985,122.9082"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="120.2185,35.0327,126.9328,42.0327"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="34.814,35.1418,41.851,41.9875"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="35.084,106.1804,41.7924,114.9348"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="110.0737,106.019,118.966,114.8664"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="110.1176,43.071,119.0268,51.9863"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="42.7683,43.1083,51.891,51.8986"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="42.9094,98.208,51.8691,105.0168"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="101.7946,97.978,109.0651,105.1057"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="102.0187,52.9836,108.96,59.9301"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="52.877,53.1303,60.067,59.8544"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="52.997,88.17,60.0993,96.9584"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="91.9138,87.9697,101.0483,96.9855"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="92.0644,61.1308,100.9645,70.2136"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="69.885,70.7277,91.4028,86.8276"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="68.3886,68.5827,69.8676,70.044"/>
+        </shape>
+        <shape type="rect">
+            <negative/>
+            <quad value="68.698,78.0112,70.137,79.064"/>
+        </shape>
+    </region>
+    <region id="3">
+        <name value="VerticalBouncingRegion"/>
+        <invisible/>
+        <shape type="rect">
+            <quad value="136.1828,22.128,139.6826,137.128"/>
+        </shape>
+        <shape type="rect">
+            <quad value="126.2082,32.983,129.708,124.983"/>
+        </shape>
+        <shape type="rect">
+            <quad value="22.2507,24.679,25.7504,122.679"/>
+        </shape>
+        <shape type="rect">
+            <quad value="32.22,32.9038,35.7197,116.9038"/>
+        </shape>
+        <shape type="rect">
+            <quad value="40.2268,41.176,43.7265,106.176"/>
+        </shape>
+        <shape type="rect">
+            <quad value="118.2321,41.372,121.732,116.372"/>
+        </shape>
+        <shape type="rect">
+            <quad value="108.1923,51.3505,111.6921,106.3505"/>
+        </shape>
+        <shape type="rect">
+            <quad value="50.219,51.1735,53.7187,99.1735"/>
+        </shape>
+        <shape type="rect">
+            <quad value="100.197,59.072,103.6967,99.072"/>
+        </shape>
+        <shape type="rect">
+            <quad value="58.2163,58.8906,61.716,88.8906"/>
+        </shape>
+        <shape type="rect">
+            <quad value="90.2546,69.6108,93.7543,88.6108"/>
+        </shape>
+        <shape type="rect">
+            <quad value="68.2014,69.99,71.7011,77.99"/>
+        </shape>
+        <shape type="rect">
+            <quad value="69.1103,78.9047,70.61,86.9047"/>
+        </shape>
+        <shape type="rect">
+            <quad value="91.276,60.9663,92.7756,68.9663"/>
+        </shape>
+        <shape type="rect">
+            <quad value="91.1994,88.9548,92.6992,96.9548"/>
+        </shape>
+        <shape type="rect">
+            <quad value="59.3046,89.0583,60.8044,97.0583"/>
+        </shape>
+        <shape type="rect">
+            <quad value="51.0954,43.0935,52.5952,51.0935"/>
+        </shape>
+        <shape type="rect">
+            <quad value="109.3996,43.1491,110.8994,51.1491"/>
+        </shape>
+        <shape type="rect">
+            <quad value="109.3471,107.1484,110.847,115.1484"/>
+        </shape>
+        <shape type="rect">
+            <quad value="41.1362,107.1284,42.636,115.1284"/>
+        </shape>
+        <shape type="rect">
+            <quad value="33.117,24.9111,34.6166,32.9111"/>
+        </shape>
+        <shape type="rect">
+            <quad value="127.2917,25.051,128.7915,33.051"/>
+        </shape>
+        <shape type="rect">
+            <quad value="127.3137,124.9616,128.8134,132.9616"/>
+        </shape>
+        <shape type="rect">
+            <quad value="25.6474,125.0122,27.1472,133.0122"/>
+        </shape>
+        <shape type="rect">
+            <quad value="33.0283,117.0163,34.528,123.0163"/>
+        </shape>
+        <shape type="rect">
+            <quad value="119.082,117.012,120.5817,123.012"/>
+        </shape>
+        <shape type="rect">
+            <quad value="119.3837,35.088,120.8835,41.088"/>
+        </shape>
+        <shape type="rect">
+            <quad value="41.0795,34.9863,42.5793,40.9863"/>
+        </shape>
+        <shape type="rect">
+            <quad value="51.072,99.1997,52.5717,105.1997"/>
+        </shape>
+        <shape type="rect">
+            <quad value="101.0151,99.1098,102.515,105.1098"/>
+        </shape>
+        <shape type="rect">
+            <quad value="101.2744,53.161,102.7741,59.161"/>
+        </shape>
+        <shape type="rect">
+            <quad value="59.3696,53.2221,60.8693,59.2221"/>
+        </shape>
+    </region>
+    <region id="5">
+        <name value="SafeZones"/>
+        <invisible/>
+        <shape type="rect">
+            <quad value="25.0014,25.1791,33.8303,33.9841"/>
+        </shape>
+        <shape type="rect">
+            <quad value="128.087,25.1328,136.8903,33.8041"/>
+        </shape>
+        <shape type="rect">
+            <quad value="127.9055,124.146,136.9511,132.874"/>
+        </shape>
+        <shape type="rect">
+            <quad value="16.5014,125.206,26.33,133.0288"/>
+        </shape>
+        <shape type="rect">
+            <quad value="25.048,116.0954,33.8515,122.9826"/>
+        </shape>
+        <shape type="rect">
+            <quad value="119.8371,116.017,127.0051,122.8981"/>
+        </shape>
+        <shape type="rect">
+            <quad value="120.2385,35.0227,126.953,42.0227"/>
+        </shape>
+        <shape type="rect">
+            <quad value="34.834,35.1318,41.871,41.9775"/>
+        </shape>
+        <shape type="rect">
+            <quad value="35.104,106.1704,41.8125,114.9248"/>
+        </shape>
+        <shape type="rect">
+            <quad value="110.0937,106.009,118.986,114.8564"/>
+        </shape>
+        <shape type="rect">
+            <quad value="110.1376,43.061,119.0468,51.9763"/>
+        </shape>
+        <shape type="rect">
+            <quad value="42.7883,43.0983,51.9111,51.8886"/>
+        </shape>
+        <shape type="rect">
+            <quad value="42.9294,98.198,51.8891,105.0068"/>
+        </shape>
+        <shape type="rect">
+            <quad value="101.8146,97.968,109.0852,105.0957"/>
+        </shape>
+        <shape type="rect">
+            <quad value="102.0388,52.9736,108.98,59.9201"/>
+        </shape>
+        <shape type="rect">
+            <quad value="52.897,53.1203,60.087,59.8444"/>
+        </shape>
+        <shape type="rect">
+            <quad value="53.017,88.16,60.1193,96.9484"/>
+        </shape>
+        <shape type="rect">
+            <quad value="91.9338,87.9597,101.0683,96.9755"/>
+        </shape>
+        <shape type="rect">
+            <quad value="92.0844,61.1208,100.9846,70.2036"/>
+        </shape>
+        <shape type="rect">
+            <quad value="69.905,70.7177,91.4228,86.8176"/>
+        </shape>
+    </region>
+    <region id="6">
+        <name value="Edge"/>
+        <invisible/>
+        <shape type="rect">
+            <quad value="68.3806,68.5725,69.8596,70.0336"/>
+        </shape>
+        <shape type="rect">
+            <quad value="68.69,78.001,70.129,79.0537"/>
+        </shape>
+    </region>
+    <region id="7">
+        <name value="Region 001"/>
+        <shape type="rect">
+            <quad value="28.9262,127.2,125.4606,130.57"/>
+        </shape>
+    </region>
+    <region id="8">
+        <name value="Region 002"/>
+        <shape type="rect">
+            <quad value="131.891,37.5712,134.2961,120.5712"/>
+        </shape>
+    </region>
+    <region id="9">
+        <name value="Region 003"/>
+        <shape type="rect">
+            <quad value="36.2312,27.5998,124.7668,30.377"/>
+        </shape>
+    </region>
+    <region id="10">
+        <name value="Region 004"/>
+        <shape type="rect">
+            <quad value="27.7656,36.8627,30.397,112.9577"/>
+        </shape>
+    </region>
+    <region id="11">
+        <name value="Region 005"/>
+        <shape type="rect">
+            <quad value="36.3564,118.9956,116.9516,120.9953"/>
+        </shape>
+    </region>
+    <region id="12">
+        <name value="Region 006"/>
+        <shape type="rect">
+            <quad value="122.997,44.1645,124.997,113.8371"/>
+        </shape>
+    </region>
+    <region id="13">
+        <name value="Region 007"/>
+        <shape type="rect">
+            <quad value="44.0651,36.9265,117.4323,38.9262"/>
+        </shape>
+    </region>
+    <region id="14">
+        <name value="Region 008"/>
+        <shape type="rect">
+            <quad value="37.0537,44.6594,39.0534,103.8222"/>
+        </shape>
+    </region>
+    <region id="15">
+        <name value="Region 009"/>
+        <shape type="rect">
+            <quad value="44.3376,109.176,106.7614,112.6718"/>
+        </shape>
+    </region>
+    <region id="16">
+        <name value="Region 010"/>
+        <shape type="rect">
+            <quad value="113.4782,54.6147,116.5776,103.0046"/>
+        </shape>
+    </region>
+    <region id="17">
+        <name value="Region 011"/>
+        <shape type="rect">
+            <quad value="55.2626,45.4926,105.2817,48.4716"/>
+        </shape>
+    </region>
+    <region id="18">
+        <name value="Region 012"/>
+        <shape type="rect">
+            <quad value="45.3498,54.7683,48.807,94.9072"/>
+        </shape>
+    </region>
+    <region id="19">
+        <name value="Region 013"/>
+        <shape type="rect">
+            <quad value="54.512,100.9477,99.6005,102.9475"/>
+        </shape>
+    </region>
+    <region id="20">
+        <name value="Region 014"/>
+        <shape type="rect">
+            <quad value="105.0041,62.0825,107.0041,95.9975"/>
+        </shape>
+    </region>
+    <region id="21">
+        <name value="Region 015"/>
+        <shape type="rect">
+            <quad value="62.522,55.0083,98.9655,57.008"/>
+        </shape>
+    </region>
+    <region id="22">
+        <name value="Region 016"/>
+        <shape type="rect">
+            <quad value="55.0537,62.3166,57.0534,85.6923"/>
+        </shape>
+    </region>
+    <region id="23">
+        <name value="Region 017"/>
+        <shape type="rect">
+            <quad value="62.6877,91.4804,89.2326,94.7346"/>
+        </shape>
+    </region>
+    <region id="24">
+        <name value="Region 018"/>
+        <shape type="rect">
+            <quad value="95.0595,72.2121,99.0595,86.0332"/>
+        </shape>
+    </region>
+    <region id="25">
+        <name value="Region 019"/>
+        <shape type="rect">
+            <quad value="64.0432,62.656,87.6694,67.187"/>
+        </shape>
+    </region>
+    <region id="26">
+        <name value="Lane001"/>
+        <shape type="rect">
+            <quad value="27.4123,125.9633,126.9123,131.9633"/>
+        </shape>
+    </region>
+    <region id="27">
+        <name value="Lane018"/>
+        <shape type="rect">
+            <quad value="94.0798,71.1594,100.0798,86.9821"/>
+        </shape>
+    </region>
+    <region id="28">
+        <name value="Lane017"/>
+        <shape type="rect">
+            <quad value="60.9985,90.091,90.9985,96.0908"/>
+        </shape>
+    </region>
+    <region id="29">
+        <name value="Lane016"/>
+        <shape type="rect">
+            <quad value="54.0446,60.7202,58.0446,87.22"/>
+        </shape>
+    </region>
+    <region id="30">
+        <name value="Lane015"/>
+        <shape type="rect">
+            <quad value="61.253,54.0246,100.9213,58.0246"/>
+        </shape>
+    </region>
+    <region id="31">
+        <name value="Lane014"/>
+        <shape type="rect">
+            <quad value="103.9978,60.9375,107.9978,96.9375"/>
+        </shape>
+    </region>
+    <region id="32">
+        <name value="Lane013"/>
+        <shape type="rect">
+            <quad value="52.837,100.0195,100.8366,104.0195"/>
+        </shape>
+    </region>
+    <region id="33">
+        <name value="Lane012"/>
+        <shape type="rect">
+            <quad value="44.0212,52.9062,50.021,96.7585"/>
+        </shape>
+    </region>
+    <region id="34">
+        <name value="Lane011"/>
+        <shape type="rect">
+            <quad value="53.0512,43.9794,109.051,49.9792"/>
+        </shape>
+    </region>
+    <region id="35">
+        <name value="Lane010"/>
+        <shape type="rect">
+            <quad value="111.9973,52.8525,117.9973,104.8525"/>
+        </shape>
+    </region>
+    <region id="36">
+        <name value="Lane009"/>
+        <shape type="rect">
+            <quad value="42.9572,108.0068,108.957,114.0065"/>
+        </shape>
+    </region>
+    <region id="37">
+        <name value="Lane008"/>
+        <shape type="rect">
+            <quad value="36.0515,43.0974,40.0515,105.0974"/>
+        </shape>
+    </region>
+    <region id="38">
+        <name value="Lane007"/>
+        <shape type="rect">
+            <quad value="42.8395,35.97,119.1015,39.97"/>
+        </shape>
+    </region>
+    <region id="39">
+        <name value="Lane006"/>
+        <shape type="rect">
+            <quad value="122.0043,42.994,126.0043,114.994"/>
+        </shape>
+    </region>
+    <region id="40">
+        <name value="Lane005"/>
+        <shape type="rect">
+            <quad value="34.8044,117.9821,118.7592,121.9821"/>
+        </shape>
+    </region>
+    <region id="41">
+        <name value="Lane004"/>
+        <shape type="rect">
+            <quad value="26.0256,34.952,32.0256,114.9516"/>
+        </shape>
+    </region>
+    <region id="42">
+        <name value="Lane003"/>
+        <shape type="rect">
+            <quad value="34.9631,25.9826,126.9631,31.9826"/>
+        </shape>
+    </region>
+    <region id="43">
+        <name value="Lane002"/>
+        <shape type="rect">
+            <quad value="130.0278,35.041,136.0275,123.041"/>
+        </shape>
+    </region>
+    <region id="44">
+        <name value="SightRegion"/>
+        <shape type="rect">
+            <quad value="15.462,21.9497,140.4665,135.9223"/>
+        </shape>
+    </region>
+</Regions>

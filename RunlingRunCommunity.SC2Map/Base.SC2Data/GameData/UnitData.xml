@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Catalog>
+    <CUnit id="CommentatorBot1">
+        <Speed value="2.1015"/>
+    </CUnit>
+    <CUnit id="PointDefenseDrone">
+        <Speed value="1.5"/>
+        <Acceleration value="1000"/>
+        <AbilArray Link="move"/>
+        <CardLayouts index="0">
+            <LayoutButtons Face="Move" Type="AbilCmd" AbilCmd="move,Move" Row="0" Column="4"/>
+        </CardLayouts>
+        <Radius value="0"/>
+        <FlagArray index="IgnoreTerrainZInit" value="1"/>
+        <Height value="10"/>
+    </CUnit>
+</Catalog>
