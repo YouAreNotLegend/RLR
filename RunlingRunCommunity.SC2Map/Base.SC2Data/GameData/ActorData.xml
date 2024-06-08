@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Catalog>
+    <CActorUnit id="RedDroneOneActor" parent="GenericUnitStandard" unitName="RedDroneOne">
+        <Aliases value="_UnitMedium"/>
+        <EditorCategories value=""/>
+        <On index="64" Terms="Behavior.PointDefenseReady.On" Send="AnimBracketStart Work Work,Start Work Work,End"/>
+        <On index="65" Terms="Behavior.PointDefenseReady.Off" Send="AnimBracketStop Work"/>
+        <On index="66" removed="1"/>
+        <On index="67" removed="1"/>
+        <On index="68" removed="1"/>
+        <Model value="PointDefenseDrone"/>
+        <ModelFlags index="OutlineEmitter" value="1"/>
+        <BuildModel value="PointDefenseDrone"/>
+        <DeathArray index="Normal" ModelLink="PointDefenseDroneDeath" SoundLink="Raven_TargetingDroneExplode"/>
+        <PlacementModel value="PointDefenseDronePlacement"/>
+        <PlacementSound value="Terran_BuildingPlacement"/>
+        <PlacementActorModel value="PointDefenseDronePlacementModel"/>
+        <PlaceholderActorModel value="PointDefenseDronePlaceholderModel"/>
+        <PortraitModel value="AdjutantPortrait"/>
+        <BarOffset value="20"/>
+        <BarWidth value="36"/>
+        <GroupIcon>
+            <Image value="Assets\Textures\Wireframe-Terran-PointDefenseDrone.dds"/>
+        </GroupIcon>
+        <HeroIcon value="Assets\Textures\btn-unit-terran-targetingdrone.dds"/>
+        <HighlightTooltip value="Unit/Name/RedDroneOneActor"/>
+        <LifeArmorIcon value="Assets\Textures\btn-upgrade-terran-buildingarmor.dds"/>
+        <SoundArray index="What" value="Raven_PointDefenseDroneWhat"/>
+        <UnitIcon value="Assets\Textures\btn-unit-terran-targetingdrone.dds"/>
+        <Wireframe>
+            <Image value="Assets\Textures\Wireframe-Terran-PointDefenseDrone.dds"/>
+        </Wireframe>
+    </CActorUnit>
+    <CActorUnit id="ShapeCylinder2" parent="PolygonBase" unitName="ShapeCylinder2">
+        <EditorCategories value=""/>
+        <Model value="ShapeCylinder"/>
+        <BuildModel value="ShapeCylinder"/>
+        <PlacementModel value="ShapeCylinder"/>
+        <HighlightTooltip value="Unit/Name/Bogus"/>
+    </CActorUnit>
+</Catalog>

@@ -1,0 +1,1473 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+	<!--ChatEdit Box Changes-->
+	<Frame type="MessageDisplay" name="GameUI/UIContainer/FullscreenUpperContainer/ChatDisplay" file="GameUI">
+		<Anchor relative="$parent/$parent/ChatBox2000/Bottom" side="Bottom" pos="Max" offset="-20"/>
+		<Anchor relative="$parent/$parent/ChatBox2000/Right" side="Right" pos="Max" offset="-15"/>
+		<Anchor relative="$parent/$parent/ChatBox2000" side="Top" pos="Min" offset="20"/>
+		<Anchor relative="$parent/$parent/ChatBox2000" side="Left" pos="Min" offset="50"/>
+		<Visible val="False"/>
+		<RenderType val="LDR"/>
+
+		<Animation name="sussy">
+			<Event event="ShowReal" action="DirectionForward,Play" frame="$this"/>
+			<Event event="HideReal" action="DirectionReverse,Play" frame="$this"/>
+			<Controller type="Property" end="Pause" frame="$this" property="Visible">
+				<Key type="Property" time="0.0" value="false"/>
+				<Key type="Property" time="0.0" value="true"/>
+			</Controller>
+		</Animation>
+	</Frame>
+
+	<!--Custom Layouts-->
+    <Frame type="Frame" name="GameUI/UIContainer" file="GameUI">
+		
+		<!--ChatBox-->
+		<Frame type="Control" name="ChatBox2000" template="Templates/StandardDialogBaseTemplate">
+			<Anchor relative="$parent" side="Top" pos="Min" offset="0"/>
+			<Anchor relative="$parent" side="Left" pos="Min" offset="0"/>
+			<Anchor relative="Bottom" side="Bottom" pos="Max" offset="1"/>
+			<Anchor relative="Right" side="Right" pos="Max" offset="1"/>
+			
+			<Draggable val="True"/>
+			<DragConstraintFrame val="$parent"/>
+
+			<!--Bottom Resize-->
+			<Frame type="Control" name="Bottom">
+				<Anchor relative="$parent" side="Top" pos="Min" offset="200"/>
+				<Anchor relative="$parent" side="Left" pos="Min" offset="0"/>
+				<Anchor relative="$parent" side="Right" pos="Max" offset="0"/>
+
+				<Height val="40"/>
+				<Draggable val="True"/>
+				<DragConstraintFrame val="$parent"/>
+
+				<Frame type="Image" name="Image">
+					<Anchor relative="$parent" side="Left" pos="Mid" offset="-10"/>
+					<Anchor relative="$parent" side="Bottom" pos="Min" offset="35"/>
+					<Anchor relative="$parent" side="Right" pos="Mid" offset="10"/>
+
+					<Height val="10"/>
+
+					<Texture val="Assets\Textures\ui_glues_social_friendslist_arrowtab.dds"/>
+				</Frame>
+				<Frame type="Image" name="HoverImage">
+					<Anchor relative="$parent" side="Left" pos="Mid" offset="-5"/>
+					<Anchor relative="$parent" side="Bottom" pos="Min" offset="35"/>
+					<Anchor relative="$parent" side="Right" pos="Mid" offset="5"/>
+					
+					<Width val="15"/>
+
+					<Texture val="Assets\Textures\sc2_ui_glues_bluebuttons_arrow_down.dds"/>
+
+					<Alpha val="0"/>
+				</Frame>
+				<Animation name="Hover">
+					<Event event="OnMouseEnter" action="Reset,Play" frame="$this"/>
+					<Controller type="Property" end="Pause" frame="HoverImage" property="Alpha">
+						<Key type="Property" time="0.0" value="255"/>
+					</Controller>
+					<Controller type="Property" end="Pause" frame="Image" property="Alpha">
+						<Key type="Property" time="0.0" value="0"/>
+					</Controller>
+				</Animation>
+				<Animation name="Exit">
+					<Event event="OnMouseExit" action="Reset,Play" frame="$this"/>
+					<Controller type="Property" end="Pause" frame="HoverImage" property="Alpha">
+						<Key type="Property" time="0.0" value="0"/>
+					</Controller>
+					<Controller type="Property" end="Pause" frame="Image" property="Alpha">
+						<Key type="Property" time="0.0" value="255"/>
+					</Controller>
+				</Animation>
+			</Frame>
+			<!--Right Resize-->
+			<Frame type="Control" name="Right">
+				<Anchor relative="$parent" side="Top" pos="Min" offset="0"/>
+				<Anchor relative="$parent" side="Left" pos="Min" offset="500"/>
+				<Anchor relative="$parent" side="Bottom" pos="Max" offset="0"/>
+
+				<Width val="40"/>
+				<Draggable val="True"/>
+				<DragConstraintFrame val="$parent"/>
+
+				<Frame type="Image" name="Image">
+					<Anchor relative="$parent" side="Top" pos="Mid" offset="-5"/>
+					<Anchor relative="$parent" side="Bottom" pos="Mid" offset="5"/>
+					<Anchor relative="$parent" side="Right" pos="Min" offset="40"/>
+
+					<Width val="20"/>
+
+					<Texture val="Assets\Textures\ui_glues_social_friendslist_arrowtab.dds"/>
+					<Rotation val="270"/>
+				</Frame>
+				<Frame type="Image" name="HoverImage">
+					<Anchor relative="$parent" side="Top" pos="Mid" offset="-10"/>
+					<Anchor relative="$parent" side="Bottom" pos="Mid" offset="10"/>
+					<Anchor relative="$parent" side="Right" pos="Min" offset="40"/>
+					
+					<Width val="20"/>
+
+					<Texture val="Assets\Textures\sc2_ui_glues_bluebuttons_arrow_down.dds"/>
+					<Rotation val="270"/>
+
+					<Alpha val="0"/>
+				</Frame>
+				<Animation name="Hover">
+					<Event event="OnMouseEnter" action="Reset,Play" frame="$this"/>
+					<Controller type="Property" end="Pause" frame="HoverImage" property="Alpha">
+						<Key type="Property" time="0.0" value="255"/>
+					</Controller>
+					<Controller type="Property" end="Pause" frame="Image" property="Alpha">
+						<Key type="Property" time="0.0" value="0"/>
+					</Controller>
+				</Animation>
+				<Animation name="Exit">
+					<Event event="OnMouseExit" action="Reset,Play" frame="$this"/>
+					<Controller type="Property" end="Pause" frame="HoverImage" property="Alpha">
+						<Key type="Property" time="0.0" value="0"/>
+					</Controller>
+					<Controller type="Property" end="Pause" frame="Image" property="Alpha">
+						<Key type="Property" time="0.0" value="255"/>
+					</Controller>
+				</Animation>
+			</Frame>
+			<!--Close Button-->
+			<Frame type="Button" name="Close" template="Templates/SmallButton">
+				<Anchor relative="$parent" side="Top" pos="Min" offset="0"/>
+				<Anchor relative="$parent" side="Left" pos="Max" offset="-69"/>
+				<Anchor relative="$parent" side="Bottom" pos="Min" offset="37"/>
+				<Anchor relative="$parent" side="Right" pos="Max" offset="0"/>
+
+			</Frame>
+			<!-- Defunct scroll buttons, but not gonna delete atm
+			<Frame type="Button" name="ScrollDown">
+				<Anchor relative="$parent" side="Top" pos="Max" offset="-100"/>
+				<Anchor relative="$parent" side="Left" pos="Min" offset="10"/>
+				<Anchor relative="$parent" side="Bottom" pos="Max" offset="-50"/>
+				<Anchor relative="$parent" side="Right" pos="Min" offset="60"/>
+
+				<NormalImage val="NormalImage"/>
+				<HoverImage val="HoverImage"/>
+
+				<Frame type="Image" name="NormalImage">
+					<Anchor relative="$parent" side="Top" pos="Min" offset="0"/>
+					<Anchor relative="$parent" side="Left" pos="Min" offset="5"/>
+					<Anchor relative="$parent" side="Bottom" pos="Max" offset="0"/>
+					<Anchor relative="$parent" side="Right" pos="Max" offset="-4"/>
+
+					<Texture val="Assets\Textures\sc2_ui_glues_icons_singlearrowdisabled.dds"/>
+					<Rotation val="-90"/>
+				</Frame>
+
+				<Frame type="Image" name="HoverImage">
+					<Anchor relative="$parent" side="Top" pos="Min" offset="0"/>
+					<Anchor relative="$parent" side="Left" pos="Min" offset="5"/>
+					<Anchor relative="$parent" side="Bottom" pos="Max" offset="0"/>
+					<Anchor relative="$parent" side="Right" pos="Max" offset="-4"/>
+
+					<Texture val="Assets\Textures\sc2_ui_glues_icons_singlearrow.dds"/>
+					<Rotation val="-90"/>
+				</Frame>
+			</Frame>
+
+			<Frame type="Button" name="ScrollBottom">
+				<Anchor relative="$parent" side="Top" pos="Max" offset="-60"/>
+				<Anchor relative="$parent" side="Left" pos="Min" offset="10"/>
+				<Anchor relative="$parent" side="Bottom" pos="Max" offset="-10"/>
+				<Anchor relative="$parent" side="Right" pos="Min" offset="60"/>
+
+				<NormalImage val="NormalImage"/>
+				<HoverImage val="HoverImage"/>
+
+				<Frame type="Image" name="NormalImage">
+					<Anchor relative="$parent" side="Top" pos="Min" offset="0"/>
+					<Anchor relative="$parent" side="Left" pos="Min" offset="0"/>
+					<Anchor relative="$parent" side="Bottom" pos="Max" offset="0"/>
+					<Anchor relative="$parent" side="Right" pos="Max" offset="0"/>
+
+					<Texture val="Assets\Textures\sc2_ui_glues_icons_doublearrowdisabled.dds"/>
+					<Rotation val="-90"/>
+				</Frame>
+
+				<Frame type="Image" name="HoverImage">
+					<Anchor relative="$parent" side="Top" pos="Min" offset="0"/>
+					<Anchor relative="$parent" side="Left" pos="Min" offset="0"/>
+					<Anchor relative="$parent" side="Bottom" pos="Max" offset="0"/>
+					<Anchor relative="$parent" side="Right" pos="Max" offset="0"/>
+
+					<Texture val="Assets\Textures\sc2_ui_glues_icons_doublearrow.dds"/>
+					<Rotation val="-90"/>
+				</Frame>
+			</Frame>
+
+			<Frame type="Button" name="ScrollUp">
+				<Anchor relative="$parent" side="Top" pos="Min" offset="10"/>
+				<Anchor relative="$parent" side="Left" pos="Min" offset="10"/>
+				<Anchor relative="$parent" side="Bottom" pos="Min" offset="60"/>
+				<Anchor relative="$parent" side="Right" pos="Min" offset="60"/>
+
+				<NormalImage val="NormalImage"/>
+				<HoverImage val="HoverImage"/>
+
+				<Frame type="Image" name="NormalImage">
+					<Anchor relative="$parent" side="Top" pos="Min" offset="0"/>
+					<Anchor relative="$parent" side="Left" pos="Min" offset="5"/>
+					<Anchor relative="$parent" side="Bottom" pos="Max" offset="0"/>
+					<Anchor relative="$parent" side="Right" pos="Max" offset="-4"/>
+
+					<Texture val="Assets\Textures\sc2_ui_glues_icons_singlearrowdisabled.dds"/>
+					<Rotation val="90"/>
+				</Frame>
+
+				<Frame type="Image" name="HoverImage">
+					<Anchor relative="$parent" side="Top" pos="Min" offset="0"/>
+					<Anchor relative="$parent" side="Left" pos="Min" offset="5"/>
+					<Anchor relative="$parent" side="Bottom" pos="Max" offset="0"/>
+					<Anchor relative="$parent" side="Right" pos="Max" offset="-4"/>
+
+					<Texture val="Assets\Textures\sc2_ui_glues_icons_singlearrow.dds"/>
+					<Rotation val="90"/>
+				</Frame>
+			</Frame>
+			-->
+			<!--Show/Hide Chat Frame Button-->
+			<Frame type="Button" name="Hide">
+				<Anchor relative="$parent" side="Top" pos="Min" offset="10"/>
+				<Anchor relative="$parent" side="Left" pos="Min" offset="10"/>
+				<Anchor relative="$parent" side="Bottom" pos="Min" offset="60"/>
+				<Anchor relative="$parent" side="Right" pos="Min" offset="60"/>
+
+				<NormalImage val="NormalImage"/>
+				<HoverImage val="HoverImage"/>
+				<Frame type="Image" name="NormalImage">
+					<Anchor relative="$parent" side="Top" pos="Min" offset="10"/>
+					<Anchor relative="$parent" side="Left" pos="Min" offset="10"/>
+					<Anchor relative="$parent" side="Bottom" pos="Max" offset="-10"/>
+					<Anchor relative="$parent" side="Right" pos="Max" offset="-10"/>
+
+					<Texture val="UI/OpenedEyeV5.dds"/>
+				</Frame>
+				<Frame type="Image" name="HoverImage">
+					<Anchor relative="$parent" side="Top" pos="Min" offset="10"/>
+					<Anchor relative="$parent" side="Left" pos="Min" offset="10"/>
+					<Anchor relative="$parent" side="Bottom" pos="Max" offset="-10"/>
+					<Anchor relative="$parent" side="Right" pos="Max" offset="-10"/>
+
+					<Texture val="UI/OpenedEyeV2.dds"/>
+				</Frame>
+
+				<Animation name="fuckyou">
+					<Event event="Visible" action="DirectionForward,Play" frame="$this"/>
+					<Event event="Invisible" action="DirectionReverse,Play" frame="$this"/>
+					<Controller type="Property" end="Pause" frame="$parent/Close" property="Visible">
+						<Key type="Property" time="0.0" value="false"/>
+						<Key type="Property" time="0.1" value="true"/>
+					</Controller>
+					<Controller type="Property" end="Pause" frame="$parent/BackgroundImage" property="Visible">
+						<Key type="Property" time="0.0" value="false"/>
+						<Key type="Property" time="0.1" value="true"/>
+					</Controller>
+					<Controller type="Property" end="Pause" frame="$parent/Bottom" property="Visible">
+						<Key type="Property" time="0.0" value="false"/>
+						<Key type="Property" time="0.1" value="true"/>
+					</Controller>
+					<Controller type="Property" end="Pause" frame="$parent/Right" property="Visible">
+						<Key type="Property" time="0.0" value="false"/>
+						<Key type="Property" time="0.1" value="true"/>
+					</Controller>
+					<Controller type="Texture" end="Pause" frame="$this/NormalImage">
+						<Key type="Image" time="0.0" image="UI/ClosedEyeV1002.dds"/>
+						<Key type="Image" time="0.1" image="UI/OpenedEyeV5.dds"/>
+					</Controller>
+					<Controller type="Texture" end="Pause" frame="$this/HoverImage">
+						<Key type="Image" time="0.0" image="UI/ClosedEyeV1001.dds"/>
+						<Key type="Image" time="0.1" image="UI/OpenedEyeV2.dds"/>
+					</Controller>
+				</Animation>
+
+			</Frame>
+			<!--Chat Display Type Button-->
+			<Frame type="Button" name="Fade">
+				<Anchor relative="$parent" side="Top" pos="Min" offset="40"/>
+				<Anchor relative="$parent" side="Left" pos="Min" offset="9"/>
+				<Anchor relative="$parent" side="Bottom" pos="Min" offset="90"/>
+				<Anchor relative="$parent" side="Right" pos="Min" offset="59"/>
+
+				<NormalImage val="NormalImage"/>
+				<HoverImage val="HoverImage"/>
+
+				<Frame type="Image" name="NormalImage">
+					<Anchor relative="$parent" side="Top" pos="Min" offset="10"/>
+					<Anchor relative="$parent" side="Left" pos="Min" offset="5"/>
+					<Anchor relative="$parent" side="Bottom" pos="Max" offset="-10"/>
+					<Anchor relative="$parent" side="Right" pos="Max" offset="-5"/>
+
+					<Texture val="UI/T.dds"/>
+				</Frame>
+
+				<Frame type="Image" name="HoverImage">
+					<Anchor relative="$parent" side="Top" pos="Min" offset="10"/>
+					<Anchor relative="$parent" side="Left" pos="Min" offset="5"/>
+					<Anchor relative="$parent" side="Bottom" pos="Max" offset="-10"/>
+					<Anchor relative="$parent" side="Right" pos="Max" offset="-5"/>
+
+					<Texture val="UI/TV1.dds"/>
+				</Frame>
+				<Animation name="booga">
+					<Event event="T2" action="Reset,Play" frame="$this"/>
+					<Controller type="Texture" end="Pause" frame="$this/NormalImage">
+						<Key type="Image" time="0.0" image="UI/TV2.dds"/>
+					</Controller>
+					<Controller type="Texture" end="Pause" frame="$this/HoverImage">
+						<Key type="Image" time="0.0" image="UI/TV3.dds"/>
+					</Controller>
+				</Animation>
+				<Animation name="blah">
+					<Event event="T" action="Reset,Play" frame="$this"/>
+					<Controller type="Texture" end="Pause" frame="$this/NormalImage">
+						<Key type="Image" time="0.0" image="UI/T.dds"/>
+					</Controller>
+					<Controller type="Texture" end="Pause" frame="$this/HoverImage">
+						<Key type="Image" time="0.0" image="UI/TV1.dds"/>
+					</Controller>
+				</Animation>
+				<Animation name="ooga">
+					<Event event="T3" action="Reset,Play" frame="$this"/>
+					<Controller type="Texture" end="Pause" frame="$this/NormalImage">
+						<Key type="Image" time="0.0" image="UI/TOG.dds"/>
+					</Controller>
+					<Controller type="Texture" end="Pause" frame="$this/HoverImage">
+						<Key type="Image" time="0.0" image="UI/TOG2.dds"/>
+					</Controller>
+				</Animation>
+			</Frame>
+			<!--Chat Display-->
+			<Frame type="Frame" name="Chat">
+				<Anchor relative="$parent" side="Left" pos="Min" offset="50"/>
+				<Anchor relative="$parent/Bottom" side="Bottom" pos="Max" offset="-5"/>
+				<Anchor relative="$parent/Right" side="Right" pos="Max" offset="-5"/>
+				<Anchor relative="$parent" side="Top" pos="Min" offset="20"/>
+				
+
+				<Animation name="stonks">
+					<Event event="ShowFake" action="DirectionReverse,Play" frame="$this"/>
+					<Event event="HideFake" action="DirectionForward,Play" frame="$this"/>
+					<Controller type="Property" end="Pause" frame="$this" property="Visible">
+						<Key type="Property" time="0.0" value="true"/>
+						<Key type="Property" time="0.0" value="false"/>
+					</Controller>
+				</Animation>
+				<!--Chat-->
+				<Frame type="Label" name="Log">
+					<Anchor relative="$parent" side="Left" pos="Min" offset="0"/>
+					<Anchor relative="$parent/$parent/Bottom" side="Bottom" pos="Max" offset="-10"/>
+					<Anchor relative="$parent/$parent/Right" side="Right" pos="Max" offset="-10"/>
+
+					<Style val="TinyFontOne"/>
+
+					<Animation name="FadeOut">
+						<Event event="Fade" action="Reset,Play" frame="$this"/>
+						<Event event="CancelFade" action="Stop" frame="$this"/>
+						<Controller type="Fade" end="Pause" frame="$this">
+							<Key type="Curve" time="0.0" value="255"/>
+							<Key type="Curve" time="5.0" value="255"/>
+							<Key type="Curve" time="10.0" value="0"/>
+						</Controller>
+					</Animation>
+					<Animation name="bringback">
+						<Event event="Unfade" action="Reset,Play" frame="$this"/>
+						<Controller type="Property" end="Pause" frame="$this" property="Alpha">
+							<Key type="Property" time="0.0" value="255"/>
+						</Controller>
+					</Animation>
+				</Frame>
+			</Frame>
+			
+			<!--Rest of Frame-->
+			<Frame type="Image" name="LeftBGGlowPattern">
+				<Anchor relative="$parent" side="Right" pos="Max" offset="0"/>
+				<Anchor relative="$parent" side="Top" pos="Mid" offset="0"/>
+				<Anchor relative="$parent" side="Bottom" pos="Mid" offset="0"/>
+				<Alpha val="0"/>
+			</Frame>
+
+			<Frame type="Image" name="RightBGGlowPattern">
+				<Anchor relative="$parent" side="Left" pos="Min" offset="0"/>
+				<Anchor relative="$parent" side="Top" pos="Mid" offset="0"/>
+				<Anchor relative="$parent" side="Bottom" pos="Mid" offset="0"/>
+				<Alpha val="0"/>
+			</Frame>
+
+			<Frame type="Image" name="FullscreenBlackoutImage">
+				<Alpha val="0"/>
+				<AcceptsMouse val="False"/>
+			</Frame>
+
+			<Frame type="Image" name="TopHexPattern">
+				<Alpha val="0"/>
+			</Frame>
+
+			<Frame type="Image" name="BottomHexPattern">
+				<Alpha val="0"/>
+			</Frame>
+
+			<Frame type="Image" name="BackgroundImage">
+				<Anchor relative="$parent" side="Bottom" pos="Max" offset="0"/>
+				<Anchor relative="$parent" side="Top" pos="Min" offset="0"/>
+				<Anchor relative="$parent" side="Left" pos="Min" offset="0"/>
+				<Anchor relative="$parent" side="Right" pos="Max" offset="0"/>
+				<Unclipped val="true"/>
+				<Alpha val="200"/>
+				<RenderType val="HDR"/>
+			</Frame>
+		</Frame>
+
+		<!--Settings-->
+		<Frame type="Frame" name="Settings" template="Templates/StandardDialogBaseTemplate">
+			<Anchor relative="$parent" side="Top" pos="Min" offset="0"/>
+			<Anchor relative="$parent" side="Left" pos="Mid" offset="400"/>
+			<Anchor relative="$parent" side="Bottom" pos="Mid" offset="-450"/>
+			<Anchor relative="$parent" side="Right" pos="Max" offset="0"/>
+			<Visible val="False"/>
+
+			<Frame type="Slider" name="CamDistanceSlider" template="StandardTemplates/StandardSliderTemplate">
+				<Anchor relative="$parent" side="Top" pos="Min" offset="50"/>
+				<Anchor relative="$parent" side="Left" pos="Min" offset="20"/>
+				<Anchor relative="$parent" side="Bottom" pos="Min" offset="100"/>
+				<Anchor relative="$parent" side="Right" pos="Max" offset="-20"/>
+
+				<Value val="100"/>
+				<MinValue val="0"/>
+				<MaxValue val="250"/>
+				<StepValue val="1"/>
+
+				<Frame type="EditBox" name="Distance">
+					<Anchor relative="$parent"/>
+					<Visible val="True"/>
+	
+					<Text val="{$parent/@Value}"/>
+				</Frame>
+
+				<Frame type="Image" name="FillImage">
+
+					<Texture val="Assets\Textures\ui_battlenet_glue_sliderfill.dds"/>
+					<TextureType val="Border"/>
+				</Frame>
+
+				<Frame type="Button" name="Button">
+
+					<Frame type="Image" name="NormalImage">
+						<Texture val="Assets\Textures\ui_replay_sliderhandlebutton_normalpressed.dds"/>
+					</Frame>
+
+					<Frame type="Image" name="HoverImage">
+						<Texture val="Assets\Textures\ui_replay_sliderhandlebutton_normaloverpressedover.dds"/>
+					</Frame>
+				</Frame>
+
+				
+			</Frame>
+
+			<Frame type="Label" name="deleteme">
+				<Anchor relative="$parent" side="Top" pos="Min" offset="100"/>
+				<Anchor relative="$parent" side="Left" pos="Min" offset="150"/>
+				<Anchor relative="$parent" side="Bottom" pos="Max" offset="0"/>
+				<Anchor relative="$parent" side="Right" pos="Max" offset="0"/>
+
+				<Text val="More to be added later"/>
+				<Style val="TinyFontOne"/>
+			</Frame>
+			<!--Rest of Frame-->
+			<Frame type="Image" name="LeftBGGlowPattern">
+				<Anchor relative="$parent" side="Right" pos="Max" offset="0"/>
+				<Anchor relative="$parent" side="Top" pos="Mid" offset="0"/>
+				<Anchor relative="$parent" side="Bottom" pos="Mid" offset="0"/>
+				<Alpha val="0"/>
+			</Frame>
+
+			<Frame type="Image" name="RightBGGlowPattern">
+				<Anchor relative="$parent" side="Left" pos="Min" offset="0"/>
+				<Anchor relative="$parent" side="Top" pos="Mid" offset="0"/>
+				<Anchor relative="$parent" side="Bottom" pos="Mid" offset="0"/>
+				<Alpha val="0"/>
+			</Frame>
+
+			<Frame type="Image" name="FullscreenBlackoutImage">
+				<Alpha val="0"/>
+				<AcceptsMouse val="False"/>
+			</Frame>
+
+			<Frame type="Image" name="TopHexPattern">
+				<Alpha val="0"/>
+			</Frame>
+
+			<Frame type="Image" name="BottomHexPattern">
+				<Alpha val="0"/>
+			</Frame>
+
+			<Frame type="Image" name="BackgroundImage">
+				<Anchor relative="$parent" side="Bottom" pos="Max" offset="0"/>
+				<Anchor relative="$parent" side="Top" pos="Min" offset="0"/>
+				<Anchor relative="$parent" side="Left" pos="Min" offset="0"/>
+				<Anchor relative="$parent" side="Right" pos="Max" offset="0"/>
+				<Unclipped val="true"/>
+				<Alpha val="200"/>
+				<RenderType val="HDR"/>
+			</Frame>
+		</Frame>
+		
+		<!--Opening Menu-->
+		<Frame type="Frame" name="ContainerFrame">
+			<Anchor relative="$parent" side="Top" pos="Min" offset="0"/>
+			<Anchor relative="$parent" side="Left" pos="Min" offset="0"/>
+			<Anchor relative="$parent" side="Bottom" pos="Max" offset="0"/>
+			<Anchor relative="$parent" side="Right" pos="Max" offset="0"/>	
+
+			<!--Background Image-->
+			<Frame type="Image" name="TRyMe">
+				<Anchor relative="$parent" side="Top" pos="Min" offset="-200"/>
+				<Anchor relative="$parent" side="Left" pos="Min" offset="200"/>
+				<Anchor relative="$parent" side="Bottom" pos="Max" offset="-200"/>
+				<Anchor relative="$parent" side="Right" pos="Max" offset="-200"/>
+				<Texture val="Assets\Textures\ui_battlenet_glue_campaign_subselectionbutton_background.dds"/>
+				<Alpha val="35"/>
+				<Height val="1750"/>
+				<Width val="3000"/>
+			</Frame>
+			<!--Opening Title-->
+			<Frame type="Label" name="Title">
+				<Anchor relative="$parent" side="Top" pos="Min" offset="40"/>
+				<Anchor relative="$parent" side="Left" pos="Mid" offset="-525"/>
+				<Anchor relative="$parent" side="Right" pos="Mid" offset="565"/>
+
+				<Style val="TestyFont"/>
+				<Text val="RUNLING RUN"/>
+			</Frame>
+			<!--Character Select-->
+			<Frame type="Frame" name="CharSelectFrame" template="Templates/StandardDialogBaseTemplate">
+
+				<Anchor relative="$parent" side="Top" pos="Min" offset="250"/>
+				<Anchor relative="$parent" side="Left" pos="Min" offset="35"/>
+				<Anchor relative="$parent" side="Right" pos="Max" offset="-35"/>
+				<Anchor relative="$parent" side="Bottom" pos="Mid" offset="-250"/>
+				<!--Zergling Button-->
+				<Frame type="Button" name="Zergling" template="Templates/CharSelectButtonVersionTwo">
+					<Anchor relative="$parent" side="Top" pos="Min" offset="0"/>
+					<Anchor relative="$parent" side="Left" pos="Min" offset="-1710"/>
+					<Anchor relative="$parent" side="Bottom" pos="Max" offset="0"/>
+					<Anchor relative="$parent" side="Right" pos="Max" offset="0"/>
+
+					<Height val="125"/>
+					<Width val="300"/>
+
+					<Frame type="Image" name="NormalImage">
+						<Texture val="UI/ZergUnits/Zergling/Zergling.dds"/>
+						<TextureType val="Normal"/>
+						<Alpha val="50"/>
+					</Frame>
+
+					<Frame type="Image" name="HoverImage">
+						<Texture val="UI/ZergUnits/Zergling/Zergling.dds"/>
+						<TextureType val="Normal"/>
+						<Alpha val="150"/>
+					</Frame>
+					<RenderPriority val="511"/>
+					<Frame type="Label" name="Label">
+						<Text val="Zergling"/>
+						<Style val="TinyFontOne"/>
+					</Frame>
+
+					<Animation name="ClickSound">
+						<Event event="OnClick" action="Reset,Play" frame="$this"/>
+						<Controller type="Sound" end="Stop" frame="$this">
+							<Key type="Sound" time="0.0" sound="@Zergling_Attack"/>
+						</Controller>
+					</Animation>
+				</Frame>
+				<!--Hydralisk Button-->
+				<Frame type="Button" name="Hydralisk" template="Templates/CharSelectButtonVersionTwo">
+					<Anchor relative="$parent" side="Top" pos="Min" offset="0"/>
+					<Anchor relative="$parent" side="Left" pos="Min" offset="-1225"/>
+					<Anchor relative="$parent" side="Bottom" pos="Max" offset="0"/>
+					<Anchor relative="$parent" side="Right" pos="Max" offset="0"/>
+
+					<Height val="125"/>
+					<Width val="300"/>
+
+					<Frame type="Image" name="NormalImage">
+						<Texture val="UI/ZergUnits/Hydralisk/Hydralisk.dds"/>
+						<TextureType val="Normal"/>
+						<Alpha val="50"/>
+					</Frame>
+
+					<Frame type="Image" name="HoverImage">
+						<Texture val="UI/ZergUnits/Hydralisk/Hydralisk.dds"/>
+						<TextureType val="Normal"/>
+						<Alpha val="150"/>
+					</Frame>
+					<RenderPriority val="511"/>
+					<Frame type="Label" name="Label">
+						<Text val="Hydralisk"/>
+						<Style val="TinyFontOne"/>
+					</Frame>
+
+					<Animation name="ClickSound">
+						<Event event="OnClick" action="Reset,Play" frame="$this"/>
+						<Controller type="Sound" end="Stop" frame="$this">
+							<Key type="Sound" time="0.0" sound="@Hydralisk_Attack"/>
+						</Controller>
+					</Animation>
+				</Frame>
+				<!--Baneling Button-->
+				<Frame type="Button" name="Baneling" template="Templates/CharSelectButtonVersionTwo">
+					<Anchor relative="$parent" side="Top" pos="Min" offset="0"/>
+					<Anchor relative="$parent" side="Left" pos="Min" offset="-735"/>
+					<Anchor relative="$parent" side="Bottom" pos="Max" offset="0"/>
+					<Anchor relative="$parent" side="Right" pos="Max" offset="0"/>
+
+					<Height val="125"/>
+					<Width val="300"/>
+
+					<Frame type="Image" name="NormalImage">
+						<Texture val="UI/ZergUnits/Baneling/Baneling.dds"/>
+						<TextureType val="Normal"/>
+						<Alpha val="50"/>
+					</Frame>
+
+					<Frame type="Image" name="HoverImage">
+						<Texture val="UI/ZergUnits/Baneling/Baneling.dds"/>
+						<TextureType val="Normal"/>
+						<Alpha val="150"/>
+					</Frame>
+					<RenderPriority val="511"/>
+					<Frame type="Label" name="Label">
+						<Text val="Baneling"/>
+						<Style val="TinyFontOne"/>
+					</Frame>
+
+					<Animation name="ClickSound">
+						<Event event="OnClick" action="Reset,Play" frame="$this"/>
+						<Controller type="Sound" end="Stop" frame="$this">
+							<Key type="Sound" time="0.0" sound="@Baneling_Attack"/>
+						</Controller>
+					</Animation>
+				</Frame>
+				<!--Ultralisk Button-->
+				<Frame type="Button" name="Ultralisk" template="Templates/CharSelectButtonVersionTwo">
+					<Anchor relative="$parent" side="Top" pos="Min" offset="0"/>
+					<Anchor relative="$parent" side="Left" pos="Min" offset="-245"/>
+					<Anchor relative="$parent" side="Bottom" pos="Max" offset="0"/>
+					<Anchor relative="$parent" side="Right" pos="Max" offset="0"/>
+
+					<Height val="125"/>
+					<Width val="300"/>
+
+					<Frame type="Image" name="NormalImage">
+						<Texture val="UI/ZergUnits/Ultralisk/Ultralisk.dds"/>
+						<TextureType val="Normal"/>
+						<Alpha val="50"/>
+					</Frame>
+
+					<Frame type="Image" name="HoverImage">
+						<Texture val="UI/ZergUnits/Ultralisk/Ultralisk.dds"/>
+						<TextureType val="Normal"/>
+						<Alpha val="150"/>
+					</Frame>
+					<RenderPriority val="511"/>
+					<Frame type="Label" name="Label">
+						<Text val="Ultralisk"/>
+						<Style val="TinyFontOne"/>
+					</Frame>
+
+
+					<Animation name="ClickSound">
+						<Event event="OnClick" action="Reset,Play" frame="$this"/>
+						<Controller type="Sound" end="Stop" frame="$this">
+							<Key type="Sound" time="0.0" sound="@Ultralisk_Attack"/>
+						</Controller>
+					</Animation>
+				</Frame>
+				<!--Lurker Button-->
+				<Frame type="Button" name="Lurker" template="Templates/CharSelectButtonVersionTwo">
+					<Anchor relative="$parent" side="Top" pos="Min" offset="0"/>
+					<Anchor relative="$parent" side="Left" pos="Min" offset="245"/>
+					<Anchor relative="$parent" side="Bottom" pos="Max" offset="0"/>
+					<Anchor relative="$parent" side="Right" pos="Max" offset="0"/>
+		
+					<Height val="125"/>
+					<Width val="300"/>
+		
+					<Frame type="Image" name="NormalImage">
+						<Texture val="UI/lurkeryes.dds"/>
+						<TextureType val="Normal"/>
+						<Alpha val="50"/>
+					</Frame>
+		
+					<Frame type="Image" name="HoverImage">
+						<Texture val="UI/lurkeryes.dds"/>
+						<TextureType val="Normal"/>
+						<Alpha val="150"/>
+					</Frame>
+					<RenderPriority val="511"/>
+					<Frame type="Label" name="Label">
+						<Text val="Lurker"/>
+						<Style val="TinyFontOne"/>
+					</Frame>
+
+					<Animation name="ClickSound">
+						<Event event="OnClick" action="Reset,Play" frame="$this"/>
+						<Controller type="Sound" end="Stop" frame="$this">
+							<Key type="Sound" time="0.0" sound="@Lurker_Attack"/>
+						</Controller>
+					</Animation>
+				</Frame>
+				<!--Roach Button-->
+				<Frame type="Button" name="Roach" template="Templates/CharSelectButtonVersionTwo">
+					<Anchor relative="$parent" side="Top" pos="Min" offset="0"/>
+					<Anchor relative="$parent" side="Left" pos="Min" offset="735"/>
+					<Anchor relative="$parent" side="Bottom" pos="Max" offset="0"/>
+					<Anchor relative="$parent" side="Right" pos="Max" offset="0"/>
+		
+					<Height val="125"/>
+					<Width val="300"/>
+		
+					<Frame type="Image" name="NormalImage">
+						<Texture val="UI/roachyes.dds"/>
+						<TextureType val="Normal"/>
+						<Alpha val="50"/>
+					</Frame>
+		
+					<Frame type="Image" name="HoverImage">
+						<Texture val="UI/roachyes.dds"/>
+						<TextureType val="Normal"/>
+						<Alpha val="150"/>
+					</Frame>
+					<RenderPriority val="509"/>
+					<Frame type="Label" name="Label">
+						<Text val="Roach"/>
+						<Style val="TinyFontOne"/>
+					</Frame>
+
+					<Animation name="ClickSound">
+						<Event event="OnClick" action="Reset,Play" frame="$this"/>
+						<Controller type="Sound" end="Stop" frame="$this">
+							<Key type="Sound" time="0.0" sound="@Roach_Attack"/>
+						</Controller>
+					</Animation>
+				</Frame>
+				<!--Infested Button-->
+				<Frame type="Button" name="Infested" template="Templates/CharSelectButtonVersionTwo">
+					<Anchor relative="$parent" side="Top" pos="Min" offset="0"/>
+					<Anchor relative="$parent" side="Left" pos="Min" offset="1225"/>
+					<Anchor relative="$parent" side="Bottom" pos="Max" offset="0"/>
+					<Anchor relative="$parent" side="Right" pos="Max" offset="0"/>
+		
+					<Height val="125"/>
+					<Width val="300"/>
+		
+					<Frame type="Image" name="NormalImage">
+						<Texture val="UI/infestedyes.dds"/>
+						<TextureType val="Normal"/>
+						<Alpha val="50"/>
+					</Frame>
+		
+					<Frame type="Image" name="HoverImage">
+						<Texture val="UI/infestedyes.dds"/>
+						<TextureType val="Normal"/>
+						<Alpha val="150"/>
+					</Frame>
+					<RenderPriority val="508"/>
+					<Frame type="Label" name="Label">
+						<Text val="Infested"/>
+						<Style val="TinyFontOne"/>
+					</Frame>
+
+					<Animation name="ClickSound">
+						<Event event="OnClick" action="Reset,Play" frame="$this"/>
+						<Controller type="Sound" end="Stop" frame="$this">
+							<Key type="Sound" time="0.0" sound="@InfestedTerran_Attack"/>
+						</Controller>
+					</Animation>
+				</Frame>
+				<!--Drone Button-->
+				<Frame type="Button" name="Drone" template="Templates/CharSelectButtonVersionTwo">
+					<Anchor relative="$parent" side="Top" pos="Min" offset="0"/>
+					<Anchor relative="$parent" side="Left" pos="Min" offset="1715"/>
+					<Anchor relative="$parent" side="Bottom" pos="Max" offset="0"/>
+					<Anchor relative="$parent" side="Right" pos="Max" offset="0"/>
+		
+					<Height val="125"/>
+					<Width val="300"/>
+		
+					<Frame type="Image" name="NormalImage">
+						<Texture val="UI/Droneyes.dds"/>
+						<TextureType val="Normal"/>
+						<Alpha val="50"/>
+					</Frame>
+		
+					<Frame type="Image" name="HoverImage">
+						<Texture val="UI/Droneyes.dds"/>
+						<TextureType val="Normal"/>
+						<Alpha val="150"/>
+					</Frame>
+					<RenderPriority val="507"/>
+					<Frame type="Label" name="Label">
+						<Text val="Drone"/>
+						<Style val="TinyFontOne"/>
+					</Frame>
+
+					<Animation name="ClickSound">
+						<Event event="OnClick" action="Reset,Play" frame="$this"/>
+						<Controller type="Sound" end="Stop" frame="$this">
+							<Key type="Sound" time="0.0" sound="@Drone_Attack"/>
+						</Controller>
+					</Animation>
+				</Frame>
+				<!--Rest of Frame-->
+				<Frame type="Image" name="LeftBGGlowPattern">
+					<Anchor relative="$parent" side="Right" pos="Max" offset="0"/>
+					<Anchor relative="$parent" side="Top" pos="Mid" offset="0"/>
+					<Anchor relative="$parent" side="Bottom" pos="Mid" offset="0"/>
+					<Alpha val="0"/>
+				</Frame>
+
+				<Frame type="Image" name="RightBGGlowPattern">
+					<Anchor relative="$parent" side="Left" pos="Min" offset="0"/>
+					<Anchor relative="$parent" side="Top" pos="Mid" offset="0"/>
+					<Anchor relative="$parent" side="Bottom" pos="Mid" offset="0"/>
+					<Alpha val="0"/>
+				</Frame>
+
+				<Frame type="Image" name="FullscreenBlackoutImage">
+					<Alpha val="0"/>
+					<AcceptsMouse val="False"/>
+				</Frame>
+
+				<Frame type="Image" name="BackgroundImage">
+					<Anchor relative="$parent" side="Bottom" pos="Max" offset="25"/>
+					<Anchor relative="$parent" side="Top" pos="Min" offset="-25"/>
+					<Anchor relative="$parent" side="Left" pos="Min" offset="0"/>
+					<Anchor relative="$parent" side="Right" pos="Max" offset="0"/>
+
+					<Unclipped val="true"/>
+					<Alpha val="200"/>
+					<RenderPriority val="500"/>
+
+				</Frame>
+
+				<Frame type="Image" name="TopHexPattern">
+					<Alpha val="0"/>
+				</Frame>
+				<Frame type="Image" name="BottomHexPattern">
+					<Alpha val="0"/>
+				</Frame>
+			</Frame>
+			<!--Character Display/Info Panel-->
+			<Frame type="Frame" name="CharDisplayFrame" template="Templates/StandardDialogBaseTemplate">
+				<Anchor relative="$parent" side="Top" pos="Mid" offset="-200"/>
+				<Anchor relative="$parent" side="Left" pos="Min" offset="0"/>
+				<Anchor relative="$parent" side="Right" pos="Mid" offset="-200"/>
+				<Anchor relative="$parent" side="Bottom" pos="Max" offset="0"/>
+
+				<Frame type="Image" name="LeftBGGlowPattern">
+					<Anchor relative="$parent" side="Right" pos="Max" offset="0"/>
+					<Anchor relative="$parent" side="Top" pos="Mid" offset="0"/>
+					<Anchor relative="$parent" side="Bottom" pos="Mid" offset="0"/>
+					<Alpha val="0"/>
+				</Frame>
+
+				<Frame type="Image" name="RightBGGlowPattern">
+					<Anchor relative="$parent" side="Left" pos="Min" offset="0"/>
+					<Anchor relative="$parent" side="Top" pos="Mid" offset="0"/>
+					<Anchor relative="$parent" side="Bottom" pos="Mid" offset="0"/>
+					<Alpha val="0"/>
+				</Frame>
+
+				<Frame type="Image" name="FullscreenBlackoutImage">
+					<Alpha val="0"/>
+					<AcceptsMouse val="False"/>
+				</Frame>
+
+				<Frame type="Image" name="TopHexPattern">
+					<Alpha val="0"/>
+				</Frame>
+
+				<Frame type="Image" name="BottomHexPattern">
+					<Alpha val="0"/>
+				</Frame>
+
+				<Frame type="Image" name="BackgroundImage">
+					<Anchor relative="$parent" side="Bottom" pos="Max" offset="0"/>
+					<Anchor relative="$parent" side="Top" pos="Min" offset="0"/>
+					<Anchor relative="$parent" side="Left" pos="Min" offset="0"/>
+					<Anchor relative="$parent" side="Right" pos="Max" offset="0"/>
+					<Unclipped val="true"/>
+					<Alpha val="200"/>
+				</Frame>
+			</Frame>
+			<!--Game Types-->
+			<Frame type="Frame" name="GameTypeFrame" template="Templates/StandardDialogBaseTemplate">
+				<Anchor relative="$parent" side="Top" pos="Mid" offset="-200"/>
+				<Anchor relative="$parent" side="Left" pos="Min" offset="850"/>
+				<Anchor relative="$parent" side="Right" pos="Mid" offset="50"/>
+				<Anchor relative="$parent" side="Bottom" pos="Max" offset="0"/>
+
+					
+				<!--Type Button One-->
+				<Frame type="Button" name="TypeOne" template="Templates/DiffSelectionButton">
+					<Anchor relative="$parent" side="Top" pos="Min" offset="25"/>
+					<Anchor relative="$parent" side="Left" pos="Min" offset="0"/>
+					<Anchor relative="$parent" side="Right" pos="Max" offset="0"/>
+					<Anchor relative="$parent" side="Bottom" pos="Min" offset="100"/>
+
+					<Frame type="Label" name="Label">
+						<Anchor relative="$parent" side="Top" pos="Min" offset="35"/>
+						<Anchor relative="$parent" side="Left" pos="Min" offset="30"/>
+						<Anchor relative="$parent" side="Right" pos="Max" offset="0"/>
+						<Anchor relative="$parent" side="Bottom" pos="Max" offset="0"/>
+						<Text val="Option1"/>
+
+					</Frame>
+
+					<Animation name="ToggleOff">
+						<Event event="OnClick" action="Play,Restart" frame="$this"/>
+						<Controller type="State" end="Pause" frame="$parent/TypeTwo" stateGroup="Toggle">
+							<Key type="Identifier" time="0.0" value="Unclicked"/>
+						</Controller>
+						<Controller type="State" end="Pause" frame="$parent/TypeThree" stateGroup="Toggle">
+							<Key type="Identifier" time="0.0" value="Unclicked"/>
+						</Controller>
+					</Animation>
+
+				</Frame>
+				<!--Type Button Two-->
+				<Frame type="Button" name="TypeTwo" template="Templates/DiffSelectionButton">
+					<Anchor relative="$parent" side="Top" pos="Min" offset="100"/>
+					<Anchor relative="$parent" side="Left" pos="Min" offset="0"/>
+					<Anchor relative="$parent" side="Right" pos="Max" offset="0"/>
+					<Anchor relative="$parent" side="Bottom" pos="Min" offset="175"/>
+
+					<Frame type="Label" name="Label">
+						<Anchor relative="$parent" side="Top" pos="Min" offset="35"/>
+						<Anchor relative="$parent" side="Left" pos="Min" offset="30"/>
+						<Anchor relative="$parent" side="Right" pos="Max" offset="0"/>
+						<Anchor relative="$parent" side="Bottom" pos="Max" offset="0"/>
+						<Text val="Option2"/>
+
+					</Frame>
+
+					<Animation name="ToggleOff">
+						<Event event="OnClick" action="Play,Restart" frame="$this"/>
+						<Controller type="State" end="Pause" frame="$parent/TypeOne" stateGroup="Toggle">
+							<Key type="Identifier" time="0.0" value="Unclicked"/>
+						</Controller>
+						<Controller type="State" end="Pause" frame="$parent/TypeThree" stateGroup="Toggle">
+							<Key type="Identifier" time="0.0" value="Unclicked"/>
+						</Controller>
+					</Animation>
+
+				</Frame>
+				<!--Type Button Three-->
+				<Frame type="Button" name="TypeThree" template="Templates/DiffSelectionButton">
+					<Anchor relative="$parent" side="Top" pos="Min" offset="175"/>
+					<Anchor relative="$parent" side="Left" pos="Min" offset="0"/>
+					<Anchor relative="$parent" side="Right" pos="Max" offset="0"/>
+					<Anchor relative="$parent" side="Bottom" pos="Min" offset="250"/>
+
+					<Frame type="Label" name="Label">
+						<Anchor relative="$parent" side="Top" pos="Min" offset="35"/>
+						<Anchor relative="$parent" side="Left" pos="Min" offset="30"/>
+						<Anchor relative="$parent" side="Right" pos="Max" offset="0"/>
+						<Anchor relative="$parent" side="Bottom" pos="Max" offset="0"/>
+						<Text val="Option3"/>
+
+					</Frame>
+
+					<Animation name="ToggleOff">
+						<Event event="OnClick" action="Play,Restart" frame="$this"/>
+						<Controller type="State" end="Pause" frame="$parent/TypeOne" stateGroup="Toggle">
+							<Key type="Identifier" time="0.0" value="Unclicked"/>
+						</Controller>
+						<Controller type="State" end="Pause" frame="$parent/TypeTwo" stateGroup="Toggle">
+							<Key type="Identifier" time="0.0" value="Unclicked"/>
+						</Controller>
+					</Animation>
+
+				</Frame>
+				<!--Rest of frame-->
+				<Frame type="Image" name="LeftBGGlowPattern">
+					<Anchor relative="$parent" side="Right" pos="Max" offset="0"/>
+					<Anchor relative="$parent" side="Top" pos="Mid" offset="0"/>
+					<Anchor relative="$parent" side="Bottom" pos="Mid" offset="0"/>
+					<Alpha val="0"/>
+				</Frame>
+
+				<Frame type="Image" name="RightBGGlowPattern">
+					<Anchor relative="$parent" side="Left" pos="Min" offset="0"/>
+					<Anchor relative="$parent" side="Top" pos="Mid" offset="0"/>
+					<Anchor relative="$parent" side="Bottom" pos="Mid" offset="0"/>
+					<Alpha val="0"/>
+				</Frame>
+
+				<Frame type="Image" name="FullscreenBlackoutImage">
+					<Alpha val="0"/>
+					<AcceptsMouse val="False"/>
+				</Frame>
+
+				<Frame type="Image" name="TopHexPattern">
+					<Alpha val="0"/>
+				</Frame>
+
+				<Frame type="Image" name="BottomHexPattern">
+					<Alpha val="0"/>
+				</Frame>
+
+				<Frame type="Image" name="BackgroundImage">
+					<Anchor relative="$parent" side="Bottom" pos="Max" offset="0"/>
+					<Anchor relative="$parent" side="Top" pos="Min" offset="0"/>
+					<Anchor relative="$parent" side="Left" pos="Min" offset="0"/>
+					<Anchor relative="$parent" side="Right" pos="Max" offset="0"/>
+					<Unclipped val="true"/>
+					<Alpha val="200"/>
+				</Frame>
+			</Frame>
+			<!--Diff Select-->
+			<Frame type="Frame" name="DifficultySelectFrame" template="Templates/StandardDialogBaseTemplate">
+				<Anchor relative="$parent" side="Top" pos="Mid" offset="-200"/>
+				<Anchor relative="$parent" side="Left" pos="Min" offset="1100"/>
+				<Anchor relative="$parent" side="Right" pos="Max" offset="-775"/>
+				<Anchor relative="$parent" side="Bottom" pos="Max" offset="0"/>
+
+				<!--Type One Diffs-->
+				<Frame type="Frame" name="TypeOneDiffs">
+					<Anchor relative="$parent" side="Top" pos="Min" offset="0"/>
+					<Anchor relative="$parent" side="Left" pos="Min" offset="0"/>
+					<Anchor relative="$parent" side="Right" pos="Max" offset="0"/>
+					<Anchor relative="$parent" side="Bottom" pos="Max" offset="0"/>
+					<!--One-->
+					<Frame type="Button" name="One" template="Templates/DiffSelectionButton">
+						<Anchor relative="$parent" side="Top" pos="Min" offset="25"/>
+						<Anchor relative="$parent" side="Left" pos="Min" offset="0"/>
+						<Anchor relative="$parent" side="Right" pos="Max" offset="0"/>
+						<Anchor relative="$parent" side="Bottom" pos="Min" offset="100"/>
+
+						<Frame type="Label" name="Label">
+							<Anchor relative="$parent" side="Top" pos="Min" offset="35"/>
+							<Anchor relative="$parent" side="Left" pos="Min" offset="30"/>
+							<Anchor relative="$parent" side="Right" pos="Max" offset="0"/>
+							<Anchor relative="$parent" side="Bottom" pos="Max" offset="0"/>
+							<Text val="Example"/>
+
+						</Frame>
+						<Animation name="ToggleOff">
+							<Event event="OnClick" action="Play,Restart" frame="$this"/>
+							<Controller type="State" end="Pause" frame="$parent/Two" stateGroup="Toggle">
+								<Key type="Identifier" time="0.0" value="Unclicked"/>
+							</Controller>
+							<Controller type="State" end="Pause" frame="$parent/Three" stateGroup="Toggle">
+								<Key type="Identifier" time="0.0" value="Unclicked"/>
+							</Controller>
+						</Animation>
+						<Animation name="MoveLabelLeft">
+							<Controller type="Anchor" end="Pause" frame="$this/Label" side="Left">
+								<Key type="Curve" time="0.0" value="0"/>
+								<Key type="Curve" time="0.125" value="70"/>
+							</Controller>
+						</Animation>
+						<Animation name="MoveLabelRight">
+							<Controller type="Anchor" end="Pause" frame="$this/Label" side="Left">
+								<Key type="Curve" time="0.0" value="70"/>
+								<Key type="Curve" time="0.125" value="0"/>
+							</Controller>
+						</Animation>
+					</Frame>
+					<!--Two-->
+					<Frame type="Button" name="Two" template="Templates/DiffSelectionButton">
+						<Anchor relative="$parent" side="Top" pos="Min" offset="100"/>
+						<Anchor relative="$parent" side="Left" pos="Min" offset="0"/>
+						<Anchor relative="$parent" side="Right" pos="Max" offset="0"/>
+						<Anchor relative="$parent" side="Bottom" pos="Min" offset="175"/>
+
+						<Frame type="Label" name="Label">
+							<Anchor relative="$parent" side="Top" pos="Min" offset="35"/>
+							<Anchor relative="$parent" side="Left" pos="Min" offset="30"/>
+							<Anchor relative="$parent" side="Right" pos="Max" offset="0"/>
+							<Anchor relative="$parent" side="Bottom" pos="Max" offset="0"/>
+							<Text val="My Set"/>
+
+						</Frame>
+						<Animation name="ToggleOff">
+							<Event event="OnClick" action="Play,Restart" frame="$this"/>
+							<Controller type="State" end="Pause" frame="$parent/One" stateGroup="Toggle">
+								<Key type="Identifier" time="0.0" value="Unclicked"/>
+							</Controller>
+							<Controller type="State" end="Pause" frame="$parent/Three" stateGroup="Toggle">
+								<Key type="Identifier" time="0.0" value="Unclicked"/>
+							</Controller>
+						</Animation>
+						<Animation name="MoveLabelLeft">
+							<Controller type="Anchor" end="Pause" frame="$this/Label" side="Left">
+								<Key type="Curve" time="0.0" value="0"/>
+								<Key type="Curve" time="0.125" value="85"/>
+							</Controller>
+						</Animation>
+						<Animation name="MoveLabelRight">
+							<Controller type="Anchor" end="Pause" frame="$this/Label" side="Left">
+								<Key type="Curve" time="0.0" value="85"/>
+								<Key type="Curve" time="0.125" value="0"/>
+							</Controller>
+						</Animation>
+					</Frame>
+					<!--Three-->
+					<Frame type="Button" name="Three" template="Templates/DiffSelectionButton">
+						<Anchor relative="$parent" side="Top" pos="Min" offset="175"/>
+						<Anchor relative="$parent" side="Left" pos="Min" offset="0"/>
+						<Anchor relative="$parent" side="Right" pos="Max" offset="0"/>
+						<Anchor relative="$parent" side="Bottom" pos="Min" offset="250"/>
+
+						<Frame type="Label" name="Label">
+							<Anchor relative="$parent" side="Top" pos="Min" offset="35"/>
+							<Anchor relative="$parent" side="Left" pos="Min" offset="30"/>
+							<Anchor relative="$parent" side="Right" pos="Max" offset="0"/>
+							<Anchor relative="$parent" side="Bottom" pos="Max" offset="0"/>
+							<Text val="Option1-3"/>
+
+						</Frame>
+						<Animation name="ToggleOff">
+							<Event event="OnClick" action="Play,Restart" frame="$this"/>
+							<Controller type="State" end="Pause" frame="$parent/One" stateGroup="Toggle">
+								<Key type="Identifier" time="0.0" value="Unclicked"/>
+							</Controller>
+							<Controller type="State" end="Pause" frame="$parent/Two" stateGroup="Toggle">
+								<Key type="Identifier" time="0.0" value="Unclicked"/>
+							</Controller>
+						</Animation>
+						<Animation name="MoveLabelLeft">
+							<Controller type="Anchor" end="Pause" frame="$this/Label" side="Left">
+								<Key type="Curve" time="0.0" value="0"/>
+								<Key type="Curve" time="0.125" value="35"/>
+							</Controller>
+						</Animation>
+						<Animation name="MoveLabelRight">
+							<Controller type="Anchor" end="Pause" frame="$this/Label" side="Left">
+								<Key type="Curve" time="0.0" value="35"/>
+								<Key type="Curve" time="0.125" value="0"/>
+							</Controller>
+						</Animation>
+					</Frame>
+				</Frame>
+
+				<!--Type two diffs-->
+				<Frame type="Frame" name="TypeTwoDiffs">
+					<Anchor relative="$parent" side="Top" pos="Min" offset="0"/>
+					<Anchor relative="$parent" side="Left" pos="Min" offset="0"/>
+					<Anchor relative="$parent" side="Right" pos="Max" offset="0"/>
+					<Anchor relative="$parent" side="Bottom" pos="Max" offset="0"/>
+					<!--One-->
+					<Frame type="Button" name="One" template="Templates/DiffSelectionButton">
+						<Anchor relative="$parent" side="Top" pos="Min" offset="25"/>
+						<Anchor relative="$parent" side="Left" pos="Min" offset="0"/>
+						<Anchor relative="$parent" side="Right" pos="Max" offset="0"/>
+						<Anchor relative="$parent" side="Bottom" pos="Min" offset="100"/>
+
+						<Frame type="Label" name="Label">
+							<Anchor relative="$parent" side="Top" pos="Min" offset="35"/>
+							<Anchor relative="$parent" side="Left" pos="Min" offset="30"/>
+							<Anchor relative="$parent" side="Right" pos="Max" offset="0"/>
+							<Anchor relative="$parent" side="Bottom" pos="Max" offset="0"/>
+							<Text val="Option2-1"/>
+
+						</Frame>
+					</Frame>
+					<!--Two-->
+					<Frame type="Button" name="Two" template="Templates/DiffSelectionButton">
+						<Anchor relative="$parent" side="Top" pos="Min" offset="100"/>
+						<Anchor relative="$parent" side="Left" pos="Min" offset="0"/>
+						<Anchor relative="$parent" side="Right" pos="Max" offset="0"/>
+						<Anchor relative="$parent" side="Bottom" pos="Min" offset="175"/>
+
+						<Frame type="Label" name="Label">
+							<Anchor relative="$parent" side="Top" pos="Min" offset="35"/>
+							<Anchor relative="$parent" side="Left" pos="Min" offset="30"/>
+							<Anchor relative="$parent" side="Right" pos="Max" offset="0"/>
+							<Anchor relative="$parent" side="Bottom" pos="Max" offset="0"/>
+							<Text val="Option2-2"/>
+
+						</Frame>
+					</Frame>
+					<!--Three-->
+					<Frame type="Button" name="Three" template="Templates/DiffSelectionButton">
+						<Anchor relative="$parent" side="Top" pos="Min" offset="175"/>
+						<Anchor relative="$parent" side="Left" pos="Min" offset="0"/>
+						<Anchor relative="$parent" side="Right" pos="Max" offset="0"/>
+						<Anchor relative="$parent" side="Bottom" pos="Min" offset="250"/>
+
+						<Frame type="Label" name="Label">
+							<Anchor relative="$parent" side="Top" pos="Min" offset="35"/>
+							<Anchor relative="$parent" side="Left" pos="Min" offset="30"/>
+							<Anchor relative="$parent" side="Right" pos="Max" offset="0"/>
+							<Anchor relative="$parent" side="Bottom" pos="Max" offset="0"/>
+							<Text val="Option2-3"/>
+
+						</Frame>
+					</Frame>
+				</Frame>
+				<!--Type three diffs-->
+				<Frame type="Frame" name="TypeThreeDiffs">
+					<Anchor relative="$parent" side="Top" pos="Min" offset="0"/>
+					<Anchor relative="$parent" side="Left" pos="Min" offset="0"/>
+					<Anchor relative="$parent" side="Right" pos="Max" offset="0"/>
+					<Anchor relative="$parent" side="Bottom" pos="Max" offset="0"/>
+					<!--One-->
+					<Frame type="Button" name="One" template="Templates/DiffSelectionButton">
+						<Anchor relative="$parent" side="Top" pos="Min" offset="25"/>
+						<Anchor relative="$parent" side="Left" pos="Min" offset="0"/>
+						<Anchor relative="$parent" side="Right" pos="Max" offset="0"/>
+						<Anchor relative="$parent" side="Bottom" pos="Min" offset="100"/>
+
+						<Frame type="Label" name="Label">
+							<Anchor relative="$parent" side="Top" pos="Min" offset="35"/>
+							<Anchor relative="$parent" side="Left" pos="Min" offset="30"/>
+							<Anchor relative="$parent" side="Right" pos="Max" offset="0"/>
+							<Anchor relative="$parent" side="Bottom" pos="Max" offset="0"/>
+							<Text val="Option3-1"/>
+
+						</Frame>
+					</Frame>
+				</Frame>
+				<!--Rest of frame-->
+
+				<Frame type="Image" name="LeftBGGlowPattern">
+					<Anchor relative="$parent" side="Right" pos="Max" offset="0"/>
+					<Anchor relative="$parent" side="Top" pos="Mid" offset="0"/>
+					<Anchor relative="$parent" side="Bottom" pos="Mid" offset="0"/>
+					<Alpha val="0"/>
+				</Frame>
+
+				<Frame type="Image" name="RightBGGlowPattern">
+					<Anchor relative="$parent" side="Left" pos="Min" offset="0"/>
+					<Anchor relative="$parent" side="Top" pos="Mid" offset="0"/>
+					<Anchor relative="$parent" side="Bottom" pos="Mid" offset="0"/>
+					<Alpha val="0"/>
+				</Frame>
+
+				<Frame type="Image" name="FullscreenBlackoutImage">
+					<Alpha val="0"/>
+					<AcceptsMouse val="False"/>
+				</Frame>
+
+				<Frame type="Image" name="TopHexPattern">
+					<Alpha val="0"/>
+				</Frame>
+
+				<Frame type="Image" name="BottomHexPattern">
+					<Alpha val="0"/>
+				</Frame>
+
+				<Frame type="Image" name="BackgroundImage">
+					<Anchor relative="$parent" side="Bottom" pos="Max" offset="0"/>
+					<Anchor relative="$parent" side="Top" pos="Min" offset="0"/>
+					<Anchor relative="$parent" side="Left" pos="Min" offset="0"/>
+					<Anchor relative="$parent" side="Right" pos="Max" offset="0"/>
+					<Unclipped val="true"/>
+					<Alpha val="200"/>
+				</Frame>
+			</Frame>
+			<!--Mutations-->
+			<Frame type="Frame" name="Mutations" template="Templates/StandardDialogBaseTemplate">
+				<Anchor relative="$parent" side="Top" pos="Mid" offset="-200"/>
+				<Anchor relative="$parent" side="Left" pos="Min" offset="1340"/>
+				<Anchor relative="$parent" side="Right" pos="Max" offset="-535"/>
+				<Anchor relative="$parent" side="Bottom" pos="Max" offset="0"/>
+
+				<Frame type="Image" name="LeftBGGlowPattern">
+					<Anchor relative="$parent" side="Right" pos="Max" offset="0"/>
+					<Anchor relative="$parent" side="Top" pos="Mid" offset="0"/>
+					<Anchor relative="$parent" side="Bottom" pos="Mid" offset="0"/>
+					<Alpha val="0"/>
+				</Frame>
+
+				<Frame type="Image" name="RightBGGlowPattern">
+					<Anchor relative="$parent" side="Left" pos="Min" offset="0"/>
+					<Anchor relative="$parent" side="Top" pos="Mid" offset="0"/>
+					<Anchor relative="$parent" side="Bottom" pos="Mid" offset="0"/>
+					<Alpha val="0"/>
+				</Frame>
+
+				<Frame type="Image" name="FullscreenBlackoutImage">
+					<Alpha val="0"/>
+					<AcceptsMouse val="False"/>
+				</Frame>
+
+				<Frame type="Image" name="TopHexPattern">
+					<Alpha val="0"/>
+				</Frame>
+
+				<Frame type="Image" name="BottomHexPattern">
+					<Alpha val="0"/>
+				</Frame>
+
+				<Frame type="Image" name="BackgroundImage">
+					<Anchor relative="$parent" side="Bottom" pos="Max" offset="0"/>
+					<Anchor relative="$parent" side="Top" pos="Min" offset="0"/>
+					<Anchor relative="$parent" side="Left" pos="Min" offset="0"/>
+					<Anchor relative="$parent" side="Right" pos="Max" offset="0"/>
+					<Unclipped val="true"/>
+					<Alpha val="200"/>
+				</Frame>
+			</Frame>
+			<!--StatsSheet-->
+			<Frame type="Frame" name="StatsSheet" template="Templates/StandardDialogBaseTemplate">
+				<Anchor relative="$parent" side="Top" pos="Mid" offset="-200"/>
+				<Anchor relative="$parent" side="Left" pos="Mid" offset="515"/>
+				<Anchor relative="$parent" side="Right" pos="Max" offset="0"/>
+				<Anchor relative="$parent" side="Bottom" pos="Max" offset="-175"/>
+
+				<Frame type="Image" name="LeftBGGlowPattern">
+					<Anchor relative="$parent" side="Right" pos="Max" offset="0"/>
+					<Anchor relative="$parent" side="Top" pos="Mid" offset="0"/>
+					<Anchor relative="$parent" side="Bottom" pos="Mid" offset="0"/>
+					<Alpha val="0"/>
+				</Frame>
+
+				<Frame type="Image" name="RightBGGlowPattern">
+					<Anchor relative="$parent" side="Left" pos="Min" offset="0"/>
+					<Anchor relative="$parent" side="Top" pos="Mid" offset="0"/>
+					<Anchor relative="$parent" side="Bottom" pos="Mid" offset="0"/>
+					<Alpha val="0"/>
+				</Frame>
+
+				<Frame type="Image" name="FullscreenBlackoutImage">
+					<Alpha val="0"/>
+					<AcceptsMouse val="False"/>
+				</Frame>
+
+				<Frame type="Image" name="TopHexPattern">
+					<Alpha val="0"/>
+				</Frame>
+
+				<Frame type="Image" name="BottomHexPattern">
+					<Alpha val="0"/>
+				</Frame>
+
+				<Frame type="Image" name="BackgroundImage">
+					<Anchor relative="$parent" side="Bottom" pos="Max" offset="0"/>
+					<Anchor relative="$parent" side="Top" pos="Min" offset="0"/>
+					<Anchor relative="$parent" side="Left" pos="Min" offset="0"/>
+					<Anchor relative="$parent" side="Right" pos="Max" offset="0"/>
+					<Unclipped val="true"/>
+					<Alpha val="200"/>
+				</Frame>
+			</Frame>
+			<!--Ready Button-->
+			<Frame type="Frame" name="Ready" template="Templates/StandardDialogBaseTemplate">
+				<Anchor relative="$parent" side="Top" pos="Mid" offset="410"/>
+				<Anchor relative="$parent" side="Left" pos="Mid" offset="515"/>
+				<Anchor relative="$parent" side="Right" pos="Max" offset="0"/>
+				<Anchor relative="$parent" side="Bottom" pos="Max" offset="0"/>
+
+				<Frame type="Button" name="Button" template="Templates/CharSelectButtonVersionTwo">
+
+					<Frame type="Label" name="Label">
+						<Text val="Ready"/>
+					</Frame>
+
+					<Frame type="Image" name="NormalImage">
+						<Alpha val="0"/>
+					</Frame>
+					<Frame type="Image" name="HoverImage">
+						<Alpha val="0"/>
+					</Frame>
+				</Frame>
+
+				<Frame type="Image" name="LeftBGGlowPattern">
+					<Anchor relative="$parent" side="Right" pos="Max" offset="0"/>
+					<Anchor relative="$parent" side="Top" pos="Mid" offset="0"/>
+					<Anchor relative="$parent" side="Bottom" pos="Mid" offset="0"/>
+					<Alpha val="0"/>
+				</Frame>
+
+				<Frame type="Image" name="RightBGGlowPattern">
+					<Anchor relative="$parent" side="Left" pos="Min" offset="0"/>
+					<Anchor relative="$parent" side="Top" pos="Mid" offset="0"/>
+					<Anchor relative="$parent" side="Bottom" pos="Mid" offset="0"/>
+					<Alpha val="0"/>
+				</Frame>
+
+				<Frame type="Image" name="FullscreenBlackoutImage">
+					<Alpha val="0"/>
+					<AcceptsMouse val="False"/>
+				</Frame>
+
+				<Frame type="Image" name="TopHexPattern">
+					<Alpha val="0"/>
+				</Frame>
+
+				<Frame type="Image" name="BottomHexPattern">
+					<Alpha val="0"/>
+				</Frame>
+
+				<Frame type="Image" name="BackgroundImage">
+					<Anchor relative="$parent" side="Bottom" pos="Max" offset="0"/>
+					<Anchor relative="$parent" side="Top" pos="Min" offset="0"/>
+					<Anchor relative="$parent" side="Left" pos="Min" offset="0"/>
+					<Anchor relative="$parent" side="Right" pos="Max" offset="0"/>
+					<Unclipped val="true"/>
+					<Alpha val="200"/>
+				</Frame>
+			</Frame>
+			<!--Opening Menu Timer-->
+			<Frame type="Frame" name="Timer" template="Templates/StandardDialogBaseTemplate">
+				<Anchor relative="$parent" side="Top" pos="Min" offset="0"/>
+				<Anchor relative="$parent" side="Left" pos="Mid" offset="515"/>
+				<Anchor relative="$parent" side="Right" pos="Max" offset="0"/>
+				<Anchor relative="$parent" side="Bottom" pos="Min" offset="250"/>
+
+				<Frame type="Label" name="Label">
+					<Anchor relative="$parent" side="Top" pos="Min" offset="100"/>
+					<Anchor relative="$parent" side="Left" pos="Min" offset="200"/>
+					<Anchor relative="$parent" side="Right" pos="Max" offset="0"/>
+					<Anchor relative="$parent" side="Bottom" pos="Max" offset="0"/>
+					<Text val="59"/>
+					<Style val="MidFontOne"/>
+				</Frame>
+				<Frame type="Image" name="LeftBGGlowPattern">
+					<Anchor relative="$parent" side="Right" pos="Max" offset="0"/>
+					<Anchor relative="$parent" side="Top" pos="Mid" offset="0"/>
+					<Anchor relative="$parent" side="Bottom" pos="Mid" offset="0"/>
+					<Alpha val="0"/>
+				</Frame>
+
+				<Frame type="Image" name="RightBGGlowPattern">
+					<Anchor relative="$parent" side="Left" pos="Min" offset="0"/>
+					<Anchor relative="$parent" side="Top" pos="Mid" offset="0"/>
+					<Anchor relative="$parent" side="Bottom" pos="Mid" offset="0"/>
+					<Alpha val="0"/>
+				</Frame>
+
+				<Frame type="Image" name="FullscreenBlackoutImage">
+					<Alpha val="0"/>
+					<AcceptsMouse val="False"/>
+				</Frame>
+
+				<Frame type="Image" name="TopHexPattern">
+					<Alpha val="0"/>
+				</Frame>
+
+				<Frame type="Image" name="BottomHexPattern">
+					<Alpha val="0"/>
+				</Frame>
+
+				<Frame type="Image" name="BackgroundImage">
+					<Anchor relative="$parent" side="Bottom" pos="Max" offset="0"/>
+					<Anchor relative="$parent" side="Top" pos="Min" offset="0"/>
+					<Anchor relative="$parent" side="Left" pos="Min" offset="0"/>
+					<Anchor relative="$parent" side="Right" pos="Max" offset="0"/>
+					<Unclipped val="true"/>
+					<Alpha val="0"/>
+				</Frame>
+			</Frame>
+		</Frame>
+	</Frame>
+</Desc>

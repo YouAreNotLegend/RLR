@@ -1,0 +1,4 @@
+﻿Actor/Name/RedDroneOneActor=RedDroneOneActor
+Actor/Name/ShapeCylinder2=Shape Cylinder2
+Light/Name/EditorTestLight=default
+Unit/EditorPrefix/RedDroneOne=

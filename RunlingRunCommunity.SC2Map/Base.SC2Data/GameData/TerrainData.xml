@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Catalog>
+    <CTerrain id="HybridLabInner">
+        <BlendTextures index="0" value="BlackOpsLabA6"/>
+    </CTerrain>
+</Catalog>

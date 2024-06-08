@@ -53,7 +53,7 @@
         Put the fonts in a root Fonts folder in your map, or in Assets/Fonts, whatever you want.
         For now, they need to point to existing fonts so that the map doesn't break,
         Fonts can be used as both OTF and TTF formats.
-    -->
+    --> 
     <Constant name="MyHeaderFont" val="UI\Fonts\Eurostile-Bol.otf"/>
     <Constant name="MyStandardFont" val="UI\Fonts\Eurostile-Reg.otf"/>
     <Constant name="Weird" val="UI\Fonts\Eurostile-Reg.otf"/>
@@ -106,6 +106,11 @@
     -->
     <Style name="OptionLabel" font="#FontStandard" height="16" styleflags="Shadow" textcolor="#MyColorAqua" hotkeycolor="#ColorWhite" shadowoffset="1"/>
     <Style name="OptionCheckboxTitle" font="#FontHeader" height="16" vjustify="Middle" hjustify="Left" styleflags="Shadow" textcolor="#MyColorMatteSky" highlightcolor="#GradientHighlight" disabledcolor="#ColorGray6" shadowoffset="2"/>
+    <Style name="TestyFont" font="UI\Sixtyfour-Regular.ttf" height="81" styleflags="Shadow|Glow|Outline" shadowoffset="8" outlinewidth="5" outlinecolor="000000" glowcolor="0075bb" glowMode="Add" textcolor="0075b5-004050" characterSpacing="15"/>
+    <Style name="CustomFontTwo" font="UI\Cinzel-Regular.ttf" height="25" textcolor="004060"/>
+    <Style name="CustomFontThree" font="UI\Sixtyfour-Regular.ttf" height="25" textcolor="004060"/>
+    <Style name="TinyFontOne" font="UI\Sixtyfour-Regular.ttf" height="18" textcolor="0070aa"/>
+    <Style name="MidFontOne" font="UI\Sixtyfour-Regular.ttf" height="36" textcolor="0070aa"/>
 
     <Constant name="MyDialogText" val="#MyColorAqua"/>
     <Constant name="MyDialogHighlight" val="#MyColorLightYellow"/>

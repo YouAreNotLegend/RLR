@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Catalog>
+    <CLight id="HybridLabInner">
+        <ToDInfoArray index="0" Id="HybridLabInner" AmbientColor="0.188235,0.196078,0.200000">
+            <Param index="ColorizationContrast" value="1.130000"/>
+        </ToDInfoArray>
+    </CLight>
+</Catalog>

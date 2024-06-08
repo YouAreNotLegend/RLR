@@ -1,43 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PlacedObjects Version="27">
-    <ObjectPoint Id="1499412361" Position="56.1877,93.1857,0" Scale="1,1,1" Type="Normal" Name="Point 001" Color="0,0,0,0"/>
-    <ObjectPoint Id="1211802061" Position="80.71,78.96,0" Scale="1,1,1" Type="Normal" Name="Center" Color="0,0,0,0"/>
-    <ObjectCamera Id="1712852337" Position="88.8581,78.2905,0" Rotation="3.1413" Scale="1,1,1" Name="Camera 002" Color="0,0,0,0" CameraTarget="88.8581,78.2905">
+    <ObjectPoint Id="1499412361" Position="30.71,78.96,0" Scale="1,1,1" Type="Normal" Name="Example Point: Left" Color="0,0,0,0"/>
+    <ObjectPoint Id="1616826619" Position="23.8986,131.801,0" Scale="1,1,1" Type="Normal" Name="StartPointForPlayerOne...IKnowThereShouldBeMorePoints" Color="0,0,0,0"/>
+    <ObjectPoint Id="1049203993" Position="120.71,78.96,0" Scale="1,1,1" Type="Normal" Name="Example Point: Right" Color="0,0,0,0"/>
+    <ObjectPoint Id="1211802061" Position="80.71,78.96,0" Scale="1,1,1" Type="Normal" Name="Center Point" Color="0,0,0,0"/>
+    <ObjectCamera Id="2136353644" Position="80.8454,78.2326,0" Rotation="3.14" Scale="1,1,1" Name="Camera 002" Color="0,0,0,0" CameraTarget="80.8454,78.2326">
         <Flag Index="CameraHidden" Value="1"/>
-        <CameraValue Index="FieldOfView" Value="27.7995"/>
+        <CameraValue Index="FieldOfView" Value="27.7998"/>
+        <CameraValue Index="NearClip" Value="0.0998"/>
+        <CameraValue Index="FarClip" Value="600"/>
+        <CameraValue Index="ShadowClip" Value="75"/>
+        <CameraValue Index="Distance" Value="72.8818"/>
+        <CameraValue Index="Pitch" Value="89.333"/>
+        <CameraValue Index="Yaw" Value="179.9025"/>
+        <CameraValue Index="FocalDepth" Value="8"/>
+        <CameraValue Index="FalloffEnd" Value="8"/>
+        <CameraValue Index="BokehFStop" Value="0.0097"/>
+        <CameraValue Index="BokehMaxCoC" Value="1"/>
+    </ObjectCamera>
+    <ObjectCamera Id="1395169869" Position="80.8454,78.2326,0" Rotation="3.14" Scale="1,1,1" Name="Camera 003" Color="0,0,0,0" CameraTarget="80.8454,78.2326">
+        <Flag Index="CameraHidden" Value="1"/>
+        <CameraValue Index="FieldOfView" Value="27.7998"/>
+        <CameraValue Index="NearClip" Value="0.0998"/>
+        <CameraValue Index="FarClip" Value="600"/>
+        <CameraValue Index="ShadowClip" Value="75"/>
+        <CameraValue Index="Distance" Value="41.14"/>
+        <CameraValue Index="Pitch" Value="89.333"/>
+        <CameraValue Index="Yaw" Value="179.9025"/>
+        <CameraValue Index="FocalDepth" Value="8"/>
+        <CameraValue Index="FalloffEnd" Value="8"/>
+        <CameraValue Index="BokehFStop" Value="0.0097"/>
+        <CameraValue Index="BokehMaxCoC" Value="1"/>
+    </ObjectCamera>
+    <ObjectCamera Id="1623587201" Position="32.5407,128.2575,0" Rotation="3.1315" Scale="1,1,1" Name="Camera 004" Color="0,0,0,0" CameraTarget="32.5407,128.2575">
+        <CameraValue Index="FieldOfView" Value="27.7998"/>
+        <CameraValue Index="NearClip" Value="0.0998"/>
+        <CameraValue Index="FarClip" Value="600"/>
+        <CameraValue Index="ShadowClip" Value="75"/>
+        <CameraValue Index="Distance" Value="45.254"/>
+        <CameraValue Index="Pitch" Value="86.882"/>
+        <CameraValue Index="Yaw" Value="179.427"/>
+        <CameraValue Index="FocalDepth" Value="8"/>
+        <CameraValue Index="FalloffEnd" Value="8"/>
+    </ObjectCamera>
+    <ObjectCamera Id="783392887" Position="84.3696,78.5324,0" Rotation="3.1357" Scale="1,1,1" Name="Camera 001" Color="0,0,0,0" CameraTarget="84.3696,78.5324">
+        <Flag Index="CameraHidden" Value="1"/>
+        <CameraValue Index="FieldOfView" Value="27.7998"/>
         <CameraValue Index="NearClip" Value="0.0998"/>
         <CameraValue Index="FarClip" Value="600"/>
         <CameraValue Index="ShadowClip" Value="75"/>
         <CameraValue Index="Distance" Value="228.735"/>
-        <CameraValue Index="Pitch" Value="89.333"/>
-        <CameraValue Index="Yaw" Value="180"/>
-        <CameraValue Index="FocalDepth" Value="8"/>
-        <CameraValue Index="FalloffStart" Value="0.0002"/>
-        <CameraValue Index="FalloffEnd" Value="8"/>
-        <CameraValue Index="FalloffStartNear" Value="0.0002"/>
-        <CameraValue Index="FalloffEndNear" Value="0.0002"/>
-    </ObjectCamera>
-    <ObjectCamera Id="1395169869" Position="97.9702,79.7668,0" Rotation="3.1413" Scale="1,1,1" Name="Camera 003" Color="0,0,0,0" CameraTarget="97.9702,79.7668">
-        <Flag Index="CameraHidden" Value="1"/>
-        <CameraValue Index="FieldOfView" Value="27.7998"/>
-        <CameraValue Index="NearClip" Value="0.0998"/>
-        <CameraValue Index="FarClip" Value="600"/>
-        <CameraValue Index="ShadowClip" Value="75"/>
-        <CameraValue Index="Distance" Value="49.7792"/>
-        <CameraValue Index="Pitch" Value="89.333"/>
-        <CameraValue Index="Yaw" Value="180"/>
-        <CameraValue Index="FocalDepth" Value="8"/>
-        <CameraValue Index="FalloffEnd" Value="8"/>
-    </ObjectCamera>
-    <ObjectCamera Id="783392887" Position="129.1083,132.7033,0" Rotation="3.14" Scale="1,1,1" Name="Camera 001" Color="0,0,0,0" CameraTarget="129.1083,132.7033">
-        <Flag Index="CameraHidden" Value="1"/>
-        <CameraValue Index="FieldOfView" Value="27.7998"/>
-        <CameraValue Index="NearClip" Value="0.0998"/>
-        <CameraValue Index="FarClip" Value="600"/>
-        <CameraValue Index="ShadowClip" Value="75"/>
-        <CameraValue Index="Distance" Value="28.099"/>
-        <CameraValue Index="Pitch" Value="80.7058"/>
-        <CameraValue Index="Yaw" Value="179.9025"/>
+        <CameraValue Index="Pitch" Value="87.176"/>
+        <CameraValue Index="Yaw" Value="179.6647"/>
         <CameraValue Index="FocalDepth" Value="8"/>
         <CameraValue Index="FalloffEnd" Value="8"/>
     </ObjectCamera>

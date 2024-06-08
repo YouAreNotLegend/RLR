@@ -6,6 +6,7 @@
         <DeactivateChatBarOnClick val="true" />
     </Frame>
 
+
     <Frame type="Frame" name="GameUI/UIContainer/FullscreenUpperContainer" file="GameUI">
         <!--
             This holds the "game is paused" message, for example.
@@ -17,11 +18,63 @@
 
         <!-- Move, resize, and restyle the chat display slightly -->
         <Frame type="GameMessageDisplay" name="ChatDisplay">
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-400"/>
-            <Width val="840"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="-450"/>
+            <Anchor relative="$parent" side="Left" pos="Min" offset="-500"/>
+            <Anchor relative="$parent" side="Top" pos="Min" offset="-100"/>
+            <Width val="500"/>
             <Height val="400"/>
-            <Style val="MyTooltipInfo"/>
+            <Style val="TinyFontOne"/>
             <HideClippedMessages val="true"/>
+        </Frame>
+
+        <Frame type="ChatBar" name="ChatBar">
+            <Anchor relative="$parent" side="Left" pos="Mid" offset="-500"/>
+            <Anchor relative="$parent" side="Bottom" pos="Mid" offset="0"/>
+            <Anchor relative="$parent" side="Top" pos="Min" offset="-200"/>
+            <Anchor relative="$parent" side="Right" pos="Mid" offset="500"/>
+
+            <Width val="1000"/>
+            <Height val="75"/>
+
+            <Frame type="Button" name="EmoticonButton">
+                <Width val="30"/>
+                <Height val="30"/>
+                <Frame type="Image" name="NormalImage">
+                    <Width val="30"/>
+                    <Height val="30"/>
+                </Frame>
+                <Frame type="Image" name="HoverImage">
+                    <Width val="30"/>
+                    <Height val="30"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="Image" name="EmojiBorderLine">
+                <Height val="30"/>
+            </Frame>
+
+            <Frame type="Image" name="RecipientImage">
+                <Height val="30"/>
+            </Frame>
+
+            <Frame type="Label" name="RecipientLabel">
+                <Anchor relative="$parent" side="Top" pos="Min" offset="25"/>
+                <Style val="TinyFontOne"/>
+            </Frame>
+
+            <Frame type="EditBox" name="ChatEditBox">
+                <Anchor side="Top" relative="$parent/BackgroundImage" pos="Min" offset="25"/>
+            </Frame>
+
+            <Frame type="Label" name="ChatEditBox/LabelContainerFrame/Label">
+                <Style val="TinyFontOne"/>
+            </Frame>
+
+            <Frame type="Image" name="BackgroundImage">
+                <Texture val="Assets\Textures\ui_console_tooltip_background_specialforces.dds"/>
+                <TextureType val="Border"/>
+                <Height val="75"/>
+            </Frame>
         </Frame>
 
         <!-- Hide these displays, our map never uses them anyway -->

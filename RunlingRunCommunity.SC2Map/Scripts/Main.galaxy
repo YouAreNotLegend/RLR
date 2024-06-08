@@ -1,17 +1,30 @@
-const fixed SLOP = 0.25;
 
-trigger gt_BounceV3 = TriggerCreate("gt_BounceV3_Func");
-void gf_spawnRed (int NumberOfDrones, fixed DroneSpeed, fixed DroneAcceleration);
+const fixed SLOP = 0.15;
+const int normalAlpha = 50;
+const int hoverAlpha = 150;
+const int clickAlpha = 200;
+const color clickColor = Color(0,112,170);
+
+trigger gt_BounceV3;
+trigger gt_SlowDown;
+trigger gt_DialogHover;
+trigger gt_DialogClick;
+trigger gt_DialogExit;
+trigger gt_Setup;
+trigger gt_TextCommands;
+trigger gt_Hit;
+trigger gt_SendChat;
+trigger gt_DialogValueChange;
 
 bool gt_BounceV3_Func (bool testConds, bool runActions) {
 
-    //refelcts drone movement upon leaving it's bouncing region so long as it's in the unit group GreyDrones
+    // Too many escapees, having to cheat to set unit scales, can only bounce in perfectly rectangular areas. \/ bad approach \/
 
     point max = RegionGetBoundsMax(EventUnitRegion());
     point min = RegionGetBoundsMin(EventUnitRegion());
     point unitPosition = UnitGetPosition(EventUnit());
     fixed angle = UnitGetFacing(EventUnit());
-    int i = 0;
+    int i;
 
     if (testConds) {
         if (!((UnitGroupHasUnit(gv_greyDrones, EventUnit())) == true)) {
@@ -33,33 +46,511 @@ bool gt_BounceV3_Func (bool testConds, bool runActions) {
 
     UnitCreate(1, "PointDefenseDrone", 0, 15, unitPosition, angle);
     UnitGroupAdd(gv_greyDrones, UnitLastCreated());
-    UnitSetScale(UnitLastCreated(), 300, 300, 300);
+    UnitSetScale(UnitLastCreated(), gv_cheatVariable, gv_cheatVariable, gv_cheatVariable);
     UnitSetPropertyFixed(UnitLastCreated(), c_unitPropMovementSpeed, UnitGetPropertyFixed(EventUnit(), c_unitPropMovementSpeed, true));
     UnitRemove(EventUnit());
 
-    for (; i < 5; i+=1) {
-        UnitIssueOrder(UnitLastCreated(), OrderTargetingPoint(AbilityCommand("move", 0), PointWithOffsetPolar((unitPosition), 25 * i, angle)), c_orderQueueReplace);
+
+    UnitIssueOrder(UnitLastCreated(), OrderTargetingPoint(AbilityCommand("move", 0), PointWithOffsetPolar((unitPosition), 25, angle)), c_orderQueueAddToEnd);
+    for (i=2; i < 5; i+=1) {
+        UnitIssueOrder(UnitLastCreated(), OrderTargetingPoint(AbilityCommand("move", 0), PointWithOffsetPolar((unitPosition), 25 * i, angle)), c_orderQueueAddToEnd);
+        
+        
     }
+    return true;
+}
+
+void spawnRed (int Num, fixed Speed, fixed Size, fixed Acceleration, string Colour, region Region, unitgroup Group, string UnitID, fixed Height) {
+    point RandomPoint;
+    int i = 0;
+    fixed lp_size = Size * 100;
+
+    for (; i < Num; i+=1) {
+        RandomPoint = RegionRandomPoint(Region);
+        UnitCreate(1, UnitID, 0, 15, RegionRandomPoint(Region), 0);
+        UnitSetScale(UnitLastCreated(), lp_size, lp_size, 10);
+        CatalogFieldValueSet(c_gameCatalogUnit, UnitID, "Acceleration", 15, FixedToString(Acceleration, 2));
+        UnitSetPropertyFixed(UnitLastCreated(), c_unitPropMovementSpeed, Speed);
+        UnitGroupAdd(Group, UnitLastCreated());
+        UnitSetHeight(UnitLastCreated(), Height, 0);
+        UnitGroupAdd(gv_dronesToMoveIfIdle, UnitLastCreated());
+        UnitGroupAdd(gv_redDrones, UnitLastCreated());
+        libNtve_gf_SendActorMessageToUnit(UnitLastCreated(), "SetTintColor " + Colour);
+        UnitIssueOrder(UnitLastCreated(), OrderTargetingPoint(AbilityCommand("move", 0), RandomPoint), c_orderQueueReplace);
+    }
+
+}
+
+bool gt_Setup_Func (bool testConds, bool runActions) {
+
+    if (!testConds) {
+        return false;
+    }
+
+    if (!runActions) {
+        return true;
+    }
+
+    //were there something to be done before anything else, it'd be done here
+
+    return true;
+}
+
+void GameStart () {
+    // what to do when everyone has hit the ready button or the timer runs out
+
+    int i = 1;
+
+    DialogControlSetVisible(gv_openingMenu, gv_allPlayers, false);
+    DialogControlSetVisible(gv_chatBox.lv_mainPanel, gv_allPlayers, true);
+    VisRevealerCreate(1, RegionEntireMap());
+
+    for (; i <= PlayerGroupCount(gv_allPlayers); i+=1){
+        UnitCreate(1, gv_characterSelected[i], 0, i, PointFromId(1616826619), 0);
+        gv_playerCharacter[i] = UnitLastCreated();
+        UnitSetPropertyFixed(UnitLastCreated(), c_unitPropMovementSpeed, 10.0);
+        CameraLockInput(i, false);
+    }
+    if (gv_diffVotedFor[1] == 1) {
+        TriggerExecute(gt_ExampleLevelOutline, true, false);
+    } else if (gv_diffVotedFor[1] == 2){
+        TriggerExecute(gt_MyLevelSet, true, false);
+    }
+    
+    gv_gameStarted = true;
+    DialogControlSetPosition(gv_chatEditBox, PlayerGroupAll(), c_anchorBottom, 0, -500);
+}
+
+bool gt_DialogHover_Func (bool testConds, bool runActions) {
+
+    if (!testConds) {
+        return false;
+    }
+
+    if (!runActions) {
+        return true;
+    }
+    
+    if (EventDialogControl() == gv_gameTypeButtons[0].lv_dialog && !gv_gameTypeButtons[0].lv_isSelected) {
+        // Game type one visual change
+    } else if (EventDialogControl() == gv_gameTypeButtons[1].lv_dialog && !gv_gameTypeButtons[1].lv_isSelected) {
+        // Game type two visual change
+    } else if (EventDialogControl() == gv_gameTypeButtons[2].lv_dialog && !gv_gameTypeButtons[2].lv_isSelected) {
+        // Game type three visual change
+    } else if (EventDialogControl() == gv_gameDiffButtons[0].lv_dialog && !gv_gameDiffButtons[0].lv_isSelected) {
+        // Game type three visual change
+    } else if (EventDialogControl() == gv_gameDiffButtons[1].lv_dialog && !gv_gameDiffButtons[1].lv_isSelected) {
+        // Game type three visual change
+    } else if (EventDialogControl() == gv_gameDiffButtons[2].lv_dialog && !gv_gameDiffButtons[2].lv_isSelected) {
+        // Game type three visual change
+    }
+    return true;
+}
+
+bool gt_DialogClick_Func (bool testConds, bool runActions) {
+
+    if (!testConds) {
+        return false;
+    }
+
+    if (!runActions) {
+        return true;
+    }
+
+    if (EventDialogControl() == gv_charSelectButtons[0].lv_dialog && !gv_charSelectButtons[0].lv_isSelected) {
+        // --- UNIT SELECT BUTTONS
+        // I saw there were radio buttons after I did this, might switch over if they work, but this is fine for now
+        // Zergling select visual change
+        DialogControlSetPropertyAsInt(gv_charSelectButtons[0].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), hoverAlpha);
+        DialogControlSetPropertyAsInt(gv_charSelectButtons[1].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
+        DialogControlSetPropertyAsInt(gv_charSelectButtons[2].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
+        DialogControlSetPropertyAsInt(gv_charSelectButtons[3].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
+        DialogControlSetPropertyAsInt(gv_charSelectButtons[4].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
+        DialogControlSetPropertyAsInt(gv_charSelectButtons[5].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
+        DialogControlSetPropertyAsInt(gv_charSelectButtons[6].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
+        DialogControlSetPropertyAsInt(gv_charSelectButtons[7].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);    
+        // Zergling select action
+        gv_characterIsSelected[EventPlayer()] = true;
+        gv_characterSelected[EventPlayer()] = "Zergling";
+    } else if (EventDialogControl() == gv_charSelectButtons[1].lv_dialog && !gv_charSelectButtons[1].lv_isSelected) {
+        // Hydralisk select visual change
+        DialogControlSetPropertyAsInt(gv_charSelectButtons[0].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
+        DialogControlSetPropertyAsInt(gv_charSelectButtons[1].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), hoverAlpha);
+        DialogControlSetPropertyAsInt(gv_charSelectButtons[2].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
+        DialogControlSetPropertyAsInt(gv_charSelectButtons[3].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
+        DialogControlSetPropertyAsInt(gv_charSelectButtons[4].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
+        DialogControlSetPropertyAsInt(gv_charSelectButtons[5].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
+        DialogControlSetPropertyAsInt(gv_charSelectButtons[6].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
+        DialogControlSetPropertyAsInt(gv_charSelectButtons[7].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
+        // Hydralisk select action
+        gv_characterIsSelected[EventPlayer()] = true;
+        gv_characterSelected[EventPlayer()] = "Hydralisk";
+    } else if (EventDialogControl() == gv_charSelectButtons[2].lv_dialog && !gv_charSelectButtons[2].lv_isSelected) {
+        // Baneling select visual change
+        DialogControlSetPropertyAsInt(gv_charSelectButtons[0].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
+        DialogControlSetPropertyAsInt(gv_charSelectButtons[1].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
+        DialogControlSetPropertyAsInt(gv_charSelectButtons[2].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), hoverAlpha);
+        DialogControlSetPropertyAsInt(gv_charSelectButtons[3].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
+        DialogControlSetPropertyAsInt(gv_charSelectButtons[4].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
+        DialogControlSetPropertyAsInt(gv_charSelectButtons[5].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
+        DialogControlSetPropertyAsInt(gv_charSelectButtons[6].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
+        DialogControlSetPropertyAsInt(gv_charSelectButtons[7].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
+        // Baneling select action
+        gv_characterIsSelected[EventPlayer()] = true;
+        gv_characterSelected[EventPlayer()] = "Baneling";
+    } else if (EventDialogControl() == gv_charSelectButtons[3].lv_dialog && !gv_charSelectButtons[3].lv_isSelected) {
+        // Ultralisk select visual change
+        DialogControlSetPropertyAsInt(gv_charSelectButtons[0].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
+        DialogControlSetPropertyAsInt(gv_charSelectButtons[1].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
+        DialogControlSetPropertyAsInt(gv_charSelectButtons[2].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
+        DialogControlSetPropertyAsInt(gv_charSelectButtons[3].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), hoverAlpha);
+        DialogControlSetPropertyAsInt(gv_charSelectButtons[4].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
+        DialogControlSetPropertyAsInt(gv_charSelectButtons[5].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
+        DialogControlSetPropertyAsInt(gv_charSelectButtons[6].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
+        DialogControlSetPropertyAsInt(gv_charSelectButtons[7].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
+        // Ultralisk select action
+        gv_characterIsSelected[EventPlayer()] = true;
+        gv_characterSelected[EventPlayer()] = "Ultralisk";
+    } else if (EventDialogControl() == gv_charSelectButtons[4].lv_dialog && !gv_charSelectButtons[4].lv_isSelected) {
+        // Lurker select visual change
+        DialogControlSetPropertyAsInt(gv_charSelectButtons[0].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
+        DialogControlSetPropertyAsInt(gv_charSelectButtons[1].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
+        DialogControlSetPropertyAsInt(gv_charSelectButtons[2].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
+        DialogControlSetPropertyAsInt(gv_charSelectButtons[3].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
+        DialogControlSetPropertyAsInt(gv_charSelectButtons[4].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), hoverAlpha);
+        DialogControlSetPropertyAsInt(gv_charSelectButtons[5].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
+        DialogControlSetPropertyAsInt(gv_charSelectButtons[6].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
+        DialogControlSetPropertyAsInt(gv_charSelectButtons[7].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
+        // Lurker select action
+        gv_characterIsSelected[EventPlayer()] = true;
+        gv_characterSelected[EventPlayer()] = "Lurker";
+    } else if (EventDialogControl() == gv_charSelectButtons[5].lv_dialog && !gv_charSelectButtons[5].lv_isSelected) {
+        // Roach select visual change
+        DialogControlSetPropertyAsInt(gv_charSelectButtons[0].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
+        DialogControlSetPropertyAsInt(gv_charSelectButtons[1].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
+        DialogControlSetPropertyAsInt(gv_charSelectButtons[2].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
+        DialogControlSetPropertyAsInt(gv_charSelectButtons[3].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
+        DialogControlSetPropertyAsInt(gv_charSelectButtons[4].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
+        DialogControlSetPropertyAsInt(gv_charSelectButtons[5].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), hoverAlpha);
+        DialogControlSetPropertyAsInt(gv_charSelectButtons[6].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
+        DialogControlSetPropertyAsInt(gv_charSelectButtons[7].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
+        // Roach select action
+        gv_characterIsSelected[EventPlayer()] = true;
+        gv_characterSelected[EventPlayer()] = "Roach";
+    } else if (EventDialogControl() == gv_charSelectButtons[6].lv_dialog && !gv_charSelectButtons[6].lv_isSelected) {
+        // Infested select visual change
+        DialogControlSetPropertyAsInt(gv_charSelectButtons[0].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
+        DialogControlSetPropertyAsInt(gv_charSelectButtons[1].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
+        DialogControlSetPropertyAsInt(gv_charSelectButtons[2].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
+        DialogControlSetPropertyAsInt(gv_charSelectButtons[3].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
+        DialogControlSetPropertyAsInt(gv_charSelectButtons[4].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
+        DialogControlSetPropertyAsInt(gv_charSelectButtons[5].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
+        DialogControlSetPropertyAsInt(gv_charSelectButtons[6].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), hoverAlpha);
+        DialogControlSetPropertyAsInt(gv_charSelectButtons[7].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
+        // Infested select action
+        gv_characterIsSelected[EventPlayer()] = true;
+        gv_characterSelected[EventPlayer()] = "InfestedTerran";
+    } else if (EventDialogControl() == gv_charSelectButtons[7].lv_dialog && !gv_charSelectButtons[7].lv_isSelected) {
+        // Drone select visual change
+        DialogControlSetPropertyAsInt(gv_charSelectButtons[0].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
+        DialogControlSetPropertyAsInt(gv_charSelectButtons[1].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
+        DialogControlSetPropertyAsInt(gv_charSelectButtons[2].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
+        DialogControlSetPropertyAsInt(gv_charSelectButtons[3].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
+        DialogControlSetPropertyAsInt(gv_charSelectButtons[4].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
+        DialogControlSetPropertyAsInt(gv_charSelectButtons[5].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
+        DialogControlSetPropertyAsInt(gv_charSelectButtons[6].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
+        DialogControlSetPropertyAsInt(gv_charSelectButtons[7].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), hoverAlpha);
+        // Drone select action
+        gv_characterIsSelected[EventPlayer()] = true;
+        gv_characterSelected[EventPlayer()] = "Drone";
+    } else if (EventDialogControl() == gv_gameTypeButtons[0].lv_dialog && !gv_gameTypeButtons[0].lv_isSelected) {
+        // --- GAME TYPE BUTTONS
+        // Variable update
+        gv_gameTypeButtons[0].lv_isSelected = true;
+        gv_gameTypeButtons[1].lv_isSelected = false;
+        gv_gameTypeButtons[2].lv_isSelected = false;
+        // Show game diff options
+        DialogControlSetVisible(gv_gameDiffFrame[0], PlayerGroupSingle(EventPlayer()), true);
+        DialogControlSetVisible(gv_gameDiffFrame[1], PlayerGroupSingle(EventPlayer()), false);
+        DialogControlSetVisible(gv_gameDiffFrame[2], PlayerGroupSingle(EventPlayer()), false);
+        // Game type one action
+    } else if (EventDialogControl() == gv_gameTypeButtons[1].lv_dialog && !gv_gameTypeButtons[1].lv_isSelected) {
+        // Variable update
+        gv_gameTypeButtons[0].lv_isSelected = false;
+        gv_gameTypeButtons[1].lv_isSelected = true;
+        gv_gameTypeButtons[2].lv_isSelected = false;
+        // Show game diff options
+        DialogControlSetVisible(gv_gameDiffFrame[0], PlayerGroupSingle(EventPlayer()), false);
+        DialogControlSetVisible(gv_gameDiffFrame[1], PlayerGroupSingle(EventPlayer()), true);
+        DialogControlSetVisible(gv_gameDiffFrame[2], PlayerGroupSingle(EventPlayer()), false);
+        // Game type two action
+    } else if (EventDialogControl() == gv_gameTypeButtons[2].lv_dialog && !gv_gameTypeButtons[2].lv_isSelected) {
+        // Variable update
+        gv_gameTypeButtons[0].lv_isSelected = false;
+        gv_gameTypeButtons[1].lv_isSelected = false;
+        gv_gameTypeButtons[2].lv_isSelected = true;
+        // Show game diff options
+        DialogControlSetVisible(gv_gameDiffFrame[0], PlayerGroupSingle(EventPlayer()), false);
+        DialogControlSetVisible(gv_gameDiffFrame[1], PlayerGroupSingle(EventPlayer()), false);
+        DialogControlSetVisible(gv_gameDiffFrame[2], PlayerGroupSingle(EventPlayer()), true);
+        // Game type three action
+    } else if (EventDialogControl() == gv_gameDiffButtons[0].lv_dialog && !gv_gameDiffButtons[0].lv_isSelected) {
+        // --- GAME DIFF BUTTONS
+        // Variable update
+        gv_gameDiffButtons[0].lv_isSelected = true;
+        gv_gameDiffButtons[1].lv_isSelected = false;
+        gv_gameDiffButtons[2].lv_isSelected = false;
+        // Game diff 1-1 action
+        gv_diffVotedFor[EventPlayer()] = 1;
+    } else if (EventDialogControl() == gv_gameDiffButtons[1].lv_dialog && !gv_gameDiffButtons[1].lv_isSelected) {
+        // Variable update
+        gv_gameDiffButtons[0].lv_isSelected = false;
+        gv_gameDiffButtons[1].lv_isSelected = true;
+        gv_gameDiffButtons[2].lv_isSelected = false;
+        // Game diff 1-2 action
+        gv_diffVotedFor[EventPlayer()] = 2;
+    } else if (EventDialogControl() == gv_gameDiffButtons[2].lv_dialog && !gv_gameDiffButtons[2].lv_isSelected) {
+        // Variable update
+        gv_gameDiffButtons[0].lv_isSelected = false;
+        gv_gameDiffButtons[1].lv_isSelected = false;
+        gv_gameDiffButtons[2].lv_isSelected = true;
+        // Game diff 1-3 action
+        gv_diffVotedFor[EventPlayer()] = 3;
+    } else if (EventDialogControl() == gv_readyButton.lv_dialog && gv_characterIsSelected[EventPlayer()]) {
+        // --- READY BUTTON
+        if (gv_readyButton.lv_isSelected == true) {
+            libNtve_gf_SetDialogItemText(gv_readyButton.lv_label, StringToText("Ready"), PlayerGroupSingle(EventPlayer()));
+            gv_readyButton.lv_isSelected = false;
+            gv_numOfPlayersReady -= 1;
+        } else {
+            libNtve_gf_SetDialogItemText(gv_readyButton.lv_label, StringToText("Unready"), PlayerGroupSingle(EventPlayer()));
+            gv_readyButton.lv_isSelected = true;
+            gv_numOfPlayersReady += 1;
+            if (gv_numOfPlayersReady == PlayerGroupCount(gv_allPlayers)) {
+                GameStart();
+            }
+        }
+    } else if (EventDialogControl() == gv_chatBox.lv_closeButton) {
+        // --- CHAT BUTTONS
+        DialogControlSetVisible(gv_chatBox.lv_mainPanel, PlayerGroupSingle(EventPlayer()), false);
+        DialogControlSetVisible(gv_nativeChat, PlayerGroupSingle(EventPlayer()), false);
+    } else if (EventDialogControl() == gv_chatBox.lv_scrollBottomButton && false) {
+        
+        gv_scroll[EventPlayer()] = 0;
+    } else if (EventDialogControl() == gv_chatBox.lv_scrollDownButton && false) {
+        
+        gv_scroll[EventPlayer()] -= gv_chatBox.lv_scrollStrength;
+    } else if (EventDialogControl() == gv_chatBox.lv_scrollUpButton && gv_scroll[EventPlayer()] < 0 && false) {
+        
+        gv_scroll[EventPlayer()] += gv_chatBox.lv_scrollStrength;
+    } else if (EventDialogControl() == gv_chatBox.lv_toggleVisibility){
+        if (gv_visibility[EventPlayer()]){
+            DialogControlSendAnimationEvent(gv_chatBox.lv_toggleVisibility, PlayerGroupSingle(EventPlayer()), "Invisible");
+            gv_visibility[EventPlayer()] = false;
+        } else {
+            DialogControlSendAnimationEvent(gv_chatBox.lv_toggleVisibility, PlayerGroupSingle(EventPlayer()), "Visible");
+            gv_visibility[EventPlayer()] = true;
+        }
+        
+    } else if (EventDialogControl() == gv_chatBox.lv_toggleFade){
+        if (gv_fade[EventPlayer()] == 0){
+            DialogControlSendAnimationEvent(gv_chatBox.lv_toggleFade, PlayerGroupSingle(EventPlayer()), "T2");
+            DialogControlSendAnimationEvent(gv_chatBox.lv_chatLog, PlayerGroupSingle(EventPlayer()), "Fade");
+            gv_fade[EventPlayer()] = 1;
+        } else if (gv_fade[EventPlayer()] == 1){
+            DialogControlSendAnimationEvent(gv_chatBox.lv_toggleFade, PlayerGroupSingle(EventPlayer()), "T3");
+            DialogControlSendAnimationEvent(gv_nativeChat, PlayerGroupSingle(EventPlayer()), "ShowReal");
+            DialogControlSendAnimationEvent(gv_chatBox.lv_chatPanel, PlayerGroupSingle(EventPlayer()), "HideFake");
+            gv_fade[EventPlayer()] = 2;
+        } else if (gv_fade[EventPlayer()] == 2) {
+            DialogControlSendAnimationEvent(gv_chatBox.lv_toggleFade, PlayerGroupSingle(EventPlayer()), "T");
+            DialogControlSendAnimationEvent(gv_nativeChat, PlayerGroupSingle(EventPlayer()), "HideReal");
+            DialogControlSendAnimationEvent(gv_chatBox.lv_chatPanel, PlayerGroupSingle(EventPlayer()), "ShowFake");
+            DialogControlSendAnimationEvent(gv_chatBox.lv_chatLog, PlayerGroupSingle(EventPlayer()), "Unfade");
+            DialogControlSendAnimationEvent(gv_chatBox.lv_chatLog, PlayerGroupSingle(EventPlayer()), "CancelFade");
+            
+            gv_fade[EventPlayer()] = 0;
+        }
+        
+    }
+    return true;
+}
+
+bool gt_DialogExit_Func (bool testConds, bool runActions) {
+
+    if (!testConds) {
+        return false;
+    }
+
+    if (!runActions) {
+        return true;
+    }
+
+    if (EventDialogControl() == gv_gameTypeButtons[0].lv_dialog && !gv_gameTypeButtons[0].lv_isSelected && false) {
+        // Game type one visual change
+    } else if (EventDialogControl() == gv_gameTypeButtons[1].lv_dialog && !gv_gameTypeButtons[1].lv_isSelected && false) {
+        // Game type two visual change
+    } else if (EventDialogControl() == gv_gameTypeButtons[2].lv_dialog && !gv_gameTypeButtons[2].lv_isSelected && false) {
+        // Game type three visual change
+    } else if (EventDialogControl() == gv_gameDiffButtons[0].lv_dialog && !gv_gameDiffButtons[0].lv_isSelected) {
+        // Game type three visual change
+    } else if (EventDialogControl() == gv_gameDiffButtons[1].lv_dialog && !gv_gameDiffButtons[1].lv_isSelected) {
+        // Game type three visual change
+    } else if (EventDialogControl() == gv_gameDiffButtons[2].lv_dialog && !gv_gameDiffButtons[2].lv_isSelected) {
+        // Game type three visual change
+    }
+
+    return true;
+}
+
+void MenuTimer (int Time) {
+    //the shame hidden behind an innocuous timer
+
+    int i = Time % 60;
+    int minutes = FixedToInt(Trunc(Time / 60));
+
+    if (i >= 10) {
+        libNtve_gf_SetDialogItemText(gv_timer, IntToText(minutes) + StringToText(":") + IntToText(i), gv_allPlayers);
+    } else {
+        libNtve_gf_SetDialogItemText(gv_timer, IntToText(minutes) + StringToText(":") + IntToText(0) + IntToText(i), gv_allPlayers);
+    }
+    for (; i > -2 && minutes > 0 || i > -1 && minutes == 0; i-=1) {
+        Wait(1.0, c_timeReal);
+        if (i == -1 && minutes > 0) {
+            i += 60;
+            minutes -= 1;
+        }
+        if (i >= 10) {
+            libNtve_gf_SetDialogItemText(gv_timer, IntToText(minutes) + StringToText(":") + IntToText(i), gv_allPlayers);
+        } else {
+            libNtve_gf_SetDialogItemText(gv_timer, IntToText(minutes) + StringToText(":") + IntToText(0) + IntToText(i), gv_allPlayers);
+        }
+    }
+    if (!gv_gameStarted){
+       GameStart(); 
+       gv_gameStarted = true;
+    }
+    
+}   
+
+bool gt_TextCommands_Func (bool testConds, bool runActions) {
+
+    string message = EventChatMessage(false);
+    int delete;
+
+    if (!testConds) {
+        return false;
+    }
+
+    if (!runActions) {
+        return true;
+    }
+
+    if (StringSub(message, 2, 5) == "Cam1"){
+        CameraApplyInfo(EventPlayer(), CameraInfoFromId(783392887), 0.0, -1, 10.0, true);
+        
+    } else if (StringSub(message, 2, 5) == "Cam2") {
+        CameraApplyInfo(EventPlayer(), CameraInfoFromId(2136353644), 0.0, -1, 10.0, true);
+        
+    } else if (StringSub(message, 2, 5) == "Cam3") {
+        CameraApplyInfo(EventPlayer(), CameraInfoFromId(1395169869), 0.0, -1, 10.0, true);
+    } else if (StringSub(message, 2, 5) == "Cam4") {
+        CameraApplyInfo(EventPlayer(), CameraInfoFromId(1623587201), 0.0, -1, 10.0, true);
+    } else if (StringSub(message, 2, 4) == "Spd"){
+        UnitSetPropertyFixed(gv_playerCharacter[EventPlayer()], c_unitPropMovementSpeed, StringToFixed(StringSub(message, 5, 6)));
+    } else if (StringSub(message, 2, 5) == "Next"){
+        gv_level += 1;
+        TriggerExecute(gt_ExampleLevelOutline, true, false);
+    } else if (StringSub(message, 2, 5) == "Turn"){
+        for (; delete < 10; delete += 1) {
+            UnitSetFacing(gv_playerCharacter[1], RandomFixed(0.0, 360.0), 0);
+            Wait(1.0, c_timeReal);
+        }
+    }
+    return true;
+}
+
+bool gt_SendChat_Func (bool testConds, bool runActions) {
+
+    string message = EventChatMessage(false);
+    int iter = gv_chatBox.lv_max -1;
+    int iter2 = gv_chatBox.lv_max - 1;
+    text AllMessages;
+    int player;
+
+    if (!testConds && StringSub(message, 1, 1) == "#") {
+        return false;
+    }
+
+    if (!runActions) {
+        return true;
+    }
+
+    while (iter > 0) {
+        gv_chatBox.lv_chatMessage[iter] = gv_chatBox.lv_chatMessage[iter -1];
+        iter -= 1;
+    }
+    gv_chatBox.lv_chatMessage[0] = StringToText(TextToString(TextWithColor(PlayerName(EventPlayer()), Color(0,100,80))) + ":" + message);
+    
+    while (iter2 >= 0) {
+        AllMessages += StringToText(TextToString(gv_chatBox.lv_chatMessage[iter2]) + "<n/>");
+        iter2 -= 1;
+    }
+    DialogControlSetPropertyAsText(gv_chatBox.lv_chatLog, c_triggerControlPropertyText, gv_allPlayers, AllMessages);
+
+    for (; player < 15; player +=1) {
+        if (gv_fade[player] == 1) {
+            DialogControlSendAnimationEvent(gv_chatBox.lv_chatLog, PlayerGroupSingle(player), "Fade");
+        }     
+    }
+    return true;
+
+}
+
+bool gt_Hit_Func (bool testConds, bool runActions) {
+
+    if (!testConds || UnitGetOwner(EventUnit()) != 15) {
+        return false;
+    }
+
+    if (!runActions) {
+        return true;
+    }
+
+    //if drones were to trigger something when they hit you, this'd be it
+
+    return true;
+}
+
+bool gt_DialogValueChange_Func (bool testConds, bool runActions) {
+
+    if (!testConds) {
+        return false;
+    }
+
+    if (!runActions) {
+        return true;
+    }
+
+    CameraSetValue(EventPlayer(), c_cameraValueDistance, libNtve_gf_DialogItemValue(gv_cam.lv_distanceSlider, EventPlayer()), 0, -1, 10.0);
     
     return true;
 }
 
-void gf_spawnRed (int NumberOfDrones, fixed DroneSpeed, fixed DroneAcceleration) {
-    point RandomPoint;
-    int i = 0;
-
-    for (; i < NumberOfDrones; i+=1) {
-        RandomPoint = RegionRandomPoint(RegionFromName("SightRegion"));
-        UnitCreate(1, "PointDefenseDrone", 0, 15, RegionRandomPoint(RegionFromName("SightRegion")), 0);
-        UnitSetScale(UnitLastCreated(), 300, 300, 300);
-        UnitSetPropertyFixed(UnitLastCreated(), c_unitPropAcceleration, DroneAcceleration);
-        UnitGroupAdd(gv_redDrones, UnitLastCreated());
-        UnitGroupAdd(gv_dronesToMoveIfIdle, UnitLastCreated());
-        UnitIssueOrder(UnitLastCreated(), OrderTargetingPoint(AbilityCommand("move", 0), RandomPoint), c_orderQueueReplace);
-    }
+void customTriggerInit(){
+    gt_BounceV3 = TriggerCreate("gt_BounceV3_Func");
+    gt_DialogHover = TriggerCreate("gt_DialogHover_Func");
+    gt_DialogClick = TriggerCreate("gt_DialogClick_Func");
+    gt_DialogExit = TriggerCreate("gt_DialogExit_Func");
+    gt_Setup = TriggerCreate("gt_Setup_Func");
+    gt_TextCommands = TriggerCreate("gt_TextCommands_Func");
+    gt_Hit = TriggerCreate("gt_Hit_Func");
+    gt_SendChat = TriggerCreate("gt_SendChat_Func");
+    gt_DialogValueChange = TriggerCreate("gt_DialogValueChange_Func");
 }
 
 void main() {
+    customTriggerInit();
     TriggerAddEventUnitRegion(gt_BounceV3, null, RegionFromName("Lane001"), false);
     TriggerAddEventUnitRegion(gt_BounceV3, null, RegionFromName("Lane002"), false);
     TriggerAddEventUnitRegion(gt_BounceV3, null, RegionFromName("Lane003"), false);
@@ -77,7 +568,15 @@ void main() {
     TriggerAddEventUnitRegion(gt_BounceV3, null, RegionFromName("Lane015"), false);
     TriggerAddEventUnitRegion(gt_BounceV3, null, RegionFromName("Lane016"), false);
     TriggerAddEventUnitRegion(gt_BounceV3, null, RegionFromName("Lane017"), false);
-    TriggerAddEventUnitRegion(gt_BounceV3, null, RegionFromName("Lane018"), false);
-    //TriggerAddEventUnitRegion(gt_BounceV3, null, RegionFromName("Lane019"), false);
+    //TriggerAddEventUnitRegion(gt_BounceV3, null, RegionFromName("Lane018"), false);
+    TriggerAddEventUnitRegion(gt_BounceV3, null, RegionFromName("Lane019"), false);
+    TriggerAddEventDialogControl(gt_DialogHover, 16, c_invalidDialogControlId, c_triggerControlEventTypeMouseEnter);
+    TriggerAddEventDialogControl(gt_DialogClick, 16, c_invalidDialogControlId, c_triggerControlEventTypeClick);
+    TriggerAddEventDialogControl(gt_DialogExit, 16, c_invalidDialogControlId, c_triggerControlEventTypeMouseExit);
+    gt_Setup_Func(true, true);
+    TriggerAddEventChatMessage(gt_TextCommands, 16, "#", false);
+    TriggerAddEventUnitRegion(gt_Hit, null, RegionFromName("Hitbox"), true);
+    TriggerAddEventChatMessage(gt_SendChat, 16, "", false);
+    TriggerAddEventDialogControl(gt_DialogValueChange, c_playerAny, c_invalidDialogControlId, c_triggerControlEventTypeValueChanged);
 }
 

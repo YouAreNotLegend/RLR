@@ -2,4 +2,383 @@
 <Desc>
     <!-- Here you add your templates.
     Templates are Frames that you will reuse multiple times. -->
+    <Frame type="Button" name="CharSelectButton">
+        <HoverImage val="HoverImage"/>
+        <NormalImage val="NormalImage"/>
+        <Animation name="MouseDownAnim">
+            <Event event="OnMouseDown" action="Restart,Play" frame="$this"/>
+            <Controller type="Anchor" end="Pause" frame="$this" side="Top">
+                <Key type="Curve" time="0.0" value="-5"/>
+                <Key type="Curve" time="0.02" value="-2.5"/>
+            </Controller>
+            <Controller type="Anchor" end="Pause" frame="$this" side="Bottom">
+                <Key type="Curve" time="0.0" value="5"/>
+                <Key type="Curve" time="0.02" value="2.5"/>
+            </Controller>
+            <Controller type="Anchor" end="Pause" frame="$this" side="Right">
+                <Key type="Curve" time="0.0" value="12"/>
+                <Key type="Curve" time="0.02" value="6"/>
+            </Controller>
+            <Controller type="Anchor" end="Pause" frame="$this" side="Left">
+                <Key type="Curve" time="0.0" value="-12"/>
+                <Key type="Curve" time="0.02" value="-6"/>
+            </Controller>
+        </Animation>
+        <Animation name="MouseUpAnim">
+            <Event event="OnMouseUp" action="Restart,Play" frame="$this"/>
+            <Controller type="Anchor" end="Pause" frame="$this" side="Top">
+                <Key type="Curve" time="0.0" value="-2.5"/>
+                <Key type="Curve" time="0.02" value="-5"/>
+            </Controller>
+            <Controller type="Anchor" end="Pause" frame="$this" side="Bottom">
+                <Key type="Curve" time="0.0" value="2.5"/>
+                <Key type="Curve" time="0.02" value="5"/>
+            </Controller>
+            <Controller type="Anchor" end="Pause" frame="$this" side="Right">
+                <Key type="Curve" time="0.0" value="6"/>
+                <Key type="Curve" time="0.02" value="12"/>
+            </Controller>
+            <Controller type="Anchor" end="Pause" frame="$this" side="Left">
+                <Key type="Curve" time="0.0" value="-6"/>
+                <Key type="Curve" time="0.02" value="-12"/>
+            </Controller>
+        </Animation>
+        <Animation name="HoverInflate">
+            <Event event="OnMouseEnter" action="Reset,Play" frame="$this"/>
+            <Controller type="Anchor" end="Pause" frame="$this" side="Top">
+                <Key type="Curve" time="0.0" value="0"/>
+                <Key type="Curve" time="0.25" value="-5"/>
+            </Controller>
+            <Controller type="Anchor" end="Pause" frame="$this" side="Bottom">
+                <Key type="Curve" time="0.0" value="0"/>
+                <Key type="Curve" time="0.25" value="5"/>
+            </Controller>
+            <Controller type="Anchor" end="Pause" frame="$this" side="Left">
+                <Key type="Curve" time="0.0" value="0"/>
+                <Key type="Curve" time="0.25" value="-12"/>
+            </Controller>
+            <Controller type="Anchor" end="Pause" frame="$this" side="Right">
+                <Key type="Curve" time="0.0" value="0"/>
+                <Key type="Curve" time="0.25" value="12"/>
+            </Controller>
+        </Animation>
+        <Animation name="NormalDeflate">
+            <Event event="OnMouseExit" action="Reset,Play" frame="$this"/>
+            <Controller type="Anchor" end="Pause" frame="$this" side="Top">
+                <Key type="Curve" time="0.0" value="-5"/>
+                <Key type="Curve" time="0.25" value="0"/>
+            </Controller>
+            <Controller type="Anchor" end="Pause" frame="$this" side="Bottom">
+                <Key type="Curve" time="0.0" value="5"/>
+                <Key type="Curve" time="0.25" value="0"/>
+            </Controller>
+            <Controller type="Anchor" end="Pause" frame="$this" side="Left">
+                <Key type="Curve" time="0.0" value="-12"/>
+                <Key type="Curve" time="0.25" value="0"/>
+            </Controller>
+            <Controller type="Anchor" end="Pause" frame="$this" side="Right">
+                <Key type="Curve" time="0.0" value="12"/>
+                <Key type="Curve" time="0.25" value="0"/>
+            </Controller>
+        </Animation>
+
+        <Anchor relative="$parent" side="Top" pos="Min" offset="0"/>
+		<Anchor relative="$parent" side="Left" pos="Min" offset="0"/>
+		<Anchor relative="$parent" side="Bottom" pos="Max" offset="0"/>
+		<Anchor relative="$parent" side="Right" pos="Max" offset="0"/>
+
+        <Frame type="Image" name="NormalImage">
+            <Anchor relative="$parent" side="Top" pos="Min" offset="0"/>
+		    <Anchor relative="$parent" side="Left" pos="Min" offset="0"/>
+		    <Anchor relative="$parent" side="Bottom" pos="Max" offset="0"/>
+		    <Anchor relative="$parent" side="Right" pos="Max" offset="0"/>
+        </Frame>
+        <Frame type="Image" name="HoverImage">
+            <Anchor relative="$parent" side="Top" pos="Min" offset="0"/>
+		    <Anchor relative="$parent" side="Left" pos="Min" offset="0"/>
+		    <Anchor relative="$parent" side="Bottom" pos="Max" offset="0"/>
+		    <Anchor relative="$parent" side="Right" pos="Max" offset="0"/>
+        </Frame>
+        <Frame type="Label" name="Label">
+            <Anchor relative="$parent" side="Top" pos="Mid" offset="0"/>
+            <Anchor relative="$parent" side="Left" pos="Mid" offset="0"/>
+            <Anchor relative="$parent" side="Bottom" pos="Mid" offset="0"/>
+            <Anchor relative="$parent" side="Right" pos="Mid" offset="0"/>
+            <Style val="DebugPanelTitle"/>
+        </Frame>
+    </Frame>
+
+    <Frame type="Button" name="CharSelectButtonVersionTwo">
+        <HoverImage val="HoverImage"/>
+        <NormalImage val="NormalImage"/>
+
+        <Anchor relative="$parent" side="Top" pos="Min" offset="0"/>
+        <Anchor relative="$parent" side="Left" pos="Min" offset="0"/>
+        <Anchor relative="$parent" side="Bottom" pos="Max" offset="0"/>
+        <Anchor relative="$parent" side="Right" pos="Max" offset="0"/>
+
+        <Frame type="Image" name="NormalImage">
+            <Anchor relative="$parent" side="Top" pos="Min" offset="0"/>
+            <Anchor relative="$parent" side="Left" pos="Min" offset="0"/>
+            <Anchor relative="$parent" side="Bottom" pos="Max" offset="0"/>
+            <Anchor relative="$parent" side="Right" pos="Max" offset="0"/>
+        </Frame>
+        <Frame type="Image" name="HoverImage">
+            <Anchor relative="$parent" side="Top" pos="Min" offset="0"/>
+            <Anchor relative="$parent" side="Left" pos="Min" offset="0"/>
+            <Anchor relative="$parent" side="Bottom" pos="Max" offset="0"/>
+            <Anchor relative="$parent" side="Right" pos="Max" offset="0"/>
+        </Frame>
+        <Frame type="Label" name="Label">
+            <Anchor relative="$parent" side="Top" pos="Mid" offset="0"/>
+            <Anchor relative="$parent" side="Left" pos="Mid" offset="0"/>
+            <Anchor relative="$parent" side="Bottom" pos="Mid" offset="0"/>
+            <Anchor relative="$parent" side="Right" pos="Mid" offset="0"/>
+            <Style val="TinyFontOne"/>
+        </Frame>
+
+        <Animation name="HoverSound">
+            <Event event="OnMouseEnter" action="Reset,Play" frame="$this"/>
+
+            <Controller type="Sound" end="Stop" frame="$this">
+                <Key type="Sound" time="0.0" sound="@UI_WarChest_ComicButton_Hover"/>
+
+            </Controller>
+            <Controller type="Anchor" end="Pause" frame="$this" side="Bottom">
+                <Key type="Curve" time="0.0" value="0"/>
+                <Key type="Curve" time="0.125" value="5"/>
+            </Controller>
+            <Controller type="Anchor" end="Pause" frame="$this" side="Top">
+                <Key type="Curve" time="0.0" value="0"/>
+                <Key type="Curve" time="0.125" value="-5"/>
+            </Controller>
+            <Controller type="Anchor" end="Pause" frame="$this" side="Left">
+                <Key type="Curve" time="0.0" value="0"/>
+                <Key type="Curve" time="0.125" value="-12"/>
+            </Controller>
+            <Controller type="Anchor" end="Pause" frame="$this" side="Right">
+                <Key type="Curve" time="0.0" value="0"/>
+                <Key type="Curve" time="0.125" value="12"/>
+            </Controller>
+        </Animation>
+
+        <Animation name="MouseExit">
+            <Event event="OnMouseExit" action="Reset,Play" frame="$this"/>
+            <Controller type="Anchor" end="Pause" frame="$this" side="Bottom">
+                <Key type="Curve" time="0.0" value="5"/>
+                <Key type="Curve" time="0.125" value="0"/>
+            </Controller>
+            <Controller type="Anchor" end="Pause" frame="$this" side="Top">
+                <Key type="Curve" time="0.0" value="-5"/>
+                <Key type="Curve" time="0.125" value="0"/>
+            </Controller>
+            <Controller type="Anchor" end="Pause" frame="$this" side="Left">
+                <Key type="Curve" time="0.0" value="-12"/>
+                <Key type="Curve" time="0.125" value="0"/>
+            </Controller>
+            <Controller type="Anchor" end="Pause" frame="$this" side="Right">
+                <Key type="Curve" time="0.0" value="12"/>
+                <Key type="Curve" time="0.125" value="0"/>
+            </Controller>
+        </Animation>
+    </Frame>
+
+    <Frame type="Frame" name="StandardDialogBaseTemplate">
+
+        <!-- This tooltip is just for blocking tooltips behind this panel -->
+        <Frame type="StandardTooltip" name="CoopCampaignTooltip">
+            <Frame type="Label" name="Label">
+                <Anchor relative="$parent"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Image" name="FullscreenBlackoutImage">
+            <Anchor relative="$parent"/>
+            <Color val="0,0,0"/>
+            <Alpha val="180"/>
+            <AcceptsMouse val="False"/>
+            <TooltipFrame val="CoopCampaignTooltip"/>
+        </Frame>
+
+        <Frame type="Image" name="LeftBGGlowPattern">
+            <Anchor side="Top" relative="$parent/BackgroundImage" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/BackgroundImage" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/BackgroundImage" pos="Min" offset="20"/>
+            <Texture val="@UI/Glues_Battlenet_DialogBox_BackGlow"/>
+        </Frame>
+
+        <Frame type="Image" name="RightBGGlowPattern">
+            <Anchor side="Top" relative="$parent/BackgroundImage" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/BackgroundImage" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/BackgroundImage" pos="Max" offset="-20"/>
+            <Texture val="@UI/Glues_Battlenet_DialogBox_BackGlow"/>
+            <TextureCoords top="0.0" left="1.0" bottom="1.0" right="0.0"/>
+        </Frame>
+        
+        <Frame type="BlurFrame" name="BackgroundBlur">
+            <Anchor side="Top" relative="$parent/BackgroundImage" pos="Min" offset="13"/>
+            <Anchor side="Bottom" relative="$parent/BackgroundImage" pos="Max" offset="-13"/>
+            <Anchor side="Left" relative="$parent/BackgroundImage" pos="Min" offset="13"/>
+            <Anchor side="Right" relative="$parent/BackgroundImage" pos="Max" offset="-13"/>
+            <BlurAmount val="0.35"/>
+            <Alpha val="255"/>
+        </Frame>
+
+        <Frame type="Image" name="BackgroundImage">
+            <Texture val="@UI/Glues_Battlenet_DialogBox_StandardBG"/>
+            <TextureType val="NineSlice"/>
+            <Tiled val="false"/>
+        </Frame>
+
+        <Frame type="Image" name="TopHexPattern">
+            <Anchor side="Top" relative="$parent/BackgroundImage" pos="Min" offset="11"/>
+            <Anchor side="Left" relative="$parent/BackgroundImage" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/BackgroundImage" pos="Mid" offset="0"/>
+            <Texture val="@UI/Glues_Battlenet_DialogBox_HexPattern"/>
+        </Frame>
+
+        <Frame type="Image" name="BottomHexPattern">
+            <Anchor side="Bottom" relative="$parent/BackgroundImage" pos="Max" offset="-11"/>
+            <Anchor side="Left" relative="$parent/BackgroundImage" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/BackgroundImage" pos="Mid" offset="0"/>
+            <Texture val="@UI/Glues_Battlenet_DialogBox_HexPattern"/>
+            <TextureCoords top="1.0" left="1.0" bottom="0.0" right="0.0"/>
+        </Frame>
+    </Frame>
+
+    <Frame type="Button" name="DiffSelectionButton">
+        <Anchor relative="$parent" side="Top" pos="Min" offset="0"/>
+        <Anchor relative="$parent" side="Left" pos="Min" offset="0"/>
+        <Anchor relative="$parent" side="Right" pos="Max" offset="0"/>
+        <Anchor relative="$parent" side="Bottom" pos="Max" offset="0"/>
+
+        <NormalImage val="NormalImage"/>
+        <HoverImage val="HoverImage"/>
+
+        <Frame type="Image" name="NormalImage">
+            <Anchor relative="$parent" side="Top" pos="Min" offset="0"/>
+            <Anchor relative="$parent" side="Left" pos="Min" offset="0"/>
+            <Anchor relative="$parent" side="Right" pos="Max" offset="0"/>
+            <Anchor relative="$parent" side="Bottom" pos="Max" offset="10"/>
+
+            <Texture val="Assets\Textures\ui_void_armyupgrade_categorybutton_alert.dds"/>
+            <Alpha val="50"/>
+            
+        </Frame>
+
+        <Frame type="Image" name="HoverImage">
+            <Anchor relative="$parent" side="Top" pos="Min" offset="0"/>
+            <Anchor relative="$parent" side="Left" pos="Min" offset="15"/>
+            <Anchor relative="$parent" side="Right" pos="Max" offset="-15"/>
+            <Anchor relative="$parent" side="Bottom" pos="Max" offset="0"/>
+
+            <Texture val="Assets\Textures\ui_battlenet_glue_columbutton_frame_base.dds"/>
+            <TextureType val="EndCap"/>
+        </Frame>
+
+        <Frame type="Image" name="Highlight">
+            <Anchor relative="$parent" side="Top" pos="Min" offset="0"/>
+            <Anchor relative="$parent" side="Left" pos="Min" offset="0"/>
+            <Anchor relative="$parent" side="Right" pos="Max" offset="0"/>
+            <Anchor relative="$parent" side="Bottom" pos="Max" offset="-5"/>
+            <Texture val="Assets\Textures\ui_battlenet_glues_topnav_buttonselected.dds"/>
+            <Alpha val="0"/>
+        </Frame>
+
+        <Frame type="Label" name="Label">
+            <Anchor relative="$parent" side="Top" pos="Mid" offset="0"/>
+            <Anchor relative="$parent" side="Left" pos="Mid" offset="-50"/>
+            <Anchor relative="$parent" side="Right" pos="Mid" offset="75"/>
+            <Anchor relative="$parent" side="Bottom" pos="Mid" offset="50"/>
+
+            <Style val="TinyFontOne"/>
+
+        </Frame>
+
+        <Animation name="HoverSound">
+            <Event event="OnMouseEnter" action="Reset,Play" frame="$this"/>
+
+            <Controller type="Sound" end="Stop" frame="$this">
+                <Key type="Sound" time="0.0" sound="@UI_WarChest_ComicButton_Hover"/>
+
+            </Controller>
+        </Animation>
+
+        <Animation name="ClickSound">
+            <Event event="OnClick" action="Reset,Play" frame="$this"/>
+
+            <Controller type="Sound" end="Stop" frame="$this">
+                <Key type="Sound" time="0.0" sound="@UI_BnetDefaultClick"/>
+            </Controller>
+        </Animation>
+
+
+        <Animation name="MoveLabelLeft">
+            <Event event="MoveLeft" action="Restart,Play" frame="$this"/>
+            <Controller type="Anchor" end="Pause" frame="$this/Label" side="Left">
+                <Key type="Curve" time="0.0" value="0"/>
+                <Key type="Curve" time="0.125" value="75"/>
+            </Controller>
+        </Animation>
+        <Animation name="MoveLabelRight">
+            <Event event="MoveRight" action="Restart,Play" frame="$this"/>
+            <Controller type="Anchor" end="Pause" frame="$this/Label" side="Left">
+                <Key type="Curve" time="0.0" value="75"/>
+                <Key type="Curve" time="0.125" value="0"/>
+            </Controller>
+        </Animation>
+
+        <Animation name="ToggleOn">
+            <Event event="OnClick" action="Play,Restart" frame="$this"/>
+
+            <Controller type="State" end="Pause" frame="$this" stateGroup="Toggle">
+                <Key type="Identifier" time="0.0" value="Clicked"/>
+            </Controller>
+        </Animation>
+
+        <StateGroup name="Toggle">
+            <DefaultState val="Unclicked"/>
+            <State name="Clicked">
+                <Action type="SetAnimationProperty" frame="$this" animation="HoverSound" enabled="False"/>
+                <Action type="SetAnimationProperty" frame="$this" animation="ClickSound" enabled="False"/>
+                <Action type="SetProperty" frame="$this/NormalImage" TextureType="EndCap"/>
+                <Action type="SetProperty" frame="$this/Highlight" Alpha="255"/>
+                <Action type="SendEvent" frame="$this" event="MoveLeft"/>
+            </State>
+
+            <State name="Unclicked">
+                <Action type="SetAnimationProperty" frame="$this" animation="HoverSound" enabled="True"/>
+                <Action type="SetAnimationProperty" frame="$this" animation="ClickSound" enabled="True"/>
+                <Action type="SendEvent" frame="$this" event="MoveRight"/>
+            </State>
+        </StateGroup>
+    </Frame>
+
+    <Frame type="Button" name="SmallButton">
+        <Anchor relative="$parent" side="Top" pos="Min" offset="0"/>
+        <Anchor relative="$parent" side="Left" pos="Min" offset="0"/>
+        <Anchor relative="$parent" side="Right" pos="Max" offset="0"/>
+        <Anchor relative="$parent" side="Bottom" pos="Max" offset="0"/>
+
+        <NormalImage val="NormalImage"/>
+        <HoverImage val="HoverImage"/>
+
+        <Frame type="Image" name="NormalImage">
+            <Anchor relative="$parent" side="Top" pos="Min" offset="0"/>
+            <Anchor relative="$parent" side="Left" pos="Min" offset="0"/>
+            <Anchor relative="$parent" side="Right" pos="Max" offset="0"/>
+            <Anchor relative="$parent" side="Bottom" pos="Max" offset="0"/>
+
+            <Texture val="Assets\Textures\sc2_ui_glues_bluebuttons_close_normal.dds"/>
+        </Frame>
+
+        <Frame type="Image" name="HoverImage">
+            <Anchor relative="$parent" side="Top" pos="Min" offset="0"/>
+            <Anchor relative="$parent" side="Left" pos="Min" offset="0"/>
+            <Anchor relative="$parent" side="Right" pos="Max" offset="0"/>
+            <Anchor relative="$parent" side="Bottom" pos="Max" offset="0"/>
+
+            <Texture val="Assets\Textures\sc2_ui_glues_bluebuttons_close_hover.dds"/>
+        </Frame>
+    </Frame>
 </Desc>
