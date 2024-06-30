@@ -1,9 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PlacedObjects Version="27">
-    <ObjectPoint Id="1499412361" Position="30.71,78.96,0" Scale="1,1,1" Type="Normal" Name="Example Point: Left" Color="0,0,0,0"/>
-    <ObjectPoint Id="1616826619" Position="23.8986,131.801,0" Scale="1,1,1" Type="Normal" Name="StartPointForPlayerOne...IKnowThereShouldBeMorePoints" Color="0,0,0,0"/>
-    <ObjectPoint Id="1049203993" Position="120.71,78.96,0" Scale="1,1,1" Type="Normal" Name="Example Point: Right" Color="0,0,0,0"/>
+    <ObjectPoint Id="328837061" Position="20,130.5,0" Scale="1,1,1" Type="Normal" Name="StartPoint12" Color="0,0,0,0"/>
+    <ObjectPoint Id="1084880194" Position="88.4865,82.0573,0" Scale="1,1,1" Type="Normal" Name="AA" Color="0,0,0,0"/>
+    <ObjectPoint Id="1394817962" Position="26.3244,132.1372,0" Scale="1,1,1" Type="Normal" Name="ChaserSpawn1" Color="0,0,0,0"/>
+    <ObjectPoint Id="1593639391" Position="22,130.5,0" Scale="1,1,1" Type="Normal" Name="StartPoint08" Color="0,0,0,0"/>
+    <ObjectPoint Id="549661550" Position="20,127.5,0" Scale="1,1,1" Type="Normal" Name="StartPoint14" Color="0,0,0,0"/>
+    <ObjectPoint Id="540320075" Position="24,129,0" Scale="1,1,1" Type="Normal" Name="StartPoint03" Color="0,0,0,0"/>
+    <ObjectPoint Id="1616826619" Position="24,132,0" Scale="1,1,1" Type="Normal" Name="StartPoint01" Color="0,0,0,0"/>
     <ObjectPoint Id="1211802061" Position="80.71,78.96,0" Scale="1,1,1" Type="Normal" Name="Center Point" Color="0,0,0,0"/>
+    <ObjectPoint Id="2037106312" Position="22,127.5,0" Scale="1,1,1" Type="Normal" Name="StartPoint10" Color="0,0,0,0"/>
+    <ObjectPoint Id="2107987011" Position="24,126,0" Scale="1,1,1" Type="Normal" Name="StartPoint06" Color="0,0,0,0"/>
+    <ObjectPoint Id="2063376118" Position="24,127.5,0" Scale="1,1,1" Type="Normal" Name="StartPoint05" Color="0,0,0,0"/>
+    <ObjectPoint Id="1600691442" Position="24,130.5,0" Scale="1,1,1" Type="Normal" Name="StartPoint02" Color="0,0,0,0"/>
+    <ObjectPoint Id="1075426566" Position="35.9821,43.0783,0" Scale="1,1,1" Type="Normal" Name="ChaserSpawn2" Color="0,0,0,0"/>
+    <ObjectPoint Id="211934240" Position="22,126,0" Scale="1,1,1" Type="Normal" Name="StartPoint11" Color="0,0,0,0"/>
+    <ObjectPoint Id="1169434643" Position="53.7558,60.7434,0" Scale="1,1,1" Type="Normal" Name="ChaserSpawn3" Color="0,0,0,0"/>
+    <ObjectPoint Id="894093397" Position="22,132,0" Scale="1,1,1" Type="Normal" Name="StartPoint07" Color="0,0,0,0"/>
+    <ObjectPoint Id="1506761562" Position="20,129,0" Scale="1,1,1" Type="Normal" Name="StartPoint13" Color="0,0,0,0"/>
+    <ObjectPoint Id="1929303033" Position="22,129,0" Scale="1,1,1" Type="Normal" Name="StartPoint09" Color="0,0,0,0"/>
+    <ObjectPoint Id="752241315" Position="24,129,0" Scale="1,1,1" Type="Normal" Name="StartPoint04" Color="0,0,0,0"/>
     <ObjectCamera Id="2136353644" Position="80.8454,78.2326,0" Rotation="3.14" Scale="1,1,1" Name="Camera 002" Color="0,0,0,0" CameraTarget="80.8454,78.2326">
         <Flag Index="CameraHidden" Value="1"/>
         <CameraValue Index="FieldOfView" Value="27.7998"/>
@@ -17,6 +32,18 @@
         <CameraValue Index="FalloffEnd" Value="8"/>
         <CameraValue Index="BokehFStop" Value="0.0097"/>
         <CameraValue Index="BokehMaxCoC" Value="1"/>
+    </ObjectCamera>
+    <ObjectCamera Id="601890848" Position="212.1525,97.99,0" Rotation="3.1372" Scale="1,1,1" Name="Camera 005" Color="0,0,0,0" CameraTarget="212.1525,97.99">
+        <Flag Index="CameraHidden" Value="1"/>
+        <CameraValue Index="FieldOfView" Value="27.7998"/>
+        <CameraValue Index="NearClip" Value="0.0998"/>
+        <CameraValue Index="FarClip" Value="600"/>
+        <CameraValue Index="ShadowClip" Value="75"/>
+        <CameraValue Index="Distance" Value="66.2563"/>
+        <CameraValue Index="Pitch" Value="81.98"/>
+        <CameraValue Index="Yaw" Value="179.7626"/>
+        <CameraValue Index="FocalDepth" Value="8"/>
+        <CameraValue Index="FalloffEnd" Value="8"/>
     </ObjectCamera>
     <ObjectCamera Id="1395169869" Position="80.8454,78.2326,0" Rotation="3.14" Scale="1,1,1" Name="Camera 003" Color="0,0,0,0" CameraTarget="80.8454,78.2326">
         <Flag Index="CameraHidden" Value="1"/>

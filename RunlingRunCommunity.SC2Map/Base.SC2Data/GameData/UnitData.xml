@@ -42,7 +42,7 @@
         <Mover value="Fly"/>
         <Speed value="1.5"/>
         <Acceleration value="5"/>
-        <Deceleration value="5"/>
+        <Deceleration value="2"/>
         <Sight value="7"/>
         <Height value="10"/>
         <VisionHeight value="4"/>

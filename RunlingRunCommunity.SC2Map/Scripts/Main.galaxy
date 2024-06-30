@@ -5,7 +5,6 @@ const int hoverAlpha = 150;
 const int clickAlpha = 200;
 const color clickColor = Color(0,112,170);
 
-trigger gt_BounceV3;
 trigger gt_SlowDown;
 trigger gt_DialogHover;
 trigger gt_DialogClick;
@@ -15,19 +14,23 @@ trigger gt_TextCommands;
 trigger gt_Hit;
 trigger gt_SendChat;
 trigger gt_DialogValueChange;
+trigger gt_HorizontalBounce;
+trigger gt_VerticalBounce;
+trigger gt_killPlayer;
+trigger gt_safe;
+trigger gt_unsafe;
+trigger gt_UpdateMousePos;
+trigger gt_EndLevel;
+trigger gt_ChaserSpawnTrigger;
+trigger gt_ChaserKillTrigger;
 
-bool gt_BounceV3_Func (bool testConds, bool runActions) {
 
-    // Too many escapees, having to cheat to set unit scales, can only bounce in perfectly rectangular areas. \/ bad approach \/
+bool gt_HorizontalBounce_Func (bool testConds, bool runActions) {
 
-    point max = RegionGetBoundsMax(EventUnitRegion());
-    point min = RegionGetBoundsMin(EventUnitRegion());
-    point unitPosition = UnitGetPosition(EventUnit());
     fixed angle = UnitGetFacing(EventUnit());
-    int i;
 
     if (testConds) {
-        if (!((UnitGroupHasUnit(gv_greyDrones, EventUnit())) == true)) {
+        if (!((UnitGroupHasUnit(gv_greyDrones, EventUnit())) || (UnitGroupHasUnit(gv_purpleDrones, EventUnit()) && EventUnitRegion() == RegionFromName("VerticalEdge")))){
             return false;
         }
     }
@@ -36,49 +39,86 @@ bool gt_BounceV3_Func (bool testConds, bool runActions) {
         return true;
     }
 
-    if (PointGetX(unitPosition) > PointGetX(max) - SLOP || PointGetX(unitPosition) < PointGetX(min) + SLOP){
-        angle = 180 - angle;
-    }
+    angle = 180 - angle;
 
-    if (PointGetY(unitPosition) > PointGetY(max) - SLOP || PointGetY(unitPosition) < PointGetY(min) + SLOP){
-        angle = angle * -1;
-    }
+    UnitSetFacing(EventUnit(), angle, 0);
 
-    UnitCreate(1, "PointDefenseDrone", 0, 15, unitPosition, angle);
-    UnitGroupAdd(gv_greyDrones, UnitLastCreated());
-    UnitSetScale(UnitLastCreated(), gv_cheatVariable, gv_cheatVariable, gv_cheatVariable);
-    UnitSetPropertyFixed(UnitLastCreated(), c_unitPropMovementSpeed, UnitGetPropertyFixed(EventUnit(), c_unitPropMovementSpeed, true));
-    UnitRemove(EventUnit());
-
-
-    UnitIssueOrder(UnitLastCreated(), OrderTargetingPoint(AbilityCommand("move", 0), PointWithOffsetPolar((unitPosition), 25, angle)), c_orderQueueAddToEnd);
-    for (i=2; i < 5; i+=1) {
-        UnitIssueOrder(UnitLastCreated(), OrderTargetingPoint(AbilityCommand("move", 0), PointWithOffsetPolar((unitPosition), 25 * i, angle)), c_orderQueueAddToEnd);
-        
-        
-    }
     return true;
 }
 
-void spawnRed (int Num, fixed Speed, fixed Size, fixed Acceleration, string Colour, region Region, unitgroup Group, string UnitID, fixed Height) {
-    point RandomPoint;
-    int i = 0;
-    fixed lp_size = Size * 100;
+bool gt_VerticalBounce_Func (bool testConds, bool runActions) {
 
-    for (; i < Num; i+=1) {
-        RandomPoint = RegionRandomPoint(Region);
-        UnitCreate(1, UnitID, 0, 15, RegionRandomPoint(Region), 0);
-        UnitSetScale(UnitLastCreated(), lp_size, lp_size, 10);
-        CatalogFieldValueSet(c_gameCatalogUnit, UnitID, "Acceleration", 15, FixedToString(Acceleration, 2));
-        UnitSetPropertyFixed(UnitLastCreated(), c_unitPropMovementSpeed, Speed);
-        UnitGroupAdd(Group, UnitLastCreated());
-        UnitSetHeight(UnitLastCreated(), Height, 0);
-        UnitGroupAdd(gv_dronesToMoveIfIdle, UnitLastCreated());
-        UnitGroupAdd(gv_redDrones, UnitLastCreated());
-        libNtve_gf_SendActorMessageToUnit(UnitLastCreated(), "SetTintColor " + Colour);
-        UnitIssueOrder(UnitLastCreated(), OrderTargetingPoint(AbilityCommand("move", 0), RandomPoint), c_orderQueueReplace);
+    fixed angle = UnitGetFacing(EventUnit());
+
+    if (testConds) {
+        if (!((UnitGroupHasUnit(gv_greyDrones, EventUnit())) || (UnitGroupHasUnit(gv_purpleDrones, EventUnit()) && EventUnitRegion() == RegionFromName("HorizontalEdge")))){
+            return false;
+        } 
     }
 
+    if (!runActions) {
+        return true;
+    }
+
+    angle = angle * -1; 
+
+    UnitSetFacing(EventUnit(), angle, 0);
+
+    return true;
+}
+
+bool gt_killPlayer_Func (bool testConds, bool runActions) {
+    
+    int i = 1;
+    int j = 1;
+    
+    if (testConds) {
+        if (EventPlayer() != 15) {
+            return false;
+        } 
+    }
+
+    if (!runActions) {
+        return true;
+    }
+    for (; i<= PlayerGroupCount(gv_allPlayers); i+=1) {
+        for (; j <= gv_droneSizeArray[0]; j+=1) {
+            if ((EventUnitRegion() == gv_deathRegionArray[i][j] && UnitGroupHasUnit(gv_droneSizeGroup[j], EventUnit())) && !gv_safe[i]){
+                UIDisplayMessage(gv_allPlayers, c_messageAreaError, StringToText("Hit Player :" + IntToString(i) ));
+            }
+        }
+    }
+
+    return true;
+}
+
+void setDeathRegion (fixed size, int j) {
+
+    int i = 1;
+
+    for (; i<=PlayerGroupCount(gv_allPlayers); i+=1) {
+        gv_deathRegionArray[i][j] = RegionCircle(UnitGetPosition(gv_playerCharacter[i]), size / 2 + 0.25);
+        RegionAttachToUnit(gv_deathRegionArray[i][j], gv_playerCharacter[i], Point(0,0));
+        TriggerAddEventUnitRegion(gt_killPlayer, null, gv_deathRegionArray[i][j], true);
+        
+    }
+}
+
+int GetSizeArrayPosition (fixed size){
+
+    int i=1;
+
+    for (; i<=gv_droneSizeArray[0]; i+=1) {
+        if (gv_droneSizeArray[i] == size) {
+            return i;
+        } else if (gv_droneSizeArray[i] == 0.0){
+            gv_droneSizeArray[i] = size;
+            gv_droneSizeArray[0] += 1;
+            setDeathRegion(size, i);
+            return i;
+        }
+    }
+    return i;
 }
 
 bool gt_Setup_Func (bool testConds, bool runActions) {
@@ -96,6 +136,38 @@ bool gt_Setup_Func (bool testConds, bool runActions) {
     return true;
 }
 
+bool gt_safe_Func (bool testConds, bool runActions) {
+
+    if (testConds) {
+        if (EventPlayer() == 15){
+           return false; 
+        }
+    }
+
+    if (!runActions) {
+        return true;
+    }
+
+    gv_safe[EventPlayer()] = true;
+    return true;
+}
+
+bool gt_unsafe_Func (bool testConds, bool runActions) {
+
+    if (testConds) {
+        if (EventPlayer() == 15){
+            return false; 
+        }
+    }
+
+    if (!runActions) {
+        return true;
+    }
+
+    gv_safe[EventPlayer()] = false;
+    return true;
+}
+
 void GameStart () {
     // what to do when everyone has hit the ready button or the timer runs out
 
@@ -106,15 +178,20 @@ void GameStart () {
     VisRevealerCreate(1, RegionEntireMap());
 
     for (; i <= PlayerGroupCount(gv_allPlayers); i+=1){
-        UnitCreate(1, gv_characterSelected[i], 0, i, PointFromId(1616826619), 0);
+        UnitCreate(1, gv_characterSelected[i], c_unitCreateIgnorePlacement, i, PointFromId(1616826619), 0);
         gv_playerCharacter[i] = UnitLastCreated();
         UnitSetPropertyFixed(UnitLastCreated(), c_unitPropMovementSpeed, 10.0);
         CameraLockInput(i, false);
     }
     if (gv_diffVotedFor[1] == 1) {
         TriggerExecute(gt_ExampleLevelOutline, true, false);
+        gv_diff = "ExampleLevelOutline";
     } else if (gv_diffVotedFor[1] == 2){
         TriggerExecute(gt_MyLevelSet, true, false);
+        gv_diff = "MyLevelSet";
+    } else if (gv_diffVotedFor[1] == 3){
+        TriggerExecute(gt_ClassicHard, true, false);
+        gv_diff = "ClassicHard";
     }
     
     gv_gameStarted = true;
@@ -466,6 +543,8 @@ bool gt_TextCommands_Func (bool testConds, bool runActions) {
             UnitSetFacing(gv_playerCharacter[1], RandomFixed(0.0, 360.0), 0);
             Wait(1.0, c_timeReal);
         }
+    } else if (StringSub(message, 2, 2) == "T") {
+        UnitSetPosition(gv_playerCharacter[EventPlayer()], PointFromName(StringSub(message, 3, 4)), false);
     }
     return true;
 }
@@ -532,13 +611,184 @@ bool gt_DialogValueChange_Func (bool testConds, bool runActions) {
         return true;
     }
 
-    CameraSetValue(EventPlayer(), c_cameraValueDistance, libNtve_gf_DialogItemValue(gv_cam.lv_distanceSlider, EventPlayer()), 0, -1, 10.0);
+    gv_camDistance[EventPlayer()] = libNtve_gf_DialogItemValue(gv_cam.lv_distanceSlider, EventPlayer());
+    CameraSetValue(EventPlayer(), c_cameraValueDistance, gv_camDistance[EventPlayer()], 0, -1, 10.0);
+    CameraInfoSetValue(CameraInfoFromId(1623587201), c_cameraValueDistance, gv_camDistance[EventPlayer()]);
     
     return true;
 }
 
+void spawnRed (int Num, fixed Speed, fixed Size, fixed Acceleration, string Colour, region Region, unitgroup Group, string UnitID, fixed Height, bool SpawnTrail, fixed TrailSize, fixed TrailFrequency, fixed TrailTime, string TrailColor) {
+    point RandomPoint;
+    int i = 0;
+    fixed lp_size = Size * 100;
+    int SizeGroup = GetSizeArrayPosition(Size);
+
+    for (; i < Num; i+=1) {
+        RandomPoint = RegionRandomPoint(Region);
+        UnitCreate(1, UnitID, 0, 15, RegionRandomPoint(Region), 0);
+        UnitSetScale(UnitLastCreated(), lp_size, lp_size, lp_size);
+        CatalogFieldValueSet(c_gameCatalogUnit, UnitID, "Acceleration", 15, FixedToString(Acceleration, 2));
+        UnitSetPropertyFixed(UnitLastCreated(), c_unitPropMovementSpeed, Speed);
+        UnitGroupAdd(Group, UnitLastCreated());
+        UnitGroupAdd(gv_droneSizeGroup[SizeGroup], UnitLastCreated());
+        UnitSetHeight(UnitLastCreated(), Height, 0);
+        UnitGroupAdd(gv_dronesToMoveIfIdle, UnitLastCreated());
+        UnitGroupAdd(gv_redDrones, UnitLastCreated());
+        libNtve_gf_SendActorMessageToUnit(UnitLastCreated(), "SetTintColor " + Colour);
+        UnitIssueOrder(UnitLastCreated(), OrderTargetingPoint(AbilityCommand("move", 0), RandomPoint), c_orderQueueReplace);
+        if (SpawnTrail) {
+            gf_TrailDronesSpawn(UnitLastCreated(), TrailSize, TrailFrequency, TrailTime, TrailColor);
+        }
+    }
+
+}
+
+void motherDrone (fixed lp_size, fixed lp_speed, string lp_movementType, int lp_pointVar, int lp_pointVar2, region lp_region, unitgroup lp_redGroup, fixed lp_height, string lp_color, fixed lp_pointMoveFrequency, int lp_thread) {
+
+    fixed size = lp_size * 100;
+    int SizeGroup = GetSizeArrayPosition(lp_size);
+    point initialposition = RegionRandomPoint(lp_region);
+
+    if (lp_movementType == "Red") {
+        UnitCreate(1, "RedDroneOne", 0, 15, initialposition, 0);
+        UnitGroupAdd(gv_dronesToMoveIfIdle, UnitLastCreated());
+        UnitGroupAdd(lp_redGroup, UnitLastCreated());
+        UnitGroupAdd(gv_redDrones, UnitLastCreated());
+        UnitIssueOrder(UnitLastCreated(), OrderTargetingPoint(AbilityCommand("move", 0), RegionRandomPoint(lp_region)), c_orderQueueReplace);
+    } else if (lp_movementType == "Grey" || lp_movementType == "Gray") {
+        UnitCreate(1, "PointDefenseDrone", 0, 15, initialposition, RandomFixed(0, 360));
+        UnitGroupAdd(gv_greyDrones, UnitLastCreated());
+    } else if (lp_movementType == "Purple") {
+        UnitCreate(1, "PointDefenseDrone", 0, 15, initialposition, RandomFixed(0, 360));
+        UnitGroupAdd(gv_purpleDrones, UnitLastCreated());
+    }
+    UnitSetScale(UnitLastCreated(), size, size, size);
+    UnitGroupAdd(gv_droneSizeGroup[SizeGroup], UnitLastCreated());
+    UnitSetHeight(UnitLastCreated(), lp_height, 0);
+    libNtve_gf_SendActorMessageToUnit(UnitLastCreated(), "SetTintColor " + lp_color);
+    gv_pointBank[lp_pointVar][lp_pointVar2] = Point(PointGetX(initialposition), PointGetY(initialposition));
+    UnitSetPropertyFixed(UnitLastCreated(), c_unitPropMovementSpeed, lp_speed);
+    gf_MovePointToUnit(UnitLastCreated(), gv_pointBank[lp_pointVar][lp_pointVar2], lp_pointMoveFrequency, lp_thread);
+}
+
+bool gt_UpdateMousePos_Func (bool testConds, bool runActions) {
+
+    if (!testConds) {
+        return false;
+    }
+
+    if (!runActions) {
+        return true;
+    }
+
+    gv_mouseLocale[EventPlayer()] = Point(EventMouseMovedPosXWorld(), EventMouseMovedPosYWorld());
+    return true;
+}
+
+bool gt_EndLevel_Func (bool testConds, bool runActions) {
+
+    int i = 1;
+
+    if (testConds) {
+        if (EventPlayer() == 15) {
+            return false;
+        }
+    }
+
+    if (!runActions) {
+        return true;
+    }
+
+    for (; i <= PlayerGroupCount(gv_allPlayers); i+=1){
+        if (i < 10) {
+            UnitSetPosition(gv_playerCharacter[i], PointFromName("StartPoint0" + IntToString(i)), false);
+        } else {
+            UnitSetPosition(gv_playerCharacter[i], PointFromName("StartPoint" + IntToString(i)), false);
+        }
+        
+    }
+    i = 1;
+
+    for (; i<=PlayerGroupCount(gv_allPlayers); i+=1){
+        CameraApplyInfo(i, gv_camera[i], 1.0, 10, 3, true);
+        UnitIssueOrder(gv_playerCharacter[i], Order(AbilityCommand("stop", 0)), c_orderQueueReplace);
+        libNtve_gf_MakeUnitUncommandable(gv_playerCharacter[i], true);
+        if (gv_autoClicking[i] == true) {
+            gv_autoClicking[i] = false;
+            gv_autoClickAtLvlStart[i] = true;
+        }
+        
+    }
+    // was going to just execute the trigger by name using gv_diff, but it was misbehaving so we get \/ this \/ abomination for now
+    gv_level += 1;
+    if (gv_diff == "ExampleLevelOutline") {
+        TriggerExecute(gt_ExampleLevelOutline, true, false);
+    } else if (gv_diff == "MyLevelSet") {
+        TriggerExecute(gt_MyLevelSet, true, false);
+    } else if (gv_diff == "ClassicHard") {
+        TriggerExecute(gt_ClassicHard, true, false);
+    }
+
+    Wait(2, c_timeGame);
+    i = 1;
+
+    for (; i<=PlayerGroupCount(gv_allPlayers); i+=1){
+        libNtve_gf_MakeUnitUncommandable(gv_playerCharacter[i], false);
+        if (gv_autoClickAtLvlStart[i] == true) {
+            gv_autoClickAtLvlStart[i] = false;
+            gv_autoClicking[i] = true;
+            gf_AutoClicker(i);
+        }
+    }
+    
+    return true;
+}
+
+bool gt_ChaserSpawnTrigger_Func (bool testConds, bool runActions) {
+
+    if (testConds) {
+        if (EventPlayer() == 15) {
+            return false;
+        }
+        
+    }
+
+    if (!runActions) {
+        return true;
+    }
+
+    if (gv_chase && (EventUnitRegion() == gv_chaserRegions[gv_whichChaser[EventPlayer()]] && gv_chaser[EventPlayer()] == null)) {
+        gf_SpawnChaser(gv_chaserAttributes[EventPlayer()].lv_size, gv_chaserAttributes[EventPlayer()].lv_speed, gv_chaserPoints[gv_whichChaser[EventPlayer()]], EventPlayer());
+    }
+
+    return true;
+}
+
+bool gt_ChaserKillTrigger_Func (bool testConds, bool runActions) {
+
+    if (testConds) {
+        if (EventPlayer() == 15) {
+            return false;
+        }
+        
+    }
+
+    if (!runActions) {
+        return true;
+    }
+
+    if (EventUnitRegion() == gv_chaserDestroyRegions[gv_whichChaser[EventPlayer()]] && gv_chaser[EventPlayer()] != null) {
+        UnitRemove(gv_chaser[EventPlayer()]);
+        gv_chaser[EventPlayer()] = null;
+        gv_whichChaser[EventPlayer()] += 1;
+    }
+
+    //fin level problem
+    return true;
+}
+
 void customTriggerInit(){
-    gt_BounceV3 = TriggerCreate("gt_BounceV3_Func");
     gt_DialogHover = TriggerCreate("gt_DialogHover_Func");
     gt_DialogClick = TriggerCreate("gt_DialogClick_Func");
     gt_DialogExit = TriggerCreate("gt_DialogExit_Func");
@@ -547,36 +797,55 @@ void customTriggerInit(){
     gt_Hit = TriggerCreate("gt_Hit_Func");
     gt_SendChat = TriggerCreate("gt_SendChat_Func");
     gt_DialogValueChange = TriggerCreate("gt_DialogValueChange_Func");
+    gt_HorizontalBounce = TriggerCreate("gt_HorizontalBounce_Func");
+    gt_VerticalBounce = TriggerCreate("gt_VerticalBounce_Func");
+    gt_killPlayer = TriggerCreate("gt_killPlayer_Func");
+    gt_safe = TriggerCreate("gt_safe_Func");
+    gt_unsafe = TriggerCreate("gt_unsafe_Func");
+    gt_UpdateMousePos = TriggerCreate("gt_UpdateMousePos_Func");
+    gt_EndLevel = TriggerCreate("gt_EndLevel_Func");
+    gt_ChaserSpawnTrigger = TriggerCreate("gt_ChaserSpawnTrigger_Func");
+    gt_ChaserKillTrigger = TriggerCreate("gt_ChaserKillTrigger_Func");
 }
 
 void main() {
     customTriggerInit();
-    TriggerAddEventUnitRegion(gt_BounceV3, null, RegionFromName("Lane001"), false);
-    TriggerAddEventUnitRegion(gt_BounceV3, null, RegionFromName("Lane002"), false);
-    TriggerAddEventUnitRegion(gt_BounceV3, null, RegionFromName("Lane003"), false);
-    TriggerAddEventUnitRegion(gt_BounceV3, null, RegionFromName("Lane004"), false);
-    TriggerAddEventUnitRegion(gt_BounceV3, null, RegionFromName("Lane005"), false);
-    TriggerAddEventUnitRegion(gt_BounceV3, null, RegionFromName("Lane006"), false);
-    TriggerAddEventUnitRegion(gt_BounceV3, null, RegionFromName("Lane007"), false);
-    TriggerAddEventUnitRegion(gt_BounceV3, null, RegionFromName("Lane008"), false);
-    TriggerAddEventUnitRegion(gt_BounceV3, null, RegionFromName("Lane009"), false);
-    TriggerAddEventUnitRegion(gt_BounceV3, null, RegionFromName("Lane010"), false);
-    TriggerAddEventUnitRegion(gt_BounceV3, null, RegionFromName("Lane011"), false);
-    TriggerAddEventUnitRegion(gt_BounceV3, null, RegionFromName("Lane012"), false);
-    TriggerAddEventUnitRegion(gt_BounceV3, null, RegionFromName("Lane013"), false);
-    TriggerAddEventUnitRegion(gt_BounceV3, null, RegionFromName("Lane014"), false);
-    TriggerAddEventUnitRegion(gt_BounceV3, null, RegionFromName("Lane015"), false);
-    TriggerAddEventUnitRegion(gt_BounceV3, null, RegionFromName("Lane016"), false);
-    TriggerAddEventUnitRegion(gt_BounceV3, null, RegionFromName("Lane017"), false);
-    //TriggerAddEventUnitRegion(gt_BounceV3, null, RegionFromName("Lane018"), false);
-    TriggerAddEventUnitRegion(gt_BounceV3, null, RegionFromName("Lane019"), false);
+    // CHASER EVENTS
+    // ------- Chaser spawn
+    TriggerAddEventUnitRegion(gt_ChaserSpawnTrigger, null, RegionFromName("Pad01"), true);
+    TriggerAddEventUnitRegion(gt_ChaserSpawnTrigger, null, RegionFromName("Pad08"), true);
+    TriggerAddEventUnitRegion(gt_ChaserSpawnTrigger, null, RegionFromName("Pad16"), true);
+    // ------- Chaser kill
+    TriggerAddEventUnitRegion(gt_ChaserKillTrigger, null, RegionFromName("Pad04"), true);
+    TriggerAddEventUnitRegion(gt_ChaserKillTrigger, null, RegionFromName("Pad12"), true);
+    TriggerAddEventUnitRegion(gt_ChaserKillTrigger, null, RegionFromName("Pad19"), true);
+    // BOUNCE EVENTS
+    TriggerAddEventUnitRegion(gt_HorizontalBounce, null, RegionFromName("VerticalBounceRegion"), true);
+    TriggerAddEventUnitRegion(gt_VerticalBounce, null, RegionFromName("HorizontalBounceRegion"), true);
+    TriggerAddEventUnitRegion(gt_HorizontalBounce, null, RegionFromName("VerticalEdge"), true);
+    TriggerAddEventUnitRegion(gt_VerticalBounce, null, RegionFromName("HorizontalEdge"), true);
+    TriggerAddEventUnitRegion(gt_HorizontalBounce, null, RegionFromName("VerticalBlah"), true);
+    TriggerAddEventUnitRegion(gt_VerticalBounce, null, RegionFromName("HorizontalBlah"), true);
+    // DIALOG EVENTS
     TriggerAddEventDialogControl(gt_DialogHover, 16, c_invalidDialogControlId, c_triggerControlEventTypeMouseEnter);
     TriggerAddEventDialogControl(gt_DialogClick, 16, c_invalidDialogControlId, c_triggerControlEventTypeClick);
     TriggerAddEventDialogControl(gt_DialogExit, 16, c_invalidDialogControlId, c_triggerControlEventTypeMouseExit);
+    // OTHER 
     gt_Setup_Func(true, true);
+    // ------- Chat commands
     TriggerAddEventChatMessage(gt_TextCommands, 16, "#", false);
+    // ------- Hit Detection
     TriggerAddEventUnitRegion(gt_Hit, null, RegionFromName("Hitbox"), true);
+    // ------- Custom Chat
     TriggerAddEventChatMessage(gt_SendChat, 16, "", false);
+    // ------- Dialog value changed
     TriggerAddEventDialogControl(gt_DialogValueChange, c_playerAny, c_invalidDialogControlId, c_triggerControlEventTypeValueChanged);
+    // ------- Update Mouse Position
+    TriggerAddEventMouseMoved(gt_UpdateMousePos, 16);
+    // ------- Safe/Danger zones
+    TriggerAddEventUnitRegion(gt_safe, null, RegionFromName("SafeZones"), true);
+    TriggerAddEventUnitRegion(gt_unsafe, null, RegionFromName("SafeZones"), false);
+    // ------- Level end
+    TriggerAddEventUnitRegion(gt_EndLevel, null, RegionFromName("End"), true);
 }
 

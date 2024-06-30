@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Catalog>
+    <CMoverAvoid id="Ground">
+        <PathMode value="Float"/>
+    </CMoverAvoid>
+    <CMoverAvoid id="GroundRunling">
+        <Flags index="RestoreHeight" value="1"/>
+        <PathMode value="Float"/>
+        <RestoreHeightDuration value="0"/>
+    </CMoverAvoid>
+</Catalog>

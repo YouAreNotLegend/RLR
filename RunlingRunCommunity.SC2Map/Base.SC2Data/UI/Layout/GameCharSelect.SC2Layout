@@ -437,7 +437,7 @@
 				<Anchor relative="$parent" side="Bottom" pos="Min" offset="100"/>
 				<Anchor relative="$parent" side="Right" pos="Max" offset="-20"/>
 
-				<Value val="100"/>
+				<Value val="45"/>
 				<MinValue val="0"/>
 				<MaxValue val="250"/>
 				<StepValue val="1"/>
@@ -1131,7 +1131,7 @@
 							<Anchor relative="$parent" side="Left" pos="Min" offset="30"/>
 							<Anchor relative="$parent" side="Right" pos="Max" offset="0"/>
 							<Anchor relative="$parent" side="Bottom" pos="Max" offset="0"/>
-							<Text val="Option1-3"/>
+							<Text val="Hard"/>
 
 						</Frame>
 						<Animation name="ToggleOff">
@@ -1146,12 +1146,12 @@
 						<Animation name="MoveLabelLeft">
 							<Controller type="Anchor" end="Pause" frame="$this/Label" side="Left">
 								<Key type="Curve" time="0.0" value="0"/>
-								<Key type="Curve" time="0.125" value="35"/>
+								<Key type="Curve" time="0.125" value="110"/>
 							</Controller>
 						</Animation>
 						<Animation name="MoveLabelRight">
 							<Controller type="Anchor" end="Pause" frame="$this/Label" side="Left">
-								<Key type="Curve" time="0.0" value="35"/>
+								<Key type="Curve" time="0.0" value="110"/>
 								<Key type="Curve" time="0.125" value="0"/>
 							</Controller>
 						</Animation>

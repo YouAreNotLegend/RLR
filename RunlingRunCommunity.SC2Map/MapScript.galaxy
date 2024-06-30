@@ -46,6 +46,11 @@ struct gs_Cam {
     bool[15] lv_isVisible;
 };
 
+struct gs_Chaser {
+    fixed lv_speed;
+    fixed lv_size;
+};
+
 //--------------------------------------------------------------------------------------------------
 // Global Variables
 //--------------------------------------------------------------------------------------------------
@@ -68,7 +73,6 @@ unitgroup[11][51] gv_neoYellowDrones;
 point[21][101] gv_pointBank;
 unitgroup[5] gv_redGroup;
 region[5] gv_redRegion;
-fixed gv_cheatVariable;
 int gv_thread;
 fixed gv_greyDroneSpeed;
 playergroup gv_allPlayers;
@@ -79,9 +83,29 @@ string[15] gv_characterSelected;
 int[15] gv_diffVotedFor;
 unit[15] gv_playerCharacter;
 bool gv_gameStarted;
+unitgroup[2] gv_greySizeUnitGroup;
+fixed[31] gv_droneSizeArray;
+unitgroup[31] gv_droneSizeGroup;
+region[15][31] gv_deathRegionArray;
+bool[15] gv_safe;
+bool[15] gv_autoClicking;
+point[15] gv_mouseLocale;
+camerainfo[15] gv_camera;
+string gv_diff;
+bool[15] gv_autoClickAtLvlStart;
+fixed[15] gv_camDistance;
+bool gv_chase;
+int[15] gv_whichChaser;
+region[11] gv_chaserRegions;
+region[11] gv_chaserDestroyRegions;
+point[11] gv_chaserPoints;
+gs_Chaser[15] gv_chaserAttributes;
+unitgroup gv_purpleDrones;
 unitgroup gv_greyDrones;
 unitgroup gv_redDrones;
 string gv_drone;
+unitgroup gv_zigZags;
+unit[15] gv_chaser;
 unitgroup gv_dronesToBeRemovedIfIdle;
 unitgroup gv_dronesToMoveIfIdle;
 
@@ -145,13 +169,28 @@ void InitGlobals () {
         gv_redGroup[init_i] = UnitGroupEmpty();
     }
     gv_allPlayers = PlayerGroupEmpty();
-    gv_level = 1;
+    gv_level = 24;
     for (init_i = 0; init_i <= 14; init_i += 1) {
         gv_characterSelected[init_i] = "";
     }
+    for (init_i = 0; init_i <= 1; init_i += 1) {
+        gv_greySizeUnitGroup[init_i] = UnitGroupEmpty();
+    }
+    for (init_i = 0; init_i <= 30; init_i += 1) {
+        gv_droneSizeGroup[init_i] = UnitGroupEmpty();
+    }
+    for (init_i = 0; init_i <= 14; init_i += 1) {
+        gv_safe[init_i] = true;
+    }
+    gv_diff = "";
+    for (init_i = 0; init_i <= 14; init_i += 1) {
+        gv_camDistance[init_i] = 45.0;
+    }
+    gv_purpleDrones = UnitGroupEmpty();
     gv_greyDrones = UnitGroupEmpty();
     gv_redDrones = UnitGroupEmpty();
     gv_drone = "PointDefenseDrone";
+    gv_zigZags = UnitGroupEmpty();
     gv_dronesToBeRemovedIfIdle = UnitGroupEmpty();
     gv_dronesToMoveIfIdle = UnitGroupEmpty();
 }
@@ -159,23 +198,26 @@ void InitGlobals () {
 //--------------------------------------------------------------------------------------------------
 // Global Function Declarations
 //--------------------------------------------------------------------------------------------------
-void gf_WheelOfDoom (int lp_arms, fixed lp_theta, int lp_lengthOfArms, fixed lp_rotationSpeed, point lp_rotationPoint, fixed lp_droneSpacing, fixed lp_initialSpacing, fixed lp_loopFrequency, fixed lp_speed, fixed lp_time, int lp_pointVar, int lp_pointVar2, fixed lp_size);
-void gf_TraditionalYellow (fixed lp_frequency, int lp_num, fixed lp_size, point lp_originPoint, fixed lp_theta, fixed lp_delta, string lp_color, int lp_moveCommands, int lp_thread, fixed lp_distancePerCommand, fixed lp_rotationAmount, fixed lp_speed, fixed lp_finalDistance, fixed lp_angleChangeReduction, fixed lp_theImBadAtMathParameter, fixed lp_height, fixed lp_initialDelay);
-void gf_NeoYellow (int lp_num, point lp_originPoint, fixed lp_theta, fixed lp_delta, fixed lp_size, fixed lp_speed, string lp_color, int lp_thread, fixed lp_angleDelta, fixed lp_time, fixed lp_distancePer, fixed lp_moveLoopWait, fixed lp_frequency, int lp_instance, fixed lp_height);
+void gf_ResetChaser ();
+void gf_ChaserIssueOrders (int lp_player, unit lp_chaser);
+void gf_SpawnChaser (fixed lp_size, fixed lp_speed, point lp_startPoint, int lp_player);
+fixed gf_GetAbsoluteValue (fixed lp_val);
+void gf_ZigZag (int lp_num, fixed lp_speed, fixed lp_theta, fixed lp_delta, point lp_originPoint, fixed lp_size, fixed lp_delay, bool lp_intraRandom, fixed lp_arcLength, fixed lp_waveSpawnArcLength, int lp_thread, string lp_color, fixed lp_originOffset, fixed lp_height, fixed lp_frequency, bool lp_interRandom, fixed lp_time, fixed lp_zagAmount, fixed lp_zagTime);
+void gf_ZagTime (unit lp_unit, fixed lp_zagTime, fixed lp_zagAmount);
+void gf_TrailDronesSpawn (unit lp_unit, fixed lp_size, fixed lp_frequency, fixed lp_time, string lp_color);
+void gf_DroneKill (unit lp_unit, fixed lp_time);
+void gf_WheelOfDoom (int lp_arms, fixed lp_theta, int lp_lengthOfArms, fixed lp_rotationSpeed, point lp_rotationPoint, fixed lp_droneSpacing, fixed lp_initialSpacing, fixed lp_loopFrequency, fixed lp_speed, fixed lp_time, int lp_pointVar, int lp_pointVar2, fixed lp_size, fixed lp_height, string lp_color);
+void gf_TraditionalYellow (fixed lp_frequency, int lp_num, fixed lp_size, point lp_originPoint, fixed lp_theta, fixed lp_delta, string lp_color, int lp_moveCommands, int lp_thread, fixed lp_distancePerCommand, fixed lp_rotationAmount, fixed lp_speed, fixed lp_finalDistance, fixed lp_angleChangeReduction, fixed lp_theImBadAtMathParameter, fixed lp_height, fixed lp_initialDelay, bool lp_interRandom, bool lp_intraRandom);
+void gf_NeoYellow (int lp_num, point lp_originPoint, fixed lp_theta, fixed lp_delta, fixed lp_size, fixed lp_speed, bool lp_interRandom, bool lp_intraRandom, string lp_color, int lp_thread, fixed lp_angleDelta, fixed lp_time, fixed lp_distancePer, fixed lp_moveLoopWait, fixed lp_frequency, int lp_instance, fixed lp_height);
 void gf_NeoYellowMove (fixed lp_speed, fixed lp_angleDelta, int lp_num, fixed lp_distancePer, fixed lp_moveLoopWait, int lp_instance, int lp_groupNum);
 void gf_NeoYellowKill (fixed lp_time, int lp_instance, int lp_groupNum);
 void gf_MovePointCircle (fixed lp_radius, fixed lp_theta, fixed lp_delta, fixed lp_frequencyOfMovement, point lp_centerPoint, int lp_thread, int lp_pointVar, int lp_pointVar2);
 void gf_MovePointStraight (point lp_destinationPoint, fixed lp_distancePerLoop, fixed lp_frequencyOfLoop, int lp_thread, int lp_pointVar, int lp_pointVar2);
-void gf_SpawnGrey (int lp__1, int lp__2, int lp__3, int lp__4, int lp__5, int lp__6, int lp__7, int lp__8, int lp__9, int lp__10, int lp__11, int lp__12, int lp__13, int lp__14, int lp__15, int lp__16, int lp__17, int lp__18, int lp__19, fixed lp_droneSpeed, fixed lp_size);
-void gf_SpawnGreySingleLane (region lp_lane, int lp_numOfDrones, fixed lp_droneSpeed, fixed lp_size);
-void gf_PointToPointBlue (fixed lp_frequency, fixed lp_speed, int lp_num, fixed lp_size, point lp_originPoint, point lp_destinationPoint, fixed lp_delay, fixed lp_lineTheta, fixed lp_lineDelta, fixed lp_spacing, fixed lp_originOffset, bool lp_randomLineAngle, int lp_thread, string lp_color, int lp_height);
-void gf_PointToRegionBlue (fixed lp_frequency, fixed lp_speed, int lp_num, fixed lp_size, point lp_originPoint, region lp_destinationRegion, fixed lp_delay, fixed lp_lineTheta, fixed lp_lineDelta, fixed lp_spacing, fixed lp_originOffset, bool lp_randomLineAngle, int lp_thread, string lp_color, fixed lp_height);
+void gf_MovePointToUnit (unit lp_unitA, point lp_movedPoint, fixed lp_frequency, int lp_thread);
+void gf_SpawnGrey (int lp__1, int lp__2, int lp__3, int lp__4, int lp__5, int lp__6, int lp__7, int lp__8, int lp__9, int lp__10, int lp__11, int lp__12, int lp__13, int lp__14, int lp__15, int lp__16, int lp__17, int lp__18, int lp__19, fixed lp_droneSpeed, fixed lp_size, string lp_color, bool lp_laneContained, bool lp_spawnTrail, fixed lp_trailSize, string lp_trailColor, fixed lp_trailFrequency, fixed lp_trailTime);
+void gf_SpawnGreySingleLane (region lp_lane, int lp_numOfDrones, fixed lp_droneSpeed, fixed lp_size, string lp_color, bool lp_laneContained, bool lp_spawnTrail, fixed lp_trailSize, fixed lp_trailFrequency, fixed lp_trailTime, string lp_trailColor);
 void gf_PointToDistanceBlue (fixed lp_frequency, fixed lp_delta, fixed lp_theta, fixed lp_speed, fixed lp_size, fixed lp_distance, fixed lp_arcLength, int lp_num, int lp_num2, fixed lp_delay, point lp_originPoint, fixed lp_originOffset, fixed lp_spacing, fixed lp_lineTheta, fixed lp_lineDelta, fixed lp_waveSpawnArcLength, bool lp_interRandom, bool lp_intraRandom, string lp_color, int lp_thread, fixed lp_height);
-fixed gf_GetAbsoluteValue (fixed lp_val);
-void gf_RegionToDistanceBlue (fixed lp_frequency, fixed lp_speed, fixed lp_distance, int lp_num, region lp_originRegion, fixed lp_initialDelay, int lp_threadlocal);
-void gf_RegionToDistanceWallBlue (fixed lp_frequency, fixed lp_delta, fixed lp_theta, fixed lp_speed, int lp_num, fixed lp_initialDelay, region lp_originRegion, fixed lp_wallDroneSpacing, int lp_threadlocal, fixed lp_initialDistance, fixed lp_distance, fixed lp_wallMovementDirection, bool lp_random);
-void gf_RegionToPointBlue (fixed lp_droneSpawnFrequency, fixed lp_droneSpeed, int lp_numOfDronesSpawned, region lp_originRegion, point lp_destinationPoint, fixed lp_initialDelay, bool lp_droneSpawnInLine, fixed lp_changeInAngle, fixed lp_initialAngle, fixed lp_lineDroneSpacing, fixed lp_lineDroneOriginOffset, bool lp_lineAnglesRandom, int lp_threadlocal);
-void gf_RegionToRegionBlue (fixed lp_droneSpawnFrequency, fixed lp_droneSpeed, int lp_numOfDronesSpawned, region lp_originRegion, region lp_destinationRegion, fixed lp_initialDelay, bool lp_droneSpawnInLine, fixed lp_changeInAngle, fixed lp_initialAngle, fixed lp_lineDroneSpacing, fixed lp_lineDroneOriginOffset, bool lp_lineAngleRandom, int lp_threadlocal);
+void gf_AutoClicker (int lp_player);
 
 //--------------------------------------------------------------------------------------------------
 // Trigger Variables
@@ -183,9 +225,10 @@ void gf_RegionToRegionBlue (fixed lp_droneSpawnFrequency, fixed lp_droneSpeed, i
 trigger gt_ExampleLVL5Trigger;
 trigger gt_ExampleLevelOutline;
 trigger gt_MyLevelSet;
-trigger gt_READifyouwant;
+trigger gt_ClassicHard;
 trigger gt_Initialization;
 trigger gt_KeyPressed;
+trigger gt_GreyMovement;
 trigger gt_RemoveIdleDrones;
 trigger gt_RemoveRedSilver;
 trigger gt_IdleMoveAgain;
@@ -205,6 +248,318 @@ void InitCustomScript () {
 //--------------------------------------------------------------------------------------------------
 // Global Functions
 //--------------------------------------------------------------------------------------------------
+void gf_ResetChaser () {
+    // Automatic Variable Declarations
+    // Implementation
+    int i;
+    
+    for (;i<= PlayerGroupCount(gv_allPlayers); i+=1) {
+        gv_whichChaser[i] = 0;
+    }
+}
+
+trigger auto_gf_ChaserIssueOrders_Trigger = null;
+int auto_gf_ChaserIssueOrders_lp_player;
+unit auto_gf_ChaserIssueOrders_lp_chaser;
+
+void gf_ChaserIssueOrders (int lp_player, unit lp_chaser) {
+    auto_gf_ChaserIssueOrders_lp_player = lp_player;
+    auto_gf_ChaserIssueOrders_lp_chaser = lp_chaser;
+
+    if (auto_gf_ChaserIssueOrders_Trigger == null) {
+        auto_gf_ChaserIssueOrders_Trigger = TriggerCreate("auto_gf_ChaserIssueOrders_TriggerFunc");
+    }
+
+    TriggerExecute(auto_gf_ChaserIssueOrders_Trigger, false, false);
+}
+
+bool auto_gf_ChaserIssueOrders_TriggerFunc (bool testConds, bool runActions) {
+    int lp_player = auto_gf_ChaserIssueOrders_lp_player;
+    unit lp_chaser = auto_gf_ChaserIssueOrders_lp_chaser;
+
+    // Automatic Variable Declarations
+    // Implementation
+    unit targetUnit = gv_playerCharacter[lp_player];
+    
+    while (gv_chaser[lp_player] != null) {
+        Wait(0.0, c_timeGame);
+        UnitIssueOrder(lp_chaser, OrderTargetingPoint(AbilityCommand("move", 0), UnitGetPosition(targetUnit)), c_orderQueueReplace);
+    }
+    return true;
+}
+
+trigger auto_gf_SpawnChaser_Trigger = null;
+fixed auto_gf_SpawnChaser_lp_size;
+fixed auto_gf_SpawnChaser_lp_speed;
+point auto_gf_SpawnChaser_lp_startPoint;
+int auto_gf_SpawnChaser_lp_player;
+
+void gf_SpawnChaser (fixed lp_size, fixed lp_speed, point lp_startPoint, int lp_player) {
+    auto_gf_SpawnChaser_lp_size = lp_size;
+    auto_gf_SpawnChaser_lp_speed = lp_speed;
+    auto_gf_SpawnChaser_lp_startPoint = lp_startPoint;
+    auto_gf_SpawnChaser_lp_player = lp_player;
+
+    if (auto_gf_SpawnChaser_Trigger == null) {
+        auto_gf_SpawnChaser_Trigger = TriggerCreate("auto_gf_SpawnChaser_TriggerFunc");
+    }
+
+    TriggerExecute(auto_gf_SpawnChaser_Trigger, false, false);
+}
+
+bool auto_gf_SpawnChaser_TriggerFunc (bool testConds, bool runActions) {
+    fixed lp_size = auto_gf_SpawnChaser_lp_size;
+    fixed lp_speed = auto_gf_SpawnChaser_lp_speed;
+    point lp_startPoint = auto_gf_SpawnChaser_lp_startPoint;
+    int lp_player = auto_gf_SpawnChaser_lp_player;
+
+    // Automatic Variable Declarations
+    // Implementation
+    fixed size = lp_size * 100;
+    int SizeGroup = GetSizeArrayPosition(lp_size);
+    
+    UnitCreate(1, "PointDefenseDrone", c_unitCreateIgnorePlacement, 15, lp_startPoint, 0);
+    UnitSetPropertyFixed(UnitLastCreated(), c_unitPropMovementSpeed, lp_speed);
+    UnitSetScale(UnitLastCreated(), size, size, size);
+    UnitGroupAdd(gv_droneSizeGroup[SizeGroup], UnitLastCreated());
+    gv_chaser[lp_player] = UnitLastCreated();
+    gf_ChaserIssueOrders(lp_player, UnitLastCreated());
+    return true;
+}
+
+fixed gf_GetAbsoluteValue (fixed lp_val) {
+    // Automatic Variable Declarations
+    // Implementation
+    if (lp_val >= 0) {
+        return lp_val;
+    } else {
+        return lp_val * -1;
+    }
+}
+
+trigger auto_gf_ZigZag_Trigger = null;
+int auto_gf_ZigZag_lp_num;
+fixed auto_gf_ZigZag_lp_speed;
+fixed auto_gf_ZigZag_lp_theta;
+fixed auto_gf_ZigZag_lp_delta;
+point auto_gf_ZigZag_lp_originPoint;
+fixed auto_gf_ZigZag_lp_size;
+fixed auto_gf_ZigZag_lp_delay;
+bool auto_gf_ZigZag_lp_intraRandom;
+fixed auto_gf_ZigZag_lp_arcLength;
+fixed auto_gf_ZigZag_lp_waveSpawnArcLength;
+int auto_gf_ZigZag_lp_thread;
+string auto_gf_ZigZag_lp_color;
+fixed auto_gf_ZigZag_lp_originOffset;
+fixed auto_gf_ZigZag_lp_height;
+fixed auto_gf_ZigZag_lp_frequency;
+bool auto_gf_ZigZag_lp_interRandom;
+fixed auto_gf_ZigZag_lp_time;
+fixed auto_gf_ZigZag_lp_zagAmount;
+fixed auto_gf_ZigZag_lp_zagTime;
+
+void gf_ZigZag (int lp_num, fixed lp_speed, fixed lp_theta, fixed lp_delta, point lp_originPoint, fixed lp_size, fixed lp_delay, bool lp_intraRandom, fixed lp_arcLength, fixed lp_waveSpawnArcLength, int lp_thread, string lp_color, fixed lp_originOffset, fixed lp_height, fixed lp_frequency, bool lp_interRandom, fixed lp_time, fixed lp_zagAmount, fixed lp_zagTime) {
+    auto_gf_ZigZag_lp_num = lp_num;
+    auto_gf_ZigZag_lp_speed = lp_speed;
+    auto_gf_ZigZag_lp_theta = lp_theta;
+    auto_gf_ZigZag_lp_delta = lp_delta;
+    auto_gf_ZigZag_lp_originPoint = lp_originPoint;
+    auto_gf_ZigZag_lp_size = lp_size;
+    auto_gf_ZigZag_lp_delay = lp_delay;
+    auto_gf_ZigZag_lp_intraRandom = lp_intraRandom;
+    auto_gf_ZigZag_lp_arcLength = lp_arcLength;
+    auto_gf_ZigZag_lp_waveSpawnArcLength = lp_waveSpawnArcLength;
+    auto_gf_ZigZag_lp_thread = lp_thread;
+    auto_gf_ZigZag_lp_color = lp_color;
+    auto_gf_ZigZag_lp_originOffset = lp_originOffset;
+    auto_gf_ZigZag_lp_height = lp_height;
+    auto_gf_ZigZag_lp_frequency = lp_frequency;
+    auto_gf_ZigZag_lp_interRandom = lp_interRandom;
+    auto_gf_ZigZag_lp_time = lp_time;
+    auto_gf_ZigZag_lp_zagAmount = lp_zagAmount;
+    auto_gf_ZigZag_lp_zagTime = lp_zagTime;
+
+    if (auto_gf_ZigZag_Trigger == null) {
+        auto_gf_ZigZag_Trigger = TriggerCreate("auto_gf_ZigZag_TriggerFunc");
+    }
+
+    TriggerExecute(auto_gf_ZigZag_Trigger, false, false);
+}
+
+bool auto_gf_ZigZag_TriggerFunc (bool testConds, bool runActions) {
+    int lp_num = auto_gf_ZigZag_lp_num;
+    fixed lp_speed = auto_gf_ZigZag_lp_speed;
+    fixed lp_theta = auto_gf_ZigZag_lp_theta;
+    fixed lp_delta = auto_gf_ZigZag_lp_delta;
+    point lp_originPoint = auto_gf_ZigZag_lp_originPoint;
+    fixed lp_size = auto_gf_ZigZag_lp_size;
+    fixed lp_delay = auto_gf_ZigZag_lp_delay;
+    bool lp_intraRandom = auto_gf_ZigZag_lp_intraRandom;
+    fixed lp_arcLength = auto_gf_ZigZag_lp_arcLength;
+    fixed lp_waveSpawnArcLength = auto_gf_ZigZag_lp_waveSpawnArcLength;
+    int lp_thread = auto_gf_ZigZag_lp_thread;
+    string lp_color = auto_gf_ZigZag_lp_color;
+    fixed lp_originOffset = auto_gf_ZigZag_lp_originOffset;
+    fixed lp_height = auto_gf_ZigZag_lp_height;
+    fixed lp_frequency = auto_gf_ZigZag_lp_frequency;
+    bool lp_interRandom = auto_gf_ZigZag_lp_interRandom;
+    fixed lp_time = auto_gf_ZigZag_lp_time;
+    fixed lp_zagAmount = auto_gf_ZigZag_lp_zagAmount;
+    fixed lp_zagTime = auto_gf_ZigZag_lp_zagTime;
+
+    // Automatic Variable Declarations
+    // Implementation
+    fixed AngleDifferenceBetweenDrones;
+    fixed Angle;
+    fixed Delta = lp_delta;
+    fixed Size = lp_size * 100;
+    fixed ArcLength = 360;
+    int i;
+    int SizeGroup;
+    Wait(lp_delay, c_timeGame);
+    SizeGroup = GetSizeArrayPosition(lp_size);
+    if (lp_intraRandom) {
+        if (lp_arcLength > 0) {
+            ArcLength = lp_arcLength;
+        }
+    } else if (lp_waveSpawnArcLength > 0){
+        AngleDifferenceBetweenDrones = lp_waveSpawnArcLength/lp_num;
+    } else {
+        AngleDifferenceBetweenDrones = 360/lp_num;
+    }
+    Angle = lp_theta;
+    while (gv_thread == lp_thread) {
+        i = 0;
+        for (; i < lp_num; i+=1) {
+            UnitCreate(1, gv_drone, 0, 15, PointWithOffsetPolar(lp_originPoint, lp_originOffset, Angle + AngleDifferenceBetweenDrones * i), Angle + AngleDifferenceBetweenDrones * i);
+            libNtve_gf_SendActorMessageToUnit(UnitLastCreated(), "SetTintColor " + lp_color);
+            UnitSetScale(UnitLastCreated(), Size, Size, Size);
+            UnitGroupAdd(gv_droneSizeGroup[SizeGroup], UnitLastCreated());
+            UnitGroupAdd(gv_zigZags, UnitLastCreated());
+            UnitSetPropertyFixed(UnitLastCreated(), c_unitPropMovementSpeed, lp_speed);
+            UnitSetHeight(UnitLastCreated(), lp_height, 0);
+            if (lp_intraRandom) {
+                Angle = RandomFixed(lp_theta, ArcLength + lp_theta);
+            }
+            gf_DroneKill(UnitLastCreated(), lp_time);
+            gf_ZagTime(UnitLastCreated(), lp_zagTime, lp_zagAmount);
+        }
+        Wait(1/lp_frequency, c_timeGame);
+        
+        if (!lp_interRandom){
+            Angle += Delta;
+        } else {
+            Angle = RandomFixed(lp_theta, ArcLength + lp_theta);
+        }
+        if ((gf_GetAbsoluteValue(Angle) >= lp_arcLength + lp_theta || Angle <= lp_theta) && lp_arcLength != 0){
+            Delta *= -1;
+        }
+    }
+    return true;
+}
+
+trigger auto_gf_ZagTime_Trigger = null;
+unit auto_gf_ZagTime_lp_unit;
+fixed auto_gf_ZagTime_lp_zagTime;
+fixed auto_gf_ZagTime_lp_zagAmount;
+
+void gf_ZagTime (unit lp_unit, fixed lp_zagTime, fixed lp_zagAmount) {
+    auto_gf_ZagTime_lp_unit = lp_unit;
+    auto_gf_ZagTime_lp_zagTime = lp_zagTime;
+    auto_gf_ZagTime_lp_zagAmount = lp_zagAmount;
+
+    if (auto_gf_ZagTime_Trigger == null) {
+        auto_gf_ZagTime_Trigger = TriggerCreate("auto_gf_ZagTime_TriggerFunc");
+    }
+
+    TriggerExecute(auto_gf_ZagTime_Trigger, false, false);
+}
+
+bool auto_gf_ZagTime_TriggerFunc (bool testConds, bool runActions) {
+    unit lp_unit = auto_gf_ZagTime_lp_unit;
+    fixed lp_zagTime = auto_gf_ZagTime_lp_zagTime;
+    fixed lp_zagAmount = auto_gf_ZagTime_lp_zagAmount;
+
+    // Automatic Variable Declarations
+    // Implementation
+    int i = 1;
+    while (UnitIsAlive(lp_unit)) {
+        Wait(lp_zagTime, c_timeGame);
+        UnitSetFacing(lp_unit, UnitGetFacing(lp_unit) + lp_zagAmount * i, 0);
+        i = i * -1;
+    }
+    return true;
+}
+
+trigger auto_gf_TrailDronesSpawn_Trigger = null;
+unit auto_gf_TrailDronesSpawn_lp_unit;
+fixed auto_gf_TrailDronesSpawn_lp_size;
+fixed auto_gf_TrailDronesSpawn_lp_frequency;
+fixed auto_gf_TrailDronesSpawn_lp_time;
+string auto_gf_TrailDronesSpawn_lp_color;
+
+void gf_TrailDronesSpawn (unit lp_unit, fixed lp_size, fixed lp_frequency, fixed lp_time, string lp_color) {
+    auto_gf_TrailDronesSpawn_lp_unit = lp_unit;
+    auto_gf_TrailDronesSpawn_lp_size = lp_size;
+    auto_gf_TrailDronesSpawn_lp_frequency = lp_frequency;
+    auto_gf_TrailDronesSpawn_lp_time = lp_time;
+    auto_gf_TrailDronesSpawn_lp_color = lp_color;
+
+    if (auto_gf_TrailDronesSpawn_Trigger == null) {
+        auto_gf_TrailDronesSpawn_Trigger = TriggerCreate("auto_gf_TrailDronesSpawn_TriggerFunc");
+    }
+
+    TriggerExecute(auto_gf_TrailDronesSpawn_Trigger, false, false);
+}
+
+bool auto_gf_TrailDronesSpawn_TriggerFunc (bool testConds, bool runActions) {
+    unit lp_unit = auto_gf_TrailDronesSpawn_lp_unit;
+    fixed lp_size = auto_gf_TrailDronesSpawn_lp_size;
+    fixed lp_frequency = auto_gf_TrailDronesSpawn_lp_frequency;
+    fixed lp_time = auto_gf_TrailDronesSpawn_lp_time;
+    string lp_color = auto_gf_TrailDronesSpawn_lp_color;
+
+    // Automatic Variable Declarations
+    // Implementation
+    fixed lv_size = lp_size * 100;
+    int SizeGroup = GetSizeArrayPosition(lp_size);
+    while (UnitIsAlive(lp_unit)) {
+        UnitCreate(1, "PointDefenseDrone", 0, 15, UnitGetPosition(lp_unit), 0);
+        UnitSetScale(UnitLastCreated(), lv_size, lv_size, lv_size);
+        UnitGroupAdd(gv_droneSizeGroup[SizeGroup], UnitLastCreated());
+        libNtve_gf_SendActorMessageToUnit(UnitLastCreated(), "SetTintColor " + lp_color);
+        gf_DroneKill(UnitLastCreated(), lp_time);
+        Wait(1.0 / lp_frequency, c_timeGame);
+    }
+    return true;
+}
+
+trigger auto_gf_DroneKill_Trigger = null;
+unit auto_gf_DroneKill_lp_unit;
+fixed auto_gf_DroneKill_lp_time;
+
+void gf_DroneKill (unit lp_unit, fixed lp_time) {
+    auto_gf_DroneKill_lp_unit = lp_unit;
+    auto_gf_DroneKill_lp_time = lp_time;
+
+    if (auto_gf_DroneKill_Trigger == null) {
+        auto_gf_DroneKill_Trigger = TriggerCreate("auto_gf_DroneKill_TriggerFunc");
+    }
+
+    TriggerExecute(auto_gf_DroneKill_Trigger, false, false);
+}
+
+bool auto_gf_DroneKill_TriggerFunc (bool testConds, bool runActions) {
+    unit lp_unit = auto_gf_DroneKill_lp_unit;
+    fixed lp_time = auto_gf_DroneKill_lp_time;
+
+    // Automatic Variable Declarations
+    // Implementation
+    Wait(lp_time, c_timeGame);
+    UnitRemove(lp_unit);
+    return true;
+}
+
 trigger auto_gf_WheelOfDoom_Trigger = null;
 int auto_gf_WheelOfDoom_lp_arms;
 fixed auto_gf_WheelOfDoom_lp_theta;
@@ -219,8 +574,10 @@ fixed auto_gf_WheelOfDoom_lp_time;
 int auto_gf_WheelOfDoom_lp_pointVar;
 int auto_gf_WheelOfDoom_lp_pointVar2;
 fixed auto_gf_WheelOfDoom_lp_size;
+fixed auto_gf_WheelOfDoom_lp_height;
+string auto_gf_WheelOfDoom_lp_color;
 
-void gf_WheelOfDoom (int lp_arms, fixed lp_theta, int lp_lengthOfArms, fixed lp_rotationSpeed, point lp_rotationPoint, fixed lp_droneSpacing, fixed lp_initialSpacing, fixed lp_loopFrequency, fixed lp_speed, fixed lp_time, int lp_pointVar, int lp_pointVar2, fixed lp_size) {
+void gf_WheelOfDoom (int lp_arms, fixed lp_theta, int lp_lengthOfArms, fixed lp_rotationSpeed, point lp_rotationPoint, fixed lp_droneSpacing, fixed lp_initialSpacing, fixed lp_loopFrequency, fixed lp_speed, fixed lp_time, int lp_pointVar, int lp_pointVar2, fixed lp_size, fixed lp_height, string lp_color) {
     auto_gf_WheelOfDoom_lp_arms = lp_arms;
     auto_gf_WheelOfDoom_lp_theta = lp_theta;
     auto_gf_WheelOfDoom_lp_lengthOfArms = lp_lengthOfArms;
@@ -234,6 +591,8 @@ void gf_WheelOfDoom (int lp_arms, fixed lp_theta, int lp_lengthOfArms, fixed lp_
     auto_gf_WheelOfDoom_lp_pointVar = lp_pointVar;
     auto_gf_WheelOfDoom_lp_pointVar2 = lp_pointVar2;
     auto_gf_WheelOfDoom_lp_size = lp_size;
+    auto_gf_WheelOfDoom_lp_height = lp_height;
+    auto_gf_WheelOfDoom_lp_color = lp_color;
 
     if (auto_gf_WheelOfDoom_Trigger == null) {
         auto_gf_WheelOfDoom_Trigger = TriggerCreate("auto_gf_WheelOfDoom_TriggerFunc");
@@ -256,79 +615,60 @@ bool auto_gf_WheelOfDoom_TriggerFunc (bool testConds, bool runActions) {
     int lp_pointVar = auto_gf_WheelOfDoom_lp_pointVar;
     int lp_pointVar2 = auto_gf_WheelOfDoom_lp_pointVar2;
     fixed lp_size = auto_gf_WheelOfDoom_lp_size;
-
-    // Variable Declarations
-    int lv_iter;
-    int lv_iter2;
-    fixed[31] lv_armAngles;
-    fixed lv_rotationPerArm;
-    unit[31][46] lv_rotationDrones;
-    point lv_point;
-    timer lv_timer;
-    unitgroup lv_drones;
-    fixed lv_lvSize;
+    fixed lp_height = auto_gf_WheelOfDoom_lp_height;
+    string lp_color = auto_gf_WheelOfDoom_lp_color;
 
     // Automatic Variable Declarations
-    int auto8971E46E_ae;
-    const int auto8971E46E_ai = 1;
-    int auto776DF90F_ae;
-    const int auto776DF90F_ai = 1;
-    int autoD3DEEDB1_ae;
-    const int autoD3DEEDB1_ai = 1;
-    int auto7042BF46_ae;
-    const int auto7042BF46_ai = 1;
-    unitgroup autoD8BD944F_g;
-    int autoD8BD944F_u;
-    unit autoD8BD944F_var;
-
-    // Variable Initialization
-    lv_timer = TimerCreate();
-    lv_drones = UnitGroupEmpty();
-
     // Implementation
-    lv_lvSize = (100.0 * lp_size);
-    if ((lp_time != 0.0)) {
+    int i = 1;
+    int j;
+    fixed[31] ArmAngles;
+    fixed RotationPerArm = 360 / lp_arms;
+    unit[31][46] RotationDrones;
+    timer DeathTimer;
+    unitgroup Drones;
+    fixed lv_size = 100 * lp_size;
+    unit RemovedUnit;
+    int SizeGroup = GetSizeArrayPosition(lp_size);
+    Drones = UnitGroupEmpty();
+    DeathTimer = TimerCreate();
+    if (lp_time != 0.0) {
         TimerStart(TimerCreate(), lp_time, false, c_timeGame);
-        lv_timer = TimerLastStarted();
+        DeathTimer = TimerLastStarted();
     }
-
     gv_pointBank[lp_pointVar][lp_pointVar2] = Point(PointGetX(lp_rotationPoint), PointGetY(lp_rotationPoint));
-    lv_rotationPerArm = (360.0 / lp_arms);
-    auto8971E46E_ae = lp_arms;
-    lv_iter = 1;
-    for ( ; ( (auto8971E46E_ai >= 0 && lv_iter <= auto8971E46E_ae) || (auto8971E46E_ai < 0 && lv_iter >= auto8971E46E_ae) ) ; lv_iter += auto8971E46E_ai ) {
-        lv_armAngles[lv_iter] = (lv_rotationPerArm * lv_iter);
-        auto776DF90F_ae = lp_lengthOfArms;
-        lv_iter2 = 1;
-        for ( ; ( (auto776DF90F_ai >= 0 && lv_iter2 <= auto776DF90F_ae) || (auto776DF90F_ai < 0 && lv_iter2 >= auto776DF90F_ae) ) ; lv_iter2 += auto776DF90F_ai ) {
-            libNtve_gf_CreateUnitsWithDefaultFacing(1, "PointDefenseDrone", 0, 15, gv_pointBank[lp_pointVar][lp_pointVar2]);
+    for (; i <= lp_arms; i+=1) {
+        ArmAngles[i] = RotationPerArm * i + lp_theta;
+        j = 1;
+        for (; j <= lp_lengthOfArms; j+=1) {
+            UnitCreate(1, "PointDefenseDrone", 0, 15, gv_pointBank[lp_pointVar][lp_pointVar2], 0.0);
             UnitSetPropertyFixed(UnitLastCreated(), c_unitPropMovementSpeed, lp_speed);
-            UnitSetScale(UnitLastCreated(), lv_lvSize, lv_lvSize, lv_lvSize);
-            UnitSetHeight(UnitLastCreated(), 10.4, 0.0);
-            libNtve_gf_SendActorMessageToUnit(UnitLastCreated(), "SetTintColor 255,128,128");
-            UnitGroupAdd(lv_drones, UnitLastCreated());
-            lv_rotationDrones[lv_iter][lv_iter2] = UnitLastCreated();
+            UnitSetScale(UnitLastCreated(), lv_size, lv_size, lv_size);
+            UnitSetHeight(UnitLastCreated(), lp_height, 0);
+            libNtve_gf_SendActorMessageToUnit(UnitLastCreated(), "SetTintColor " + lp_color);
+            UnitGroupAdd(Drones, UnitLastCreated());
+            UnitGroupAdd(gv_droneSizeGroup[SizeGroup], UnitLastCreated());
+            RotationDrones[i][j] = UnitLastCreated();
         }
     }
-    while ((TimerGetRemaining(lv_timer) > 0.0)) {
-        Wait((1.0 / lp_loopFrequency), c_timeGame);
-        autoD3DEEDB1_ae = lp_arms;
-        lv_iter = 1;
-        for ( ; ( (autoD3DEEDB1_ai >= 0 && lv_iter <= autoD3DEEDB1_ae) || (autoD3DEEDB1_ai < 0 && lv_iter >= autoD3DEEDB1_ae) ) ; lv_iter += autoD3DEEDB1_ai ) {
-            lv_armAngles[lv_iter] += lp_rotationSpeed;
-            auto7042BF46_ae = lp_lengthOfArms;
-            lv_iter2 = 1;
-            for ( ; ( (auto7042BF46_ai >= 0 && lv_iter2 <= auto7042BF46_ae) || (auto7042BF46_ai < 0 && lv_iter2 >= auto7042BF46_ae) ) ; lv_iter2 += auto7042BF46_ai ) {
-                UnitIssueOrder(lv_rotationDrones[lv_iter][lv_iter2], OrderTargetingPoint(AbilityCommand("move", 0), Point((PointGetX(gv_pointBank[lp_pointVar][lp_pointVar2]) + (Cos(lv_armAngles[lv_iter]) * ((lp_droneSpacing * lv_iter2) + lp_initialSpacing))), (PointGetY(gv_pointBank[lp_pointVar][lp_pointVar2]) + (Sin(lv_armAngles[lv_iter]) * ((lp_droneSpacing * lv_iter2) + lp_initialSpacing))))), c_orderQueueReplace);
+    i = 1;
+    j = 1;
+    while (TimerGetRemaining(DeathTimer) > 0.0) {
+        Wait(1.0 / lp_loopFrequency, c_timeGame);
+        i = 1;
+        for (; i <= lp_arms; i+=1) {
+            ArmAngles[i] += lp_rotationSpeed;
+            j = 1;
+            for (; j <= lp_lengthOfArms; j+=1) {
+                UnitIssueOrder(RotationDrones[i][j],OrderTargetingPoint(AbilityCommand("move", 0), Point((PointGetX(gv_pointBank[lp_pointVar][lp_pointVar2]) + (Cos(ArmAngles[i]) * ((lp_droneSpacing * j) + lp_initialSpacing))), (PointGetY(gv_pointBank[lp_pointVar][lp_pointVar2]) + (Sin(ArmAngles[i]) * ((lp_droneSpacing * j) + lp_initialSpacing))))), c_orderQueueReplace);
             }
         }
     }
-    autoD8BD944F_g = lv_drones;
-    autoD8BD944F_u = UnitGroupCount(autoD8BD944F_g, c_unitCountAll);
-    for (;; autoD8BD944F_u -= 1) {
-        autoD8BD944F_var = UnitGroupUnitFromEnd(autoD8BD944F_g, autoD8BD944F_u);
-        if (autoD8BD944F_var == null) { break; }
-        UnitRemove(autoD8BD944F_var);
+    i = UnitGroupCount(Drones, c_unitCountAll);
+    for (;; i-=1){
+        RemovedUnit = UnitGroupUnitFromEnd(Drones, i);
+        if (RemovedUnit == null) {break;}
+        UnitRemove(RemovedUnit);
     }
     return true;
 }
@@ -351,8 +691,10 @@ fixed auto_gf_TraditionalYellow_lp_angleChangeReduction;
 fixed auto_gf_TraditionalYellow_lp_theImBadAtMathParameter;
 fixed auto_gf_TraditionalYellow_lp_height;
 fixed auto_gf_TraditionalYellow_lp_initialDelay;
+bool auto_gf_TraditionalYellow_lp_interRandom;
+bool auto_gf_TraditionalYellow_lp_intraRandom;
 
-void gf_TraditionalYellow (fixed lp_frequency, int lp_num, fixed lp_size, point lp_originPoint, fixed lp_theta, fixed lp_delta, string lp_color, int lp_moveCommands, int lp_thread, fixed lp_distancePerCommand, fixed lp_rotationAmount, fixed lp_speed, fixed lp_finalDistance, fixed lp_angleChangeReduction, fixed lp_theImBadAtMathParameter, fixed lp_height, fixed lp_initialDelay) {
+void gf_TraditionalYellow (fixed lp_frequency, int lp_num, fixed lp_size, point lp_originPoint, fixed lp_theta, fixed lp_delta, string lp_color, int lp_moveCommands, int lp_thread, fixed lp_distancePerCommand, fixed lp_rotationAmount, fixed lp_speed, fixed lp_finalDistance, fixed lp_angleChangeReduction, fixed lp_theImBadAtMathParameter, fixed lp_height, fixed lp_initialDelay, bool lp_interRandom, bool lp_intraRandom) {
     auto_gf_TraditionalYellow_lp_frequency = lp_frequency;
     auto_gf_TraditionalYellow_lp_num = lp_num;
     auto_gf_TraditionalYellow_lp_size = lp_size;
@@ -370,6 +712,8 @@ void gf_TraditionalYellow (fixed lp_frequency, int lp_num, fixed lp_size, point 
     auto_gf_TraditionalYellow_lp_theImBadAtMathParameter = lp_theImBadAtMathParameter;
     auto_gf_TraditionalYellow_lp_height = lp_height;
     auto_gf_TraditionalYellow_lp_initialDelay = lp_initialDelay;
+    auto_gf_TraditionalYellow_lp_interRandom = lp_interRandom;
+    auto_gf_TraditionalYellow_lp_intraRandom = lp_intraRandom;
 
     if (auto_gf_TraditionalYellow_Trigger == null) {
         auto_gf_TraditionalYellow_Trigger = TriggerCreate("auto_gf_TraditionalYellow_TriggerFunc");
@@ -396,6 +740,8 @@ bool auto_gf_TraditionalYellow_TriggerFunc (bool testConds, bool runActions) {
     fixed lp_theImBadAtMathParameter = auto_gf_TraditionalYellow_lp_theImBadAtMathParameter;
     fixed lp_height = auto_gf_TraditionalYellow_lp_height;
     fixed lp_initialDelay = auto_gf_TraditionalYellow_lp_initialDelay;
+    bool lp_interRandom = auto_gf_TraditionalYellow_lp_interRandom;
+    bool lp_intraRandom = auto_gf_TraditionalYellow_lp_intraRandom;
 
     // Automatic Variable Declarations
     // Implementation
@@ -405,7 +751,7 @@ bool auto_gf_TraditionalYellow_TriggerFunc (bool testConds, bool runActions) {
     fixed AngleTemp;
     fixed AnotherAngleVariable;
     fixed Size = lp_size * 100;
-    fixed AngleDifferenceBetweenDrones = 360 / IntToFixed(lp_num);
+    fixed AngleDifferenceBetweenDrones = 360.0 / IntToFixed(lp_num);
     fixed m;
     fixed b;
     fixed x1;
@@ -423,13 +769,20 @@ bool auto_gf_TraditionalYellow_TriggerFunc (bool testConds, bool runActions) {
     fixed p;
     fixed q;
     fixed d = lp_finalDistance;
+    int SizeGroup = GetSizeArrayPosition(lp_size);
     Wait(lp_initialDelay, c_timeGame);
     while (lp_thread == gv_thread) {
-        Angle = lp_theta + AnotherAngleVariable;
+        if (!lp_interRandom) {
+            AnotherAngleVariable += lp_delta;
+            Angle += lp_theta + AnotherAngleVariable;
+        } else {
+            Angle = RandomFixed(0, 360);
+        }
         AngleTemp = Angle;
         for (; i<lp_num; i+=1) {
             UnitCreate(1, gv_drone, 0, 15, lp_originPoint, Angle);
             UnitGroupAdd(gv_dronesToBeRemovedIfIdle, UnitLastCreated());
+            UnitGroupAdd(gv_droneSizeGroup[SizeGroup], UnitLastCreated());
             UnitSetPropertyFixed(UnitLastCreated(), c_unitPropMovementSpeed, lp_speed);
             UnitIssueOrder(UnitLastCreated(), OrderTargetingPoint(AbilityCommand("move", 0), PointWithOffsetPolar(lp_originPoint, lp_distancePerCommand, UnitGetFacing(UnitLastCreated()))), c_orderQueueReplace);
             for (; j<lp_moveCommands + 2; j+=1) {
@@ -446,7 +799,7 @@ bool auto_gf_TraditionalYellow_TriggerFunc (bool testConds, bool runActions) {
             q = PointGetY(lp_originPoint);
             m = (y2 - y1) / (x2 - x1);
             b = y1 - m * x1;
-            if (m > 50 || m < -50) {
+            if (m > 10 || m < -10) {
                 x = x2;
                 xx = x2 + 1;
                 if (y2 > y1) {
@@ -472,13 +825,16 @@ bool auto_gf_TraditionalYellow_TriggerFunc (bool testConds, bool runActions) {
             libNtve_gf_SendActorMessageToUnit(UnitLastCreated(), "SetTintColor " + lp_color);
             UnitSetScale(UnitLastCreated(), Size, Size, Size);
             UnitSetHeight(UnitLastCreated(), lp_height, 0);
-            Angle += AngleDifferenceBetweenDrones;
+            if (lp_intraRandom) {
+                Angle = RandomFixed(0, 360);
+            } else {
+                Angle += AngleDifferenceBetweenDrones;
+            }
             AngleTemp = Angle;
             j = 2;
         }
         Wait(1/lp_frequency, c_timeGame);
         i = 0;
-        AnotherAngleVariable += lp_delta;
     } 
     return true;
 }
@@ -490,6 +846,8 @@ fixed auto_gf_NeoYellow_lp_theta;
 fixed auto_gf_NeoYellow_lp_delta;
 fixed auto_gf_NeoYellow_lp_size;
 fixed auto_gf_NeoYellow_lp_speed;
+bool auto_gf_NeoYellow_lp_interRandom;
+bool auto_gf_NeoYellow_lp_intraRandom;
 string auto_gf_NeoYellow_lp_color;
 int auto_gf_NeoYellow_lp_thread;
 fixed auto_gf_NeoYellow_lp_angleDelta;
@@ -500,13 +858,15 @@ fixed auto_gf_NeoYellow_lp_frequency;
 int auto_gf_NeoYellow_lp_instance;
 fixed auto_gf_NeoYellow_lp_height;
 
-void gf_NeoYellow (int lp_num, point lp_originPoint, fixed lp_theta, fixed lp_delta, fixed lp_size, fixed lp_speed, string lp_color, int lp_thread, fixed lp_angleDelta, fixed lp_time, fixed lp_distancePer, fixed lp_moveLoopWait, fixed lp_frequency, int lp_instance, fixed lp_height) {
+void gf_NeoYellow (int lp_num, point lp_originPoint, fixed lp_theta, fixed lp_delta, fixed lp_size, fixed lp_speed, bool lp_interRandom, bool lp_intraRandom, string lp_color, int lp_thread, fixed lp_angleDelta, fixed lp_time, fixed lp_distancePer, fixed lp_moveLoopWait, fixed lp_frequency, int lp_instance, fixed lp_height) {
     auto_gf_NeoYellow_lp_num = lp_num;
     auto_gf_NeoYellow_lp_originPoint = lp_originPoint;
     auto_gf_NeoYellow_lp_theta = lp_theta;
     auto_gf_NeoYellow_lp_delta = lp_delta;
     auto_gf_NeoYellow_lp_size = lp_size;
     auto_gf_NeoYellow_lp_speed = lp_speed;
+    auto_gf_NeoYellow_lp_interRandom = lp_interRandom;
+    auto_gf_NeoYellow_lp_intraRandom = lp_intraRandom;
     auto_gf_NeoYellow_lp_color = lp_color;
     auto_gf_NeoYellow_lp_thread = lp_thread;
     auto_gf_NeoYellow_lp_angleDelta = lp_angleDelta;
@@ -531,6 +891,8 @@ bool auto_gf_NeoYellow_TriggerFunc (bool testConds, bool runActions) {
     fixed lp_delta = auto_gf_NeoYellow_lp_delta;
     fixed lp_size = auto_gf_NeoYellow_lp_size;
     fixed lp_speed = auto_gf_NeoYellow_lp_speed;
+    bool lp_interRandom = auto_gf_NeoYellow_lp_interRandom;
+    bool lp_intraRandom = auto_gf_NeoYellow_lp_intraRandom;
     string lp_color = auto_gf_NeoYellow_lp_color;
     int lp_thread = auto_gf_NeoYellow_lp_thread;
     fixed lp_angleDelta = auto_gf_NeoYellow_lp_angleDelta;
@@ -547,16 +909,21 @@ bool auto_gf_NeoYellow_TriggerFunc (bool testConds, bool runActions) {
     fixed Angle = lp_theta;
     fixed AngleDifferenceBetweenDrones = 360.0/IntToFixed(lp_num);
     fixed Size = 100.0 * lp_size;
+    int SizeGroup = GetSizeArrayPosition(lp_size);
     int j;
     while (lp_thread == gv_thread) {
         for (; i < lp_num; i+=1) {
             UnitCreate(1, gv_drone, 0, 15, lp_originPoint, Angle);
             Angle += AngleDifferenceBetweenDrones;
             UnitGroupAdd(gv_neoYellowDrones[lp_instance][j], UnitLastCreated());
-            UnitSetScale(UnitLastCreated(), Size, Size, 10);
+            UnitGroupAdd(gv_droneSizeGroup[SizeGroup], UnitLastCreated());
+            UnitSetScale(UnitLastCreated(), Size, Size, Size);
             UnitSetHeight(UnitLastCreated(), lp_height, 0);
             UnitSetPropertyFixed(UnitLastCreated(), c_unitPropMovementSpeed, lp_speed);
             libNtve_gf_SendActorMessageToUnit(UnitLastCreated(), "SetTintColor " + lp_color);
+            if (lp_intraRandom) {
+                Angle = RandomFixed(0, 360);
+            }
         }
         gf_NeoYellowMove(lp_speed, lp_angleDelta, lp_num, lp_distancePer, lp_moveLoopWait, lp_instance, j);
         gf_NeoYellowKill(lp_time, lp_instance, j);
@@ -566,7 +933,11 @@ bool auto_gf_NeoYellow_TriggerFunc (bool testConds, bool runActions) {
         } else {
             j = 0;
         }
-        Angle += lp_delta;
+        if (!lp_interRandom) {
+            Angle += lp_delta;
+        } else {
+            Angle = RandomFixed(0, 360);
+        }
         Wait(1.0/lp_frequency, c_timeGame);
     }
     return true;
@@ -761,252 +1132,91 @@ bool auto_gf_MovePointStraight_TriggerFunc (bool testConds, bool runActions) {
     return true;
 }
 
-void gf_SpawnGrey (int lp__1, int lp__2, int lp__3, int lp__4, int lp__5, int lp__6, int lp__7, int lp__8, int lp__9, int lp__10, int lp__11, int lp__12, int lp__13, int lp__14, int lp__15, int lp__16, int lp__17, int lp__18, int lp__19, fixed lp_droneSpeed, fixed lp_size) {
+trigger auto_gf_MovePointToUnit_Trigger = null;
+unit auto_gf_MovePointToUnit_lp_unitA;
+point auto_gf_MovePointToUnit_lp_movedPoint;
+fixed auto_gf_MovePointToUnit_lp_frequency;
+int auto_gf_MovePointToUnit_lp_thread;
+
+void gf_MovePointToUnit (unit lp_unitA, point lp_movedPoint, fixed lp_frequency, int lp_thread) {
+    auto_gf_MovePointToUnit_lp_unitA = lp_unitA;
+    auto_gf_MovePointToUnit_lp_movedPoint = lp_movedPoint;
+    auto_gf_MovePointToUnit_lp_frequency = lp_frequency;
+    auto_gf_MovePointToUnit_lp_thread = lp_thread;
+
+    if (auto_gf_MovePointToUnit_Trigger == null) {
+        auto_gf_MovePointToUnit_Trigger = TriggerCreate("auto_gf_MovePointToUnit_TriggerFunc");
+    }
+
+    TriggerExecute(auto_gf_MovePointToUnit_Trigger, false, false);
+}
+
+bool auto_gf_MovePointToUnit_TriggerFunc (bool testConds, bool runActions) {
+    unit lp_unitA = auto_gf_MovePointToUnit_lp_unitA;
+    point lp_movedPoint = auto_gf_MovePointToUnit_lp_movedPoint;
+    fixed lp_frequency = auto_gf_MovePointToUnit_lp_frequency;
+    int lp_thread = auto_gf_MovePointToUnit_lp_thread;
+
+    // Automatic Variable Declarations
+    // Implementation
+    while (lp_thread == gv_thread) {
+      PointSet(lp_movedPoint, UnitGetPosition(lp_unitA));
+      Wait(1.0/lp_frequency, c_timeGame);
+    }
+    return true;
+}
+
+void gf_SpawnGrey (int lp__1, int lp__2, int lp__3, int lp__4, int lp__5, int lp__6, int lp__7, int lp__8, int lp__9, int lp__10, int lp__11, int lp__12, int lp__13, int lp__14, int lp__15, int lp__16, int lp__17, int lp__18, int lp__19, fixed lp_droneSpeed, fixed lp_size, string lp_color, bool lp_laneContained, bool lp_spawnTrail, fixed lp_trailSize, string lp_trailColor, fixed lp_trailFrequency, fixed lp_trailTime) {
     // Variable Declarations
     int lv_iter;
     int lv_iter2;
 
     // Automatic Variable Declarations
-    const int auto0BDF69DC_ae = 18;
-    const int auto0BDF69DC_ai = 1;
-
     // Variable Initialization
 
     // Implementation
-    gv_cheatVariable = (100.0 * lp_size);
-    lv_iter = 1;
-    for ( ; ( (auto0BDF69DC_ai >= 0 && lv_iter <= auto0BDF69DC_ae) || (auto0BDF69DC_ai < 0 && lv_iter >= auto0BDF69DC_ae) ) ; lv_iter += auto0BDF69DC_ai ) {
-        if ((lv_iter < 10)) {
-            gf_SpawnGreySingleLane(RegionFromName(("Region 00" + IntToString(lv_iter))), lp__1, lp_droneSpeed, lp_size);
-        }
-        else {
-            gf_SpawnGreySingleLane(RegionFromName(("Region 0" + IntToString(lv_iter))), lp__1, lp_droneSpeed, lp_size);
-        }
-    }
+    gf_SpawnGreySingleLane(RegionFromId(26), lp__1, lp_droneSpeed, lp_size, lp_color, lp_laneContained, lp_spawnTrail, lp_trailSize, lp_trailFrequency, lp_trailTime, lp_trailColor);
+    gf_SpawnGreySingleLane(RegionFromId(43), lp__2, lp_droneSpeed, lp_size, lp_color, lp_laneContained, lp_spawnTrail, lp_trailSize, lp_trailFrequency, lp_trailTime, lp_trailColor);
+    gf_SpawnGreySingleLane(RegionFromId(42), lp__3, lp_droneSpeed, lp_size, lp_color, lp_laneContained, lp_spawnTrail, lp_trailSize, lp_trailFrequency, lp_trailTime, lp_trailColor);
+    gf_SpawnGreySingleLane(RegionFromId(41), lp__4, lp_droneSpeed, lp_size, lp_color, lp_laneContained, lp_spawnTrail, lp_trailSize, lp_trailFrequency, lp_trailTime, lp_trailColor);
+    gf_SpawnGreySingleLane(RegionFromId(40), lp__5, lp_droneSpeed, lp_size, lp_color, lp_laneContained, lp_spawnTrail, lp_trailSize, lp_trailFrequency, lp_trailTime, lp_trailColor);
+    gf_SpawnGreySingleLane(RegionFromId(39), lp__6, lp_droneSpeed, lp_size, lp_color, lp_laneContained, lp_spawnTrail, lp_trailSize, lp_trailFrequency, lp_trailTime, lp_trailColor);
+    gf_SpawnGreySingleLane(RegionFromId(38), lp__7, lp_droneSpeed, lp_size, lp_color, lp_laneContained, lp_spawnTrail, lp_trailSize, lp_trailFrequency, lp_trailTime, lp_trailColor);
+    gf_SpawnGreySingleLane(RegionFromId(37), lp__8, lp_droneSpeed, lp_size, lp_color, lp_laneContained, lp_spawnTrail, lp_trailSize, lp_trailFrequency, lp_trailTime, lp_trailColor);
+    gf_SpawnGreySingleLane(RegionFromId(36), lp__9, lp_droneSpeed, lp_size, lp_color, lp_laneContained, lp_spawnTrail, lp_trailSize, lp_trailFrequency, lp_trailTime, lp_trailColor);
+    gf_SpawnGreySingleLane(RegionFromId(35), lp__10, lp_droneSpeed, lp_size, lp_color, lp_laneContained, lp_spawnTrail, lp_trailSize, lp_trailFrequency, lp_trailTime, lp_trailColor);
+    gf_SpawnGreySingleLane(RegionFromId(34), lp__11, lp_droneSpeed, lp_size, lp_color, lp_laneContained, lp_spawnTrail, lp_trailSize, lp_trailFrequency, lp_trailTime, lp_trailColor);
+    gf_SpawnGreySingleLane(RegionFromId(33), lp__12, lp_droneSpeed, lp_size, lp_color, lp_laneContained, lp_spawnTrail, lp_trailSize, lp_trailFrequency, lp_trailTime, lp_trailColor);
+    gf_SpawnGreySingleLane(RegionFromId(32), lp__13, lp_droneSpeed, lp_size, lp_color, lp_laneContained, lp_spawnTrail, lp_trailSize, lp_trailFrequency, lp_trailTime, lp_trailColor);
+    gf_SpawnGreySingleLane(RegionFromId(31), lp__14, lp_droneSpeed, lp_size, lp_color, lp_laneContained, lp_spawnTrail, lp_trailSize, lp_trailFrequency, lp_trailTime, lp_trailColor);
+    gf_SpawnGreySingleLane(RegionFromId(30), lp__15, lp_droneSpeed, lp_size, lp_color, lp_laneContained, lp_spawnTrail, lp_trailSize, lp_trailFrequency, lp_trailTime, lp_trailColor);
+    gf_SpawnGreySingleLane(RegionFromId(29), lp__16, lp_droneSpeed, lp_size, lp_color, lp_laneContained, lp_spawnTrail, lp_trailSize, lp_trailFrequency, lp_trailTime, lp_trailColor);
+    gf_SpawnGreySingleLane(RegionFromId(28), lp__17, lp_droneSpeed, lp_size, lp_color, lp_laneContained, lp_spawnTrail, lp_trailSize, lp_trailFrequency, lp_trailTime, lp_trailColor);
+    gf_SpawnGreySingleLane(RegionFromId(27), lp__18, lp_droneSpeed, lp_size, lp_color, lp_laneContained, lp_spawnTrail, lp_trailSize, lp_trailFrequency, lp_trailTime, lp_trailColor);
+    gf_SpawnGreySingleLane(RegionFromId(25), lp__19, lp_droneSpeed, lp_size, lp_color, lp_laneContained, lp_spawnTrail, lp_trailSize, lp_trailFrequency, lp_trailTime, lp_trailColor);
 }
 
-void gf_SpawnGreySingleLane (region lp_lane, int lp_numOfDrones, fixed lp_droneSpeed, fixed lp_size) {
-    // Variable Declarations
-    int lv_iter;
-    int lv_movement;
-    fixed lv_lvSize;
-
-    // Automatic Variable Declarations
-    int auto8BB9E948_ae;
-    const int auto8BB9E948_ai = 1;
-    const int autoC26C9E04_ae = 5;
-    const int autoC26C9E04_ai = 1;
-
-    // Variable Initialization
-
-    // Implementation
-    lv_lvSize = (100.0 * lp_size);
-    gv_greyDroneSpeed = lp_droneSpeed;
-    auto8BB9E948_ae = lp_numOfDrones;
-    lv_iter = 1;
-    for ( ; ( (auto8BB9E948_ai >= 0 && lv_iter <= auto8BB9E948_ae) || (auto8BB9E948_ai < 0 && lv_iter >= auto8BB9E948_ae) ) ; lv_iter += auto8BB9E948_ai ) {
-        UnitCreate(1, "PointDefenseDrone", 0, 15, RegionRandomPoint(lp_lane), libNtve_gf_RandomAngle());
-        UnitGroupAdd(gv_greyDrones, UnitLastCreated());
-        UnitSetPropertyFixed(UnitLastCreated(), c_unitPropMovementSpeed, lp_droneSpeed);
-        UnitSetScale(UnitLastCreated(), lv_lvSize, lv_lvSize, lv_lvSize);
-        lv_movement = 1;
-        for ( ; ( (autoC26C9E04_ai >= 0 && lv_movement <= autoC26C9E04_ae) || (autoC26C9E04_ai < 0 && lv_movement >= autoC26C9E04_ae) ) ; lv_movement += autoC26C9E04_ai ) {
-            UnitIssueOrder(UnitLastCreated(), OrderTargetingPoint(AbilityCommand("move", 0), PointWithOffsetPolar(UnitGetPosition(UnitLastCreated()), (lv_movement * 25.0), UnitGetFacing(UnitLastCreated()))), c_orderQueueAddToEnd);
-        }
-    }
-}
-
-trigger auto_gf_PointToPointBlue_Trigger = null;
-fixed auto_gf_PointToPointBlue_lp_frequency;
-fixed auto_gf_PointToPointBlue_lp_speed;
-int auto_gf_PointToPointBlue_lp_num;
-fixed auto_gf_PointToPointBlue_lp_size;
-point auto_gf_PointToPointBlue_lp_originPoint;
-point auto_gf_PointToPointBlue_lp_destinationPoint;
-fixed auto_gf_PointToPointBlue_lp_delay;
-fixed auto_gf_PointToPointBlue_lp_lineTheta;
-fixed auto_gf_PointToPointBlue_lp_lineDelta;
-fixed auto_gf_PointToPointBlue_lp_spacing;
-fixed auto_gf_PointToPointBlue_lp_originOffset;
-bool auto_gf_PointToPointBlue_lp_randomLineAngle;
-int auto_gf_PointToPointBlue_lp_thread;
-string auto_gf_PointToPointBlue_lp_color;
-int auto_gf_PointToPointBlue_lp_height;
-
-void gf_PointToPointBlue (fixed lp_frequency, fixed lp_speed, int lp_num, fixed lp_size, point lp_originPoint, point lp_destinationPoint, fixed lp_delay, fixed lp_lineTheta, fixed lp_lineDelta, fixed lp_spacing, fixed lp_originOffset, bool lp_randomLineAngle, int lp_thread, string lp_color, int lp_height) {
-    auto_gf_PointToPointBlue_lp_frequency = lp_frequency;
-    auto_gf_PointToPointBlue_lp_speed = lp_speed;
-    auto_gf_PointToPointBlue_lp_num = lp_num;
-    auto_gf_PointToPointBlue_lp_size = lp_size;
-    auto_gf_PointToPointBlue_lp_originPoint = lp_originPoint;
-    auto_gf_PointToPointBlue_lp_destinationPoint = lp_destinationPoint;
-    auto_gf_PointToPointBlue_lp_delay = lp_delay;
-    auto_gf_PointToPointBlue_lp_lineTheta = lp_lineTheta;
-    auto_gf_PointToPointBlue_lp_lineDelta = lp_lineDelta;
-    auto_gf_PointToPointBlue_lp_spacing = lp_spacing;
-    auto_gf_PointToPointBlue_lp_originOffset = lp_originOffset;
-    auto_gf_PointToPointBlue_lp_randomLineAngle = lp_randomLineAngle;
-    auto_gf_PointToPointBlue_lp_thread = lp_thread;
-    auto_gf_PointToPointBlue_lp_color = lp_color;
-    auto_gf_PointToPointBlue_lp_height = lp_height;
-
-    if (auto_gf_PointToPointBlue_Trigger == null) {
-        auto_gf_PointToPointBlue_Trigger = TriggerCreate("auto_gf_PointToPointBlue_TriggerFunc");
-    }
-
-    TriggerExecute(auto_gf_PointToPointBlue_Trigger, false, false);
-}
-
-bool auto_gf_PointToPointBlue_TriggerFunc (bool testConds, bool runActions) {
-    fixed lp_frequency = auto_gf_PointToPointBlue_lp_frequency;
-    fixed lp_speed = auto_gf_PointToPointBlue_lp_speed;
-    int lp_num = auto_gf_PointToPointBlue_lp_num;
-    fixed lp_size = auto_gf_PointToPointBlue_lp_size;
-    point lp_originPoint = auto_gf_PointToPointBlue_lp_originPoint;
-    point lp_destinationPoint = auto_gf_PointToPointBlue_lp_destinationPoint;
-    fixed lp_delay = auto_gf_PointToPointBlue_lp_delay;
-    fixed lp_lineTheta = auto_gf_PointToPointBlue_lp_lineTheta;
-    fixed lp_lineDelta = auto_gf_PointToPointBlue_lp_lineDelta;
-    fixed lp_spacing = auto_gf_PointToPointBlue_lp_spacing;
-    fixed lp_originOffset = auto_gf_PointToPointBlue_lp_originOffset;
-    bool lp_randomLineAngle = auto_gf_PointToPointBlue_lp_randomLineAngle;
-    int lp_thread = auto_gf_PointToPointBlue_lp_thread;
-    string lp_color = auto_gf_PointToPointBlue_lp_color;
-    int lp_height = auto_gf_PointToPointBlue_lp_height;
-
+void gf_SpawnGreySingleLane (region lp_lane, int lp_numOfDrones, fixed lp_droneSpeed, fixed lp_size, string lp_color, bool lp_laneContained, bool lp_spawnTrail, fixed lp_trailSize, fixed lp_trailFrequency, fixed lp_trailTime, string lp_trailColor) {
     // Automatic Variable Declarations
     // Implementation
-    int i;
-    fixed WallDistancing;
-    fixed Angle;
-    fixed Size;
-    Size = lp_size * 100;
-    Wait(lp_delay, c_timeGame);
-    if ( lp_randomLineAngle == true) {
-        Angle = libNtve_gf_RandomAngle();
-    } else {
-        Angle = lp_lineTheta;
-    }
-    while (lp_thread == gv_thread) {
-        WallDistancing = 0;
-        UIDisplayMessage(PlayerGroupSingle(1), c_messageAreaChat, IntToText(i));
-        for (; i < lp_num; i+=1){
-            UnitCreate(1, gv_drone, 0, 15, PointWithOffsetPolar(lp_originPoint, WallDistancing, Angle), 0);
-            UnitIssueOrder(UnitLastCreated(), OrderTargetingPoint(AbilityCommand("move", 0), lp_destinationPoint), c_orderQueueReplace);
-            libNtve_gf_SendActorMessageToUnit(UnitLastCreated(), "SetTintColor " + lp_color);
-            UnitSetScale(UnitLastCreated(), Size, Size, 10);
-            UnitSetHeight(UnitLastCreated(), lp_height, 0);
-            UnitGroupAdd(gv_dronesToBeRemovedIfIdle, UnitLastCreated());
-            UnitSetPropertyFixed(UnitLastCreated(), c_unitPropMovementSpeed, lp_speed);
-            libNtve_gf_MakeUnitFacePoint(UnitLastCreated(), lp_destinationPoint, 0);
-            WallDistancing += lp_spacing;
-        }
-        if (lp_randomLineAngle == true) {
-            Angle = libNtve_gf_RandomAngle();
+    int SizeGroup = GetSizeArrayPosition(lp_size);
+    int i = 1;
+    fixed size = lp_size * 100;
+    for (; i <= lp_numOfDrones; i+=1){
+        UnitCreate(1, gv_drone, 0, 15, RegionRandomPoint(lp_lane), RandomFixed(0, 360));
+        UnitGroupAdd(gv_droneSizeGroup[SizeGroup], UnitLastCreated());
+        if (lp_laneContained){
+            UnitGroupAdd(gv_greyDrones, UnitLastCreated());
         } else {
-            Angle += lp_lineDelta;
+            UnitGroupAdd(gv_purpleDrones, UnitLastCreated());
         }
-        Wait(1/lp_frequency, c_timeGame);
-        i = 0;
-    }
-    return true;
-}
-
-trigger auto_gf_PointToRegionBlue_Trigger = null;
-fixed auto_gf_PointToRegionBlue_lp_frequency;
-fixed auto_gf_PointToRegionBlue_lp_speed;
-int auto_gf_PointToRegionBlue_lp_num;
-fixed auto_gf_PointToRegionBlue_lp_size;
-point auto_gf_PointToRegionBlue_lp_originPoint;
-region auto_gf_PointToRegionBlue_lp_destinationRegion;
-fixed auto_gf_PointToRegionBlue_lp_delay;
-fixed auto_gf_PointToRegionBlue_lp_lineTheta;
-fixed auto_gf_PointToRegionBlue_lp_lineDelta;
-fixed auto_gf_PointToRegionBlue_lp_spacing;
-fixed auto_gf_PointToRegionBlue_lp_originOffset;
-bool auto_gf_PointToRegionBlue_lp_randomLineAngle;
-int auto_gf_PointToRegionBlue_lp_thread;
-string auto_gf_PointToRegionBlue_lp_color;
-fixed auto_gf_PointToRegionBlue_lp_height;
-
-void gf_PointToRegionBlue (fixed lp_frequency, fixed lp_speed, int lp_num, fixed lp_size, point lp_originPoint, region lp_destinationRegion, fixed lp_delay, fixed lp_lineTheta, fixed lp_lineDelta, fixed lp_spacing, fixed lp_originOffset, bool lp_randomLineAngle, int lp_thread, string lp_color, fixed lp_height) {
-    auto_gf_PointToRegionBlue_lp_frequency = lp_frequency;
-    auto_gf_PointToRegionBlue_lp_speed = lp_speed;
-    auto_gf_PointToRegionBlue_lp_num = lp_num;
-    auto_gf_PointToRegionBlue_lp_size = lp_size;
-    auto_gf_PointToRegionBlue_lp_originPoint = lp_originPoint;
-    auto_gf_PointToRegionBlue_lp_destinationRegion = lp_destinationRegion;
-    auto_gf_PointToRegionBlue_lp_delay = lp_delay;
-    auto_gf_PointToRegionBlue_lp_lineTheta = lp_lineTheta;
-    auto_gf_PointToRegionBlue_lp_lineDelta = lp_lineDelta;
-    auto_gf_PointToRegionBlue_lp_spacing = lp_spacing;
-    auto_gf_PointToRegionBlue_lp_originOffset = lp_originOffset;
-    auto_gf_PointToRegionBlue_lp_randomLineAngle = lp_randomLineAngle;
-    auto_gf_PointToRegionBlue_lp_thread = lp_thread;
-    auto_gf_PointToRegionBlue_lp_color = lp_color;
-    auto_gf_PointToRegionBlue_lp_height = lp_height;
-
-    if (auto_gf_PointToRegionBlue_Trigger == null) {
-        auto_gf_PointToRegionBlue_Trigger = TriggerCreate("auto_gf_PointToRegionBlue_TriggerFunc");
-    }
-
-    TriggerExecute(auto_gf_PointToRegionBlue_Trigger, false, false);
-}
-
-bool auto_gf_PointToRegionBlue_TriggerFunc (bool testConds, bool runActions) {
-    fixed lp_frequency = auto_gf_PointToRegionBlue_lp_frequency;
-    fixed lp_speed = auto_gf_PointToRegionBlue_lp_speed;
-    int lp_num = auto_gf_PointToRegionBlue_lp_num;
-    fixed lp_size = auto_gf_PointToRegionBlue_lp_size;
-    point lp_originPoint = auto_gf_PointToRegionBlue_lp_originPoint;
-    region lp_destinationRegion = auto_gf_PointToRegionBlue_lp_destinationRegion;
-    fixed lp_delay = auto_gf_PointToRegionBlue_lp_delay;
-    fixed lp_lineTheta = auto_gf_PointToRegionBlue_lp_lineTheta;
-    fixed lp_lineDelta = auto_gf_PointToRegionBlue_lp_lineDelta;
-    fixed lp_spacing = auto_gf_PointToRegionBlue_lp_spacing;
-    fixed lp_originOffset = auto_gf_PointToRegionBlue_lp_originOffset;
-    bool lp_randomLineAngle = auto_gf_PointToRegionBlue_lp_randomLineAngle;
-    int lp_thread = auto_gf_PointToRegionBlue_lp_thread;
-    string lp_color = auto_gf_PointToRegionBlue_lp_color;
-    fixed lp_height = auto_gf_PointToRegionBlue_lp_height;
-
-    // Automatic Variable Declarations
-    // Implementation
-    int i;
-    fixed WallDistancing;
-    fixed Angle;
-    point RandomPoint;
-    fixed Size;
-    Size = lp_size * 100;
-    Wait(lp_delay, c_timeGame);
-    if ( lp_randomLineAngle == true) {
-        Angle = libNtve_gf_RandomAngle();
-    } else {
-        Angle = lp_lineTheta;
-    }
-    while (lp_thread == gv_thread) {
-        WallDistancing = 0;
-        for (; i < lp_num; i+=1){
-            RandomPoint = RegionRandomPoint(lp_destinationRegion);
-            UnitCreate(1, gv_drone, 0, 15, PointWithOffsetPolar(lp_originPoint, WallDistancing, Angle), 0);
-            UnitIssueOrder(UnitLastCreated(), OrderTargetingPoint(AbilityCommand("move", 0), RandomPoint), c_orderQueueReplace);
-            libNtve_gf_SendActorMessageToUnit(UnitLastCreated(), "SetTintColor " + lp_color);
-            UnitSetScale(UnitLastCreated(), Size, Size, 10);
-            UnitSetHeight(UnitLastCreated(), lp_height, 0);
-            UnitGroupAdd(gv_dronesToBeRemovedIfIdle, UnitLastCreated());
-            UnitSetPropertyFixed(UnitLastCreated(), c_unitPropMovementSpeed, lp_speed);
-            libNtve_gf_MakeUnitFacePoint(UnitLastCreated(), RandomPoint, 0);
-            WallDistancing += lp_spacing;
+        UnitSetPropertyFixed(UnitLastCreated(), c_unitPropBaseMovementSpeed, lp_droneSpeed);
+        UnitSetScale(UnitLastCreated(), size, size, size);
+        libNtve_gf_SendActorMessageToUnit(UnitLastCreated(), "SetTintColor " + lp_color);
+        if (lp_spawnTrail) {
+            gf_TrailDronesSpawn(UnitLastCreated(), lp_trailSize, lp_trailFrequency, lp_trailTime, lp_trailColor);
         }
-        if (lp_randomLineAngle == true) {
-            Angle = libNtve_gf_RandomAngle();
-        } else {
-            Angle += lp_lineDelta;
-        }
-        Wait(1/lp_frequency, c_timeGame);
-        i = 0;
     }
-    return true;
 }
 
 trigger auto_gf_PointToDistanceBlue_Trigger = null;
@@ -1098,20 +1308,22 @@ bool auto_gf_PointToDistanceBlue_TriggerFunc (bool testConds, bool runActions) {
     fixed ArcLength = 360;
     int i;
     int j;
-    int k = 1;
+    int k = 2;
     int MoveCount = 1;
+    int SizeGroup;
     Wait(lp_delay, c_timeGame);
+    SizeGroup = GetSizeArrayPosition(lp_size);
     if (PointGetX(lp_originPoint) <= PointGetY(lp_originPoint)) {
         if (PointGetX(lp_originPoint) <= (lp_distance - 5)){
-            MoveDistance = PointGetX(lp_originPoint) - 5;
             MoveCount = FixedToInt(lp_distance/PointGetX(lp_originPoint));
+            MoveDistance = lp_distance/MoveCount;
         } else {
             MoveDistance = lp_distance;
         }
     } else {
         if (PointGetY(lp_originPoint) <= lp_distance - 5) {
-            MoveDistance = PointGetY(lp_originPoint) - 5;
             MoveCount = FixedToInt(lp_distance/PointGetY(lp_originPoint));
+            MoveDistance = lp_distance/MoveCount;
         } else {
             MoveDistance = lp_distance;
         }
@@ -1121,28 +1333,28 @@ bool auto_gf_PointToDistanceBlue_TriggerFunc (bool testConds, bool runActions) {
             ArcLength = lp_arcLength;
         }
     } else if (lp_waveSpawnArcLength > 0){
-        AngleDifferenceBetweenDrones = lp_waveSpawnArcLength/lp_num;
+        AngleDifferenceBetweenDrones = lp_waveSpawnArcLength/IntToFixed(lp_num);
     } else {
-        AngleDifferenceBetweenDrones = 360/lp_num;
+        AngleDifferenceBetweenDrones = 360.0/IntToFixed(lp_num);
     }
     Angle = lp_theta;
     LineAngle = lp_lineTheta;
-    UIDisplayMessage(gv_allPlayers, c_messageAreaChat, StringToText("yes"));
     while (gv_thread == lp_thread) {
-        i = 0;
-        for (; i < lp_num; i+=1) {
+        i = 1;
+        for (; i <= lp_num; i+=1) {
             WallDistancing = 0;
             j = 0;
             for (; j < lp_num2; j+=1) {
                 UnitCreate(1, gv_drone, 0, 15, PointWithOffsetPolar(lp_originPoint, WallDistancing + lp_originOffset, Angle + AngleDifferenceBetweenDrones * i), Angle + LineAngle + AngleDifferenceBetweenDrones * i);
                 UnitIssueOrder(UnitLastCreated(), OrderTargetingPoint(AbilityCommand("move", 0), PointWithOffsetPolar(UnitGetPosition(UnitLastCreated()), MoveDistance, UnitGetFacing(UnitLastCreated()))), c_orderQueueReplace);
-                for (; k < MoveCount; k+=1) {
+                for (; k <= MoveCount; k+=1) {
                     UnitIssueOrder(UnitLastCreated(), OrderTargetingPoint(AbilityCommand("move", 0), PointWithOffsetPolar(UnitGetPosition(UnitLastCreated()), MoveDistance * k, UnitGetFacing(UnitLastCreated()))), c_orderQueueAddToEnd);
                 }
-                k = 1;
+                k = 2;
                 libNtve_gf_SendActorMessageToUnit(UnitLastCreated(), "SetTintColor " + lp_color);
                 UnitSetScale(UnitLastCreated(), Size, Size, Size);
                 UnitGroupAdd(gv_dronesToBeRemovedIfIdle, UnitLastCreated());
+                UnitGroupAdd(gv_droneSizeGroup[SizeGroup], UnitLastCreated());
                 UnitSetPropertyFixed(UnitLastCreated(), c_unitPropMovementSpeed, lp_speed);
                 UnitSetHeight(UnitLastCreated(), lp_height, 0);
                 WallDistancing += lp_spacing;
@@ -1172,361 +1384,27 @@ bool auto_gf_PointToDistanceBlue_TriggerFunc (bool testConds, bool runActions) {
     return true;
 }
 
-fixed gf_GetAbsoluteValue (fixed lp_val) {
+trigger auto_gf_AutoClicker_Trigger = null;
+int auto_gf_AutoClicker_lp_player;
+
+void gf_AutoClicker (int lp_player) {
+    auto_gf_AutoClicker_lp_player = lp_player;
+
+    if (auto_gf_AutoClicker_Trigger == null) {
+        auto_gf_AutoClicker_Trigger = TriggerCreate("auto_gf_AutoClicker_TriggerFunc");
+    }
+
+    TriggerExecute(auto_gf_AutoClicker_Trigger, false, false);
+}
+
+bool auto_gf_AutoClicker_TriggerFunc (bool testConds, bool runActions) {
+    int lp_player = auto_gf_AutoClicker_lp_player;
+
     // Automatic Variable Declarations
     // Implementation
-    if (lp_val >= 0) {
-        return lp_val;
-    } else {
-        return lp_val * -1;
-    }
-}
-
-trigger auto_gf_RegionToDistanceBlue_Trigger = null;
-fixed auto_gf_RegionToDistanceBlue_lp_frequency;
-fixed auto_gf_RegionToDistanceBlue_lp_speed;
-fixed auto_gf_RegionToDistanceBlue_lp_distance;
-int auto_gf_RegionToDistanceBlue_lp_num;
-region auto_gf_RegionToDistanceBlue_lp_originRegion;
-fixed auto_gf_RegionToDistanceBlue_lp_initialDelay;
-int auto_gf_RegionToDistanceBlue_lp_threadlocal;
-
-void gf_RegionToDistanceBlue (fixed lp_frequency, fixed lp_speed, fixed lp_distance, int lp_num, region lp_originRegion, fixed lp_initialDelay, int lp_threadlocal) {
-    auto_gf_RegionToDistanceBlue_lp_frequency = lp_frequency;
-    auto_gf_RegionToDistanceBlue_lp_speed = lp_speed;
-    auto_gf_RegionToDistanceBlue_lp_distance = lp_distance;
-    auto_gf_RegionToDistanceBlue_lp_num = lp_num;
-    auto_gf_RegionToDistanceBlue_lp_originRegion = lp_originRegion;
-    auto_gf_RegionToDistanceBlue_lp_initialDelay = lp_initialDelay;
-    auto_gf_RegionToDistanceBlue_lp_threadlocal = lp_threadlocal;
-
-    if (auto_gf_RegionToDistanceBlue_Trigger == null) {
-        auto_gf_RegionToDistanceBlue_Trigger = TriggerCreate("auto_gf_RegionToDistanceBlue_TriggerFunc");
-    }
-
-    TriggerExecute(auto_gf_RegionToDistanceBlue_Trigger, false, false);
-}
-
-bool auto_gf_RegionToDistanceBlue_TriggerFunc (bool testConds, bool runActions) {
-    fixed lp_frequency = auto_gf_RegionToDistanceBlue_lp_frequency;
-    fixed lp_speed = auto_gf_RegionToDistanceBlue_lp_speed;
-    fixed lp_distance = auto_gf_RegionToDistanceBlue_lp_distance;
-    int lp_num = auto_gf_RegionToDistanceBlue_lp_num;
-    region lp_originRegion = auto_gf_RegionToDistanceBlue_lp_originRegion;
-    fixed lp_initialDelay = auto_gf_RegionToDistanceBlue_lp_initialDelay;
-    int lp_threadlocal = auto_gf_RegionToDistanceBlue_lp_threadlocal;
-
-    // Variable Declarations
-    int lv_iter;
-    fixed lv_moveDistance;
-    int lv_moveCount;
-    int lv_iter2;
-    fixed lv_distanceTemp;
-
-    // Automatic Variable Declarations
-    int auto079D708B_ae;
-    const int auto079D708B_ai = 1;
-
-    // Variable Initialization
-    lv_moveCount = 1;
-
-    // Implementation
-    Wait(lp_initialDelay, c_timeGame);
-    while ((gv_thread == lp_threadlocal)) {
-        auto079D708B_ae = lp_num;
-        lv_iter = 1;
-        for ( ; ( (auto079D708B_ai >= 0 && lv_iter <= auto079D708B_ae) || (auto079D708B_ai < 0 && lv_iter >= auto079D708B_ae) ) ; lv_iter += auto079D708B_ai ) {
-            UnitCreate(1, "PointDefenseDrone", 0, 15, RegionRandomPoint(lp_originRegion), libNtve_gf_RandomAngle());
-            UnitIssueOrder(UnitLastCreated(), OrderTargetingPoint(AbilityCommand("move", 0), PointWithOffsetPolar(UnitGetPosition(UnitLastCreated()), lp_distance, UnitGetFacing(UnitLastCreated()))), c_orderQueueReplace);
-            libNtve_gf_SendActorMessageToUnit(UnitLastCreated(), "SetTintColor 102,102,255");
-            UnitSetScale(UnitLastCreated(), 300.0, 300.0, 300.0);
-            UnitGroupAdd(gv_dronesToBeRemovedIfIdle, UnitLastCreated());
-            UnitSetPropertyFixed(UnitLastCreated(), c_unitPropMovementSpeed, lp_speed);
-        }
-        Wait((1.0 / lp_frequency), c_timeGame);
-    }
-    return true;
-}
-
-void gf_RegionToDistanceWallBlue (fixed lp_frequency, fixed lp_delta, fixed lp_theta, fixed lp_speed, int lp_num, fixed lp_initialDelay, region lp_originRegion, fixed lp_wallDroneSpacing, int lp_threadlocal, fixed lp_initialDistance, fixed lp_distance, fixed lp_wallMovementDirection, bool lp_random) {
-    // Variable Declarations
-    int lv_iter;
-    fixed lv_wallDistancing;
-    fixed lv_angle;
-    point[2] lv_randomPoint;
-
-    // Automatic Variable Declarations
-    int auto651479CE_ae;
-    const int auto651479CE_ai = 1;
-
-    // Variable Initialization
-
-    // Implementation
-    Wait(lp_initialDelay, c_timeGame);
-    if ((lp_random == true)) {
-        lv_angle = libNtve_gf_RandomAngle();
-    }
-    else {
-        lv_angle = lp_theta;
-    }
-    while ((gv_thread == lp_threadlocal)) {
-        lv_wallDistancing = 0.0;
-        lv_randomPoint[0] = RegionRandomPoint(lp_originRegion);
-        auto651479CE_ae = lp_num;
-        lv_iter = 1;
-        for ( ; ( (auto651479CE_ai >= 0 && lv_iter <= auto651479CE_ae) || (auto651479CE_ai < 0 && lv_iter >= auto651479CE_ae) ) ; lv_iter += auto651479CE_ai ) {
-            UnitCreate(1, "PointDefenseDrone", 0, 15, PointWithOffsetPolar(lv_randomPoint[0], (lv_wallDistancing + lp_initialDistance), lv_angle), lp_wallMovementDirection);
-            UnitIssueOrder(UnitLastCreated(), OrderTargetingPoint(AbilityCommand("move", 0), PointWithOffsetPolar(UnitGetPosition(UnitLastCreated()), lp_distance, UnitGetFacing(UnitLastCreated()))), c_orderQueueReplace);
-            libNtve_gf_SendActorMessageToUnit(UnitLastCreated(), "SetTintColor 102,102,255");
-            UnitSetScale(UnitLastCreated(), 300.0, 300.0, 300.0);
-            UnitGroupAdd(gv_dronesToBeRemovedIfIdle, UnitLastCreated());
-            UnitSetPropertyFixed(UnitLastCreated(), c_unitPropMovementSpeed, lp_speed);
-            lv_wallDistancing += lp_wallDroneSpacing;
-        }
-        if ((lp_random == true)) {
-            lv_angle = libNtve_gf_RandomAngle();
-        }
-        else {
-            lv_angle += lp_delta;
-        }
-        Wait((1.0 / lp_frequency), c_timeGame);
-    }
-}
-
-trigger auto_gf_RegionToPointBlue_Trigger = null;
-fixed auto_gf_RegionToPointBlue_lp_droneSpawnFrequency;
-fixed auto_gf_RegionToPointBlue_lp_droneSpeed;
-int auto_gf_RegionToPointBlue_lp_numOfDronesSpawned;
-region auto_gf_RegionToPointBlue_lp_originRegion;
-point auto_gf_RegionToPointBlue_lp_destinationPoint;
-fixed auto_gf_RegionToPointBlue_lp_initialDelay;
-bool auto_gf_RegionToPointBlue_lp_droneSpawnInLine;
-fixed auto_gf_RegionToPointBlue_lp_changeInAngle;
-fixed auto_gf_RegionToPointBlue_lp_initialAngle;
-fixed auto_gf_RegionToPointBlue_lp_lineDroneSpacing;
-fixed auto_gf_RegionToPointBlue_lp_lineDroneOriginOffset;
-bool auto_gf_RegionToPointBlue_lp_lineAnglesRandom;
-int auto_gf_RegionToPointBlue_lp_threadlocal;
-
-void gf_RegionToPointBlue (fixed lp_droneSpawnFrequency, fixed lp_droneSpeed, int lp_numOfDronesSpawned, region lp_originRegion, point lp_destinationPoint, fixed lp_initialDelay, bool lp_droneSpawnInLine, fixed lp_changeInAngle, fixed lp_initialAngle, fixed lp_lineDroneSpacing, fixed lp_lineDroneOriginOffset, bool lp_lineAnglesRandom, int lp_threadlocal) {
-    auto_gf_RegionToPointBlue_lp_droneSpawnFrequency = lp_droneSpawnFrequency;
-    auto_gf_RegionToPointBlue_lp_droneSpeed = lp_droneSpeed;
-    auto_gf_RegionToPointBlue_lp_numOfDronesSpawned = lp_numOfDronesSpawned;
-    auto_gf_RegionToPointBlue_lp_originRegion = lp_originRegion;
-    auto_gf_RegionToPointBlue_lp_destinationPoint = lp_destinationPoint;
-    auto_gf_RegionToPointBlue_lp_initialDelay = lp_initialDelay;
-    auto_gf_RegionToPointBlue_lp_droneSpawnInLine = lp_droneSpawnInLine;
-    auto_gf_RegionToPointBlue_lp_changeInAngle = lp_changeInAngle;
-    auto_gf_RegionToPointBlue_lp_initialAngle = lp_initialAngle;
-    auto_gf_RegionToPointBlue_lp_lineDroneSpacing = lp_lineDroneSpacing;
-    auto_gf_RegionToPointBlue_lp_lineDroneOriginOffset = lp_lineDroneOriginOffset;
-    auto_gf_RegionToPointBlue_lp_lineAnglesRandom = lp_lineAnglesRandom;
-    auto_gf_RegionToPointBlue_lp_threadlocal = lp_threadlocal;
-
-    if (auto_gf_RegionToPointBlue_Trigger == null) {
-        auto_gf_RegionToPointBlue_Trigger = TriggerCreate("auto_gf_RegionToPointBlue_TriggerFunc");
-    }
-
-    TriggerExecute(auto_gf_RegionToPointBlue_Trigger, false, false);
-}
-
-bool auto_gf_RegionToPointBlue_TriggerFunc (bool testConds, bool runActions) {
-    fixed lp_droneSpawnFrequency = auto_gf_RegionToPointBlue_lp_droneSpawnFrequency;
-    fixed lp_droneSpeed = auto_gf_RegionToPointBlue_lp_droneSpeed;
-    int lp_numOfDronesSpawned = auto_gf_RegionToPointBlue_lp_numOfDronesSpawned;
-    region lp_originRegion = auto_gf_RegionToPointBlue_lp_originRegion;
-    point lp_destinationPoint = auto_gf_RegionToPointBlue_lp_destinationPoint;
-    fixed lp_initialDelay = auto_gf_RegionToPointBlue_lp_initialDelay;
-    bool lp_droneSpawnInLine = auto_gf_RegionToPointBlue_lp_droneSpawnInLine;
-    fixed lp_changeInAngle = auto_gf_RegionToPointBlue_lp_changeInAngle;
-    fixed lp_initialAngle = auto_gf_RegionToPointBlue_lp_initialAngle;
-    fixed lp_lineDroneSpacing = auto_gf_RegionToPointBlue_lp_lineDroneSpacing;
-    fixed lp_lineDroneOriginOffset = auto_gf_RegionToPointBlue_lp_lineDroneOriginOffset;
-    bool lp_lineAnglesRandom = auto_gf_RegionToPointBlue_lp_lineAnglesRandom;
-    int lp_threadlocal = auto_gf_RegionToPointBlue_lp_threadlocal;
-
-    // Variable Declarations
-    int lv_iter;
-    point[2] lv_randomPoint;
-    fixed lv_wallDistancing;
-    fixed lv_angle;
-
-    // Automatic Variable Declarations
-    int auto3896F756_ae;
-    const int auto3896F756_ai = 1;
-    int auto0ACE32F9_ae;
-    const int auto0ACE32F9_ai = 1;
-
-    // Variable Initialization
-
-    // Implementation
-    Wait(lp_initialDelay, c_timeGame);
-    if ((lp_droneSpawnInLine == false)) {
-        while ((gv_thread == lp_threadlocal)) {
-            auto0ACE32F9_ae = lp_numOfDronesSpawned;
-            lv_iter = 1;
-            for ( ; ( (auto0ACE32F9_ai >= 0 && lv_iter <= auto0ACE32F9_ae) || (auto0ACE32F9_ai < 0 && lv_iter >= auto0ACE32F9_ae) ) ; lv_iter += auto0ACE32F9_ai ) {
-                UnitCreate(1, "PointDefenseDrone", 0, 15, RegionRandomPoint(lp_originRegion), 0.0);
-                UnitIssueOrder(UnitLastCreated(), OrderTargetingPoint(AbilityCommand("move", 0), lp_destinationPoint), c_orderQueueReplace);
-                libNtve_gf_SendActorMessageToUnit(UnitLastCreated(), "SetTintColor 102,102,255");
-                UnitSetScale(UnitLastCreated(), 300.0, 300.0, 300.0);
-                UnitGroupAdd(gv_dronesToBeRemovedIfIdle, UnitLastCreated());
-                UnitSetPropertyFixed(UnitLastCreated(), c_unitPropMovementSpeed, lp_droneSpeed);
-                libNtve_gf_MakeUnitFacePoint(UnitLastCreated(), lp_destinationPoint, 0.0);
-            }
-            Wait((1.0 / lp_droneSpawnFrequency), c_timeGame);
-        }
-    }
-    else {
-        if ((lp_lineAnglesRandom == true)) {
-            lv_angle = libNtve_gf_RandomAngle();
-        }
-        else {
-            lv_angle = lp_initialAngle;
-        }
-        while ((gv_thread == lp_threadlocal)) {
-            lv_randomPoint[0] = RegionRandomPoint(lp_originRegion);
-            lv_wallDistancing = 0.0;
-            auto3896F756_ae = lp_numOfDronesSpawned;
-            lv_iter = 1;
-            for ( ; ( (auto3896F756_ai >= 0 && lv_iter <= auto3896F756_ae) || (auto3896F756_ai < 0 && lv_iter >= auto3896F756_ae) ) ; lv_iter += auto3896F756_ai ) {
-                UnitCreate(1, "PointDefenseDrone", 0, 15, PointWithOffsetPolar(lv_randomPoint[0], (lv_wallDistancing + lp_lineDroneOriginOffset), lv_angle), 0.0);
-                UnitIssueOrder(UnitLastCreated(), OrderTargetingPoint(AbilityCommand("move", 0), lp_destinationPoint), c_orderQueueReplace);
-                libNtve_gf_SendActorMessageToUnit(UnitLastCreated(), "SetTintColor 102,102,255");
-                UnitSetScale(UnitLastCreated(), 300.0, 300.0, 300.0);
-                UnitGroupAdd(gv_dronesToBeRemovedIfIdle, UnitLastCreated());
-                UnitSetPropertyFixed(UnitLastCreated(), c_unitPropMovementSpeed, lp_droneSpeed);
-                libNtve_gf_MakeUnitFacePoint(UnitLastCreated(), lp_destinationPoint, 0.0);
-                lv_wallDistancing += lp_lineDroneSpacing;
-            }
-            if ((lp_lineAnglesRandom == true)) {
-                lv_angle = libNtve_gf_RandomAngle();
-            }
-            else {
-                lv_angle += lp_changeInAngle;
-            }
-            Wait((1.0 / lp_droneSpawnFrequency), c_timeGame);
-        }
-    }
-    return true;
-}
-
-trigger auto_gf_RegionToRegionBlue_Trigger = null;
-fixed auto_gf_RegionToRegionBlue_lp_droneSpawnFrequency;
-fixed auto_gf_RegionToRegionBlue_lp_droneSpeed;
-int auto_gf_RegionToRegionBlue_lp_numOfDronesSpawned;
-region auto_gf_RegionToRegionBlue_lp_originRegion;
-region auto_gf_RegionToRegionBlue_lp_destinationRegion;
-fixed auto_gf_RegionToRegionBlue_lp_initialDelay;
-bool auto_gf_RegionToRegionBlue_lp_droneSpawnInLine;
-fixed auto_gf_RegionToRegionBlue_lp_changeInAngle;
-fixed auto_gf_RegionToRegionBlue_lp_initialAngle;
-fixed auto_gf_RegionToRegionBlue_lp_lineDroneSpacing;
-fixed auto_gf_RegionToRegionBlue_lp_lineDroneOriginOffset;
-bool auto_gf_RegionToRegionBlue_lp_lineAngleRandom;
-int auto_gf_RegionToRegionBlue_lp_threadlocal;
-
-void gf_RegionToRegionBlue (fixed lp_droneSpawnFrequency, fixed lp_droneSpeed, int lp_numOfDronesSpawned, region lp_originRegion, region lp_destinationRegion, fixed lp_initialDelay, bool lp_droneSpawnInLine, fixed lp_changeInAngle, fixed lp_initialAngle, fixed lp_lineDroneSpacing, fixed lp_lineDroneOriginOffset, bool lp_lineAngleRandom, int lp_threadlocal) {
-    auto_gf_RegionToRegionBlue_lp_droneSpawnFrequency = lp_droneSpawnFrequency;
-    auto_gf_RegionToRegionBlue_lp_droneSpeed = lp_droneSpeed;
-    auto_gf_RegionToRegionBlue_lp_numOfDronesSpawned = lp_numOfDronesSpawned;
-    auto_gf_RegionToRegionBlue_lp_originRegion = lp_originRegion;
-    auto_gf_RegionToRegionBlue_lp_destinationRegion = lp_destinationRegion;
-    auto_gf_RegionToRegionBlue_lp_initialDelay = lp_initialDelay;
-    auto_gf_RegionToRegionBlue_lp_droneSpawnInLine = lp_droneSpawnInLine;
-    auto_gf_RegionToRegionBlue_lp_changeInAngle = lp_changeInAngle;
-    auto_gf_RegionToRegionBlue_lp_initialAngle = lp_initialAngle;
-    auto_gf_RegionToRegionBlue_lp_lineDroneSpacing = lp_lineDroneSpacing;
-    auto_gf_RegionToRegionBlue_lp_lineDroneOriginOffset = lp_lineDroneOriginOffset;
-    auto_gf_RegionToRegionBlue_lp_lineAngleRandom = lp_lineAngleRandom;
-    auto_gf_RegionToRegionBlue_lp_threadlocal = lp_threadlocal;
-
-    if (auto_gf_RegionToRegionBlue_Trigger == null) {
-        auto_gf_RegionToRegionBlue_Trigger = TriggerCreate("auto_gf_RegionToRegionBlue_TriggerFunc");
-    }
-
-    TriggerExecute(auto_gf_RegionToRegionBlue_Trigger, false, false);
-}
-
-bool auto_gf_RegionToRegionBlue_TriggerFunc (bool testConds, bool runActions) {
-    fixed lp_droneSpawnFrequency = auto_gf_RegionToRegionBlue_lp_droneSpawnFrequency;
-    fixed lp_droneSpeed = auto_gf_RegionToRegionBlue_lp_droneSpeed;
-    int lp_numOfDronesSpawned = auto_gf_RegionToRegionBlue_lp_numOfDronesSpawned;
-    region lp_originRegion = auto_gf_RegionToRegionBlue_lp_originRegion;
-    region lp_destinationRegion = auto_gf_RegionToRegionBlue_lp_destinationRegion;
-    fixed lp_initialDelay = auto_gf_RegionToRegionBlue_lp_initialDelay;
-    bool lp_droneSpawnInLine = auto_gf_RegionToRegionBlue_lp_droneSpawnInLine;
-    fixed lp_changeInAngle = auto_gf_RegionToRegionBlue_lp_changeInAngle;
-    fixed lp_initialAngle = auto_gf_RegionToRegionBlue_lp_initialAngle;
-    fixed lp_lineDroneSpacing = auto_gf_RegionToRegionBlue_lp_lineDroneSpacing;
-    fixed lp_lineDroneOriginOffset = auto_gf_RegionToRegionBlue_lp_lineDroneOriginOffset;
-    bool lp_lineAngleRandom = auto_gf_RegionToRegionBlue_lp_lineAngleRandom;
-    int lp_threadlocal = auto_gf_RegionToRegionBlue_lp_threadlocal;
-
-    // Variable Declarations
-    int lv_iter;
-    point[2] lv_randomPoint;
-    fixed lv_wallDistancing;
-    fixed lv_angle;
-
-    // Automatic Variable Declarations
-    int autoEC52FE50_ae;
-    const int autoEC52FE50_ai = 1;
-    int autoF03F9EE0_ae;
-    const int autoF03F9EE0_ai = 1;
-
-    // Variable Initialization
-
-    // Implementation
-    Wait(lp_initialDelay, c_timeGame);
-    if ((lp_droneSpawnInLine == false)) {
-        while ((gv_thread == lp_threadlocal)) {
-            autoF03F9EE0_ae = lp_numOfDronesSpawned;
-            lv_iter = 1;
-            for ( ; ( (autoF03F9EE0_ai >= 0 && lv_iter <= autoF03F9EE0_ae) || (autoF03F9EE0_ai < 0 && lv_iter >= autoF03F9EE0_ae) ) ; lv_iter += autoF03F9EE0_ai ) {
-                lv_randomPoint[0] = RegionRandomPoint(lp_destinationRegion);
-                UnitCreate(1, "PointDefenseDrone", 0, 15, RegionRandomPoint(lp_originRegion), 0.0);
-                UnitIssueOrder(UnitLastCreated(), OrderTargetingPoint(AbilityCommand("move", 0), lv_randomPoint[0]), c_orderQueueReplace);
-                libNtve_gf_SendActorMessageToUnit(UnitLastCreated(), "SetTintColor 102,102,255");
-                UnitSetScale(UnitLastCreated(), 300.0, 300.0, 300.0);
-                UnitGroupAdd(gv_dronesToBeRemovedIfIdle, UnitLastCreated());
-                UnitSetPropertyFixed(UnitLastCreated(), c_unitPropMovementSpeed, lp_droneSpeed);
-                libNtve_gf_MakeUnitFacePoint(UnitLastCreated(), lv_randomPoint[0], 0.0);
-            }
-            Wait((1.0 / lp_droneSpawnFrequency), c_timeGame);
-        }
-    }
-    else {
-        if ((lp_lineAngleRandom == true)) {
-            lv_angle = libNtve_gf_RandomAngle();
-        }
-        else {
-            lv_angle = lp_initialAngle;
-        }
-        while ((gv_thread == lp_threadlocal)) {
-            lv_randomPoint[0] = RegionRandomPoint(lp_originRegion);
-            lv_wallDistancing = 0.0;
-            autoEC52FE50_ae = lp_numOfDronesSpawned;
-            lv_iter = 1;
-            for ( ; ( (autoEC52FE50_ai >= 0 && lv_iter <= autoEC52FE50_ae) || (autoEC52FE50_ai < 0 && lv_iter >= autoEC52FE50_ae) ) ; lv_iter += autoEC52FE50_ai ) {
-                lv_randomPoint[1] = RegionRandomPoint(lp_destinationRegion);
-                UnitCreate(1, "PointDefenseDrone", 0, 15, PointWithOffsetPolar(lv_randomPoint[0], (lv_wallDistancing + lp_lineDroneOriginOffset), lv_angle), 0.0);
-                UnitIssueOrder(UnitLastCreated(), OrderTargetingPoint(AbilityCommand("move", 0), lv_randomPoint[1]), c_orderQueueReplace);
-                libNtve_gf_SendActorMessageToUnit(UnitLastCreated(), "SetTintColor 102,102,255");
-                UnitSetScale(UnitLastCreated(), 300.0, 300.0, 300.0);
-                UnitGroupAdd(gv_dronesToBeRemovedIfIdle, UnitLastCreated());
-                UnitSetPropertyFixed(UnitLastCreated(), c_unitPropMovementSpeed, lp_droneSpeed);
-                libNtve_gf_MakeUnitFacePoint(UnitLastCreated(), lv_randomPoint[1], 0.0);
-                lv_wallDistancing += lp_lineDroneSpacing;
-            }
-            if ((lp_lineAngleRandom == true)) {
-                lv_angle = libNtve_gf_RandomAngle();
-            }
-            else {
-                lv_angle += lp_changeInAngle;
-            }
-            Wait((1.0 / lp_droneSpawnFrequency), c_timeGame);
-        }
+    while (gv_autoClicking[lp_player]) {
+            UnitIssueOrder(gv_playerCharacter[lp_player], OrderTargetingPoint(AbilityCommand("move", 0), gv_mouseLocale[lp_player]), c_orderQueueReplace);
+            Wait(0.0, c_timeGame);
     }
     return true;
 }
@@ -1554,7 +1432,7 @@ bool gt_ExampleLVL5Trigger_Func (bool testConds, bool runActions) {
     while (true) {
         lv_i = 1;
         for ( ; ( (auto00F88BF3_ai >= 0 && lv_i <= auto00F88BF3_ae) || (auto00F88BF3_ai < 0 && lv_i >= auto00F88BF3_ae) ) ; lv_i += auto00F88BF3_ai ) {
-            gf_WheelOfDoom(5, 0.0, 1, 4.0, PointFromId(1211802061), 0.0, 6.0, 100.0, 100.0, 6.5, lv_pointVar[0], lv_pointVar[1], 3.0);
+            gf_WheelOfDoom(5, 0.0, 1, 4.0, PointFromId(1211802061), 0.0, 6.0, 100.0, 100.0, 6.5, lv_pointVar[0], lv_pointVar[1], 2.5, 10.4, "255,128,128");
             gf_MovePointStraight(PointWithOffsetPolar(gv_pointBank[lv_pointVar[0]][lv_pointVar[1]], 80.0, lv_angle), 0.75, 100.0, 18, lv_pointVar[0], lv_pointVar[1]);
             lv_pointVar[1] = lv_i;
             Wait(1.0, c_timeGame);
@@ -1613,7 +1491,7 @@ bool gt_ExampleLevelOutline_Func (bool testConds, bool runActions) {
     }
     else if ((gv_level == 6)) {
         gv_thread = 5;
-        gf_PointToDistanceBlue(0.25, 12.0, 0.0, 7.0, 3.0, 75.0, 0.0, 15, 1, 0.0, PointFromId(1211802061), 0.0, 0.0, 0.0, 0.0, 0.0, false, false, "102,102,255", 5, 10.0);
+        gf_PointToDistanceBlue(0.25, 12.0, 0.0, 7.0, 3.0, 75.0, 0.0, 35, 1, 0.0, PointFromId(1211802061), 0.0, 0.0, 0.0, 0.0, 0.0, false, false, "102,102,255", 5, 10.0);
         UIDisplayMessage(PlayerGroupAll(), c_messageAreaError, StringExternal("Param/Value/3DAEEB52"));
         gv_level = 7;
     }
@@ -1675,14 +1553,14 @@ bool gt_ExampleLevelOutline_Func (bool testConds, bool runActions) {
     }
     else if ((gv_level == 16)) {
         gv_thread = 15;
-        gf_NeoYellow(15, PointFromId(1211802061), 0.0, 10.0, 3.0, 11.0, "200,200,0", 15, 1.7, 13.25, 30.0, 0.05, 0.2, 0, 10.0);
+        gf_NeoYellow(15, PointFromId(1211802061), 0.0, 10.0, 3.0, 11.0, false, false, "200,200,0", 15, 1.7, 13.25, 30.0, 0.05, 0.2, 0, 10.0);
         UIDisplayMessage(PlayerGroupAll(), c_messageAreaError, StringExternal("Param/Value/910431A1"));
         gv_level = 17;
     }
     else if ((gv_level == 17)) {
         gv_thread = 16;
         Wait(6.0, c_timeGame);
-        gf_TraditionalYellow(0.2, 10, 3.0, PointFromId(1211802061), 0.0, 10.0, "200,200,0", 20, 16, 2.0, 5.0, 11.0, 75.0, 0.1, 50.0, 10.0, 0.0);
+        gf_TraditionalYellow(0.2, 10, 3.0, PointFromId(1211802061), 0.0, 10.0, "200,200,0", 20, 16, 2.0, 5.0, 11.0, 75.0, 0.1, 50.0, 10.0, 0.0, false, false);
         UIDisplayMessage(PlayerGroupAll(), c_messageAreaError, StringExternal("Param/Value/16594EF3"));
         gv_level = 18;
     }
@@ -1693,10 +1571,10 @@ bool gt_ExampleLevelOutline_Func (bool testConds, bool runActions) {
         gv_redRegion[1] = RegionFromId(47);
         gv_redRegion[2] = RegionFromId(48);
         gv_redRegion[3] = RegionFromId(49);
-        spawnRed(15, 12.0, 3.0, 2.0, "255,100,100", RegionFromId(1), gv_redGroup[0], "RedDroneOne", 10.0);
-        spawnRed(15, 12.0, 3.0, 2.0, "255,100,100", RegionFromId(47), gv_redGroup[1], "RedDroneOne", 10.0);
-        spawnRed(15, 12.0, 3.0, 2.0, "255,100,100", RegionFromId(48), gv_redGroup[2], "RedDroneOne", 10.0);
-        spawnRed(15, 12.0, 3.0, 2.0, "255,100,100", RegionFromId(49), gv_redGroup[3], "RedDroneOne", 10.0);
+        spawnRed(15, 12.0, 3.0, 2.0, "255,100,100", RegionFromId(1), gv_redGroup[0], "RedDroneOne", 10.0, false, 0, 0, 0, "");
+        spawnRed(15, 12.0, 3.0, 2.0, "255,100,100", RegionFromId(47), gv_redGroup[1], "RedDroneOne", 10.0, false, 0, 0, 0, "");
+        spawnRed(15, 12.0, 3.0, 2.0, "255,100,100", RegionFromId(48), gv_redGroup[2], "RedDroneOne", 10.0, false, 0, 0, 0, "");
+        spawnRed(15, 12.0, 3.0, 2.0, "255,100,100", RegionFromId(49), gv_redGroup[3], "RedDroneOne", 10.0, false, 0, 0, 0, "");
         UIDisplayMessage(PlayerGroupAll(), c_messageAreaError, StringExternal("Param/Value/6C0E9F5A"));
         gv_level = 19;
     }
@@ -1711,18 +1589,60 @@ bool gt_ExampleLevelOutline_Func (bool testConds, bool runActions) {
         TriggerStop(gt_ExampleLVL5Trigger);
         Wait(6.5, c_timeGame);
         gv_thread = 19;
-        gf_WheelOfDoom(10, 0.0, 2, 3.0, PointFromId(1211802061), 10.0, 10.0, 100.0, 100.0, 12.0, 1, 1, 3.0);
-        gf_WheelOfDoom(10, 0.0, 2, -3.0, PointFromId(1211802061), 10.0, 5.0, 100.0, 100.0, 12.0, 1, 1, 3.0);
+        gf_WheelOfDoom(10, 0.0, 2, 3.0, PointFromId(1211802061), 10.0, 10.0, 100.0, 100.0, 12.0, 1, 1, 3.0, 10.0, "255,153,51");
+        gf_WheelOfDoom(10, 0.0, 2, -3.0, PointFromId(1211802061), 10.0, 5.0, 100.0, 100.0, 12.0, 1, 1, 3.0, 10.0, "255,153,51");
         gf_MovePointCircle(25.0, 0.0, 3.0, 20.0, PointFromId(1211802061), 19, 1, 1);
         UIDisplayMessage(PlayerGroupAll(), c_messageAreaError, StringExternal("Param/Value/2DE75F01"));
         gv_level = 21;
     }
     else if ((gv_level == 21)) {
-        UIDisplayMessage(PlayerGroupAll(), c_messageAreaError, StringExternal("Param/Value/880E6AA5"));
         gv_thread = 20;
+        gf_ZigZag(1, 7.5, 0.0, 0.0, PointFromId(1211802061), 2.5, 0.0, true, 0.0, 0.0, 20, "255,153,51", 0.0, 10.0, 10.0, false, 10.0, 90.0, 0.7);
+        UIDisplayMessage(PlayerGroupAll(), c_messageAreaError, StringExternal("Param/Value/2B7BE58B"));
+        gv_level = 22;
+    }
+    else if ((gv_level == 22)) {
+        gv_thread = 21;
+        gf_SpawnGrey(5, 5, 5, 5, 4, 4, 4, 4, 3, 3, 3, 3, 2, 2, 2, 2, 1, 1, 1, 1.2, 3.0, "200,200,200", true, false, 0.0, "255,102,153", 0.0, 0.0);
+        gf_SpawnGrey(5, 5, 5, 5, 4, 4, 4, 4, 3, 3, 3, 3, 2, 2, 2, 2, 1, 1, 1, 2.0, 2.0, "200,200,200", true, false, 0.0, "255,102,153", 0.0, 0.0);
+        gf_SpawnGrey(5, 5, 5, 5, 4, 4, 4, 4, 3, 3, 3, 3, 2, 2, 2, 2, 1, 1, 1, 3.5, 1.0, "200,200,200", true, false, 0.0, "255,102,153", 0.0, 0.0);
+        UIDisplayMessage(PlayerGroupAll(), c_messageAreaError, StringExternal("Param/Value/24C38449"));
+        gv_level = 23;
+    }
+    else if ((gv_level == 23)) {
+        gv_thread = 22;
+        TriggerExecute(gt_RemoveRedSilver, true, false);
+        gf_SpawnGreySingleLane(RegionFromId(6), 15, 7.0, 5.0, "191,69,249", false, false, 0.0, 0.0, 0.0, "255,102,153");
+        UIDisplayMessage(PlayerGroupAll(), c_messageAreaError, StringExternal("Param/Value/13F2C05B"));
+        gv_level = 24;
+    }
+    else if ((gv_level == 24)) {
+        gv_thread = 23;
+        gv_redRegion[0] = RegionFromId(44);
+        TriggerExecute(gt_RemoveRedSilver, true, false);
+        motherDrone(3.0, 2.0, "Red", 2, 1, RegionFromId(44), gv_redGroup[0], 10.0, "255,153,102", 20.0, 23);
+        gf_PointToDistanceBlue(0.25, 5.0, 0.0, 7.0, 2.0, 30.0, 0.0, 15, 1, 0.0, gv_pointBank[2][1], 0.0, 0.0, 0.0, 0.0, 0.0, false, false, "102,102,255", 23, 10.0);
+        gf_PointToDistanceBlue(4.0, 10.0, 0.0, 7.0, 2.0, 30.0, 0.0, 2, 1, 0.0, gv_pointBank[2][1], 0.0, 0.0, 0.0, 0.0, 0.0, false, false, "102,102,255", 23, 10.0);
+        motherDrone(3.0, 2.0, "Purple", 2, 2, RegionFromId(44), gv_redGroup[0], 10.0, "255,153,102", 20.0, 23);
+        gf_NeoYellow(3, gv_pointBank[2][2], 0.0, 0.0, 2.0, 8.0, false, true, "200,200,0", 23, 2.0, 10.0, 6.0, 0.05, 3.0, 0, 10.0);
+        UIDisplayMessage(PlayerGroupAll(), c_messageAreaError, StringExternal("Param/Value/1342916B"));
+        gv_level = 25;
+    }
+    else if ((gv_level == 25)) {
+        TriggerExecute(gt_RemoveRedSilver, true, false);
+        gv_thread = 24;
+        gf_SpawnGreySingleLane(RegionFromId(6), 15, 6.0, 5.0, "191,69,249", false, true, 2.0, 5.0, 3.0, "255,102,153");
+        UIDisplayMessage(PlayerGroupAll(), c_messageAreaError, StringExternal("Param/Value/EAD7E79B"));
+        gv_level = 26;
+    }
+    else if ((gv_level == 26)) {
+        UIDisplayMessage(PlayerGroupAll(), c_messageAreaError, StringExternal("Param/Value/72F1E11E"));
+        gv_thread = 21;
         Wait(50.0, c_timeGame);
-        UIDisplayMessage(PlayerGroupAll(), c_messageAreaError, StringExternal("Param/Value/3D768F25"));
+        UIDisplayMessage(PlayerGroupAll(), c_messageAreaError, StringExternal("Param/Value/EBDBBED2"));
         Wait(10.0, c_timeGame);
+        UIDisplayMessage(PlayerGroupAll(), c_messageAreaError, StringExternal("Param/Value/1B7C63C6"));
+        Wait(1.0, c_timeGame);
         GameOver(1, c_gameOverVictory, true, true);
     }
     Wait(12.0, c_timeGame);
@@ -1756,16 +1676,93 @@ void gt_MyLevelSet_Init () {
 }
 
 //--------------------------------------------------------------------------------------------------
-// Trigger: READ... if you want
+// Trigger: Classic Hard
 //--------------------------------------------------------------------------------------------------
-bool gt_READifyouwant_Func (bool testConds, bool runActions) {
+bool gt_ClassicHard_Func (bool testConds, bool runActions) {
+    // Variable Declarations
+    int lv_i;
+
     // Automatic Variable Declarations
+    const int autoD7D26F88_ae = 14;
+    const int autoD7D26F88_ai = 1;
+
+    // Variable Initialization
+
+    // Actions
+    if (!runActions) {
+        return true;
+    }
+
+    if ((gv_level == 1)) {
+        gv_chase = true;
+        gf_SpawnGrey(10, 10, 10, 10, 9, 9, 9, 9, 8, 8, 8, 8, 7, 7, 7, 7, 6, 6, 6, 1.2, 1.0, "200,200,200", true, false, 0.0, "255,102,153", 0.0, 0.0);
+    }
+    else if ((gv_level == 2)) {
+        TriggerExecute(gt_RemoveRedSilver, true, false);
+        gv_thread = 1;
+        gf_ResetChaser();
+        gf_PointToDistanceBlue(7.0, 0.0, 0.0, 5.5, 1.0, 75.0, 0.0, 1, 1, 0.0, PointFromId(1211802061), 0.0, 0.0, 0.0, 0.0, 0.0, true, false, "102,102,255", 1, 10.0);
+        gf_SpawnGrey(10, 10, 10, 10, 9, 9, 9, 9, 8, 8, 8, 8, 7, 7, 7, 7, 6, 6, 6, 1.2, 1.0, "200,200,200", true, false, 0.0, "255,102,153", 0.0, 0.0);
+    }
+    else if ((gv_level == 3)) {
+        gv_thread = 2;
+        TriggerExecute(gt_RemoveRedSilver, true, false);
+        gv_redRegion[0] = RegionFromId(44);
+        gf_ResetChaser();
+        gf_PointToDistanceBlue(7.0, 0.0, 0.0, 5.5, 1.0, 75.0, 0.0, 1, 1, 0.0, PointFromId(1211802061), 0.0, 0.0, 0.0, 0.0, 0.0, true, false, "102,102,255", 2, 10.0);
+        spawnRed(75, 8.0, 1.0, 1.5, "255,100,100", RegionFromId(44), gv_redGroup[0], "RedDroneOne", 10.0, false, 0.0, 0.0, 0.0, "255,102,153");
+    }
+    else if ((gv_level == 4)) {
+        gv_thread = 3;
+        TriggerExecute(gt_RemoveRedSilver, true, false);
+        gf_SpawnGrey(8, 8, 8, 8, 7, 7, 7, 7, 6, 6, 6, 6, 5, 5, 5, 5, 4, 4, 4, 2.0, 2.0, "200,200,200", true, false, 0.0, "255,102,153", 0.0, 0.0);
+        gf_PointToDistanceBlue(0.15, 0.0, 0.0, 8.0, 2.2, 75.0, 0.0, 30, 1, 0.0, PointFromId(1211802061), 0.0, 0.0, 0.0, 0.0, 0.0, false, false, "102,102,255", 3, 10.0);
+    }
+    else if ((gv_level == 5)) {
+        gv_thread = 4;
+        TriggerExecute(gt_RemoveRedSilver, true, false);
+        gf_ResetChaser();
+        gv_chase = false;
+        gf_SpawnGrey(8, 8, 8, 8, 7, 7, 7, 7, 6, 6, 6, 6, 5, 5, 5, 5, 4, 4, 4, 2.0, 2.0, "200,200,200", true, false, 0.0, "255,102,153", 0.0, 0.0);
+        spawnRed(60, 10.0, 2.0, 1.5, "255,100,100", RegionFromId(44), gv_redGroup[0], "RedDroneOne", 10.0, false, 0.0, 0.0, 0.0, "255,102,153");
+    }
+    else if ((gv_level == 6)) {
+        gv_thread = 5;
+        TriggerExecute(gt_RemoveRedSilver, true, false);
+        gf_SpawnGrey(8, 8, 8, 8, 7, 7, 7, 7, 6, 6, 6, 6, 5, 5, 5, 5, 4, 4, 4, 2.0, 2.0, "200,200,200", true, false, 0.0, "255,102,153", 0.0, 0.0);
+        gf_TraditionalYellow(0.15, 30, 2.0, PointFromId(1211802061), 0.0, 12.0, "200,200,0", 25, 5, 1.5, 5.0, 9.0, 75.0, 0.0, 50.0, 10.0, 0.0, false, false);
+    }
+    else if ((gv_level == 7)) {
+        gv_thread = 6;
+        TriggerExecute(gt_RemoveRedSilver, true, false);
+        gf_SpawnGrey(8, 8, 8, 8, 7, 7, 7, 7, 6, 6, 6, 6, 5, 5, 5, 5, 4, 4, 4, 3.0, 2.0, "200,200,200", true, false, 0.0, "255,102,153", 0.0, 0.0);
+        gf_ZigZag(1, 5.5, 0.0, 0.0, PointFromId(1211802061), 2.0, 0.0, false, 0.0, 0.0, 6, "255,153,51", 0.0, 10.0, 7.5, true, 12.0, 110.0, 0.7);
+    }
+    else if ((gv_level == 8)) {
+        gv_thread = 7;
+        TriggerExecute(gt_RemoveRedSilver, true, false);
+        spawnRed(40, 10.0, 2.0, 2.0, "255,100,100", RegionFromId(44), gv_redGroup[0], "RedDroneOne", 10.0, false, 0.0, 0.0, 0.0, "255,102,153");
+        gf_ZigZag(1, 5.5, 0.0, -15.0, PointFromId(1211802061), 2.0, 0.0, false, 0.0, 0.0, 7, "255,153,51", 0.0, 10.0, 6.0, false, 12.0, 110.0, 0.7);
+    }
+    else if ((gv_level == 9)) {
+        gv_thread = 8;
+        TriggerExecute(gt_RemoveRedSilver, true, false);
+        gf_SpawnGrey(8, 8, 8, 8, 7, 7, 7, 7, 6, 6, 6, 6, 5, 5, 5, 5, 4, 4, 4, 3.0, 2.0, "200,200,200", true, false, 0.0, "255,102,153", 0.0, 0.0);
+        gf_TraditionalYellow(0.15, 30, 2.0, PointFromId(1211802061), 0.0, 12.0, "200,200,0", 25, 8, 1.5, 5.0, 8.0, 75.0, 0.0, 50.0, 10.0, 0.0, false, false);
+        gf_PointToDistanceBlue(3.0, 12.0, 0.0, 8.0, 2.0, 75.0, 0.0, 2, 1, 0.0, PointFromId(1211802061), 0.0, 0.0, 0.0, 0.0, 0.0, false, false, "102,102,255", 8, 10.0);
+    }
+    else if ((gv_level == 10)) {
+        lv_i = 1;
+        for ( ; ( (autoD7D26F88_ai >= 0 && lv_i <= autoD7D26F88_ae) || (autoD7D26F88_ai < 0 && lv_i >= autoD7D26F88_ae) ) ; lv_i += autoD7D26F88_ai ) {
+            GameOver(lv_i, c_gameOverVictory, true, true);
+        }
+    }
     return true;
 }
 
 //--------------------------------------------------------------------------------------------------
-void gt_READifyouwant_Init () {
-    gt_READifyouwant = TriggerCreate("gt_READifyouwant_Func");
+void gt_ClassicHard_Init () {
+    gt_ClassicHard = TriggerCreate("gt_ClassicHard_Func");
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -1957,17 +1954,29 @@ bool gt_Initialization_Func (bool testConds, bool runActions) {
         VisSetFoWAlpha(lv_i, 100.0);
         CameraLockInput(lv_i, true);
         gv_visibility[lv_i] = false;
+        gv_camera[lv_i] = CameraInfoFromId(1623587201);
     }
     gv_allPlayers = PlayerGroupActive();
     CameraApplyInfo(1, CameraInfoFromId(1623587201), 0.0, -1, 10.0, true);
     libNtve_gf_HideGameUI(false, PlayerGroupAll());
     DialogControlSetVisible(gv_openingMenu, PlayerGroupAll(), true);
-    DialogControlSetEnabled(gv_gameDiffButtons[2].lv_dialog, gv_allPlayers, false);
     DialogControlSetEnabled(gv_gameDiffButtons[3].lv_dialog, gv_allPlayers, false);
     DialogControlSetEnabled(gv_gameDiffButtons[4].lv_dialog, gv_allPlayers, false);
     DialogControlSetEnabled(gv_gameDiffButtons[5].lv_dialog, gv_allPlayers, false);
     DialogControlSetEnabled(gv_gameDiffButtons[6].lv_dialog, gv_allPlayers, false);
     DialogControlSendAnimationEvent(gv_chatBox.lv_toggleVisibility, PlayerGroupAll(), "Invisible");
+    gv_chaserAttributes[1].lv_size = 1.0;
+    gv_chaserAttributes[1].lv_speed = 5.0;
+    gv_droneSizeArray[0] = 2.0;
+    gv_chaserRegions[0] = RegionFromId(3);
+    gv_chaserDestroyRegions[0] = RegionFromId(9);
+    gv_chaserRegions[1] = RegionFromId(10);
+    gv_chaserDestroyRegions[1] = RegionFromId(11);
+    gv_chaserRegions[2] = RegionFromId(12);
+    gv_chaserDestroyRegions[2] = RegionFromId(13);
+    gv_chaserPoints[0] = PointFromId(1394817962);
+    gv_chaserPoints[1] = PointFromId(1075426566);
+    gv_chaserPoints[2] = PointFromId(1169434643);
     MenuTimer(125);
     return true;
 }
@@ -2005,6 +2014,15 @@ bool gt_KeyPressed_Func (bool testConds, bool runActions) {
             gv_cam.lv_isVisible[EventPlayer()] = false;
         }
     }
+    else if ((EventKeyPressed() == c_keyC)) {
+        if ((gv_autoClicking[EventPlayer()] == true) && (gv_autoClickAtLvlStart[EventPlayer()] == false)) {
+            gv_autoClicking[EventPlayer()] = false;
+        }
+        else if ((gv_autoClickAtLvlStart[EventPlayer()] == false)) {
+            gv_autoClicking[EventPlayer()] = true;
+            gf_AutoClicker(EventPlayer());
+        }
+    }
     return true;
 }
 
@@ -2012,6 +2030,59 @@ bool gt_KeyPressed_Func (bool testConds, bool runActions) {
 void gt_KeyPressed_Init () {
     gt_KeyPressed = TriggerCreate("gt_KeyPressed_Func");
     TriggerAddEventKeyPressed(gt_KeyPressed, c_playerAny, c_keyNone, true, c_keyModifierStateIgnore, c_keyModifierStateIgnore, c_keyModifierStateIgnore);
+}
+
+//--------------------------------------------------------------------------------------------------
+// Trigger: GreyMovement
+//--------------------------------------------------------------------------------------------------
+bool gt_GreyMovement_Func (bool testConds, bool runActions) {
+    // Automatic Variable Declarations
+    unitgroup auto254CBA5F_g;
+    int auto254CBA5F_u;
+    unit auto254CBA5F_var;
+    unitgroup auto44924439_g;
+    int auto44924439_u;
+    unit auto44924439_var;
+    unitgroup auto65161308_g;
+    int auto65161308_u;
+    unit auto65161308_var;
+
+    // Actions
+    if (!runActions) {
+        return true;
+    }
+
+    while (true) {
+        Wait(0.0, c_timeGame);
+        auto254CBA5F_g = gv_greyDrones;
+        auto254CBA5F_u = UnitGroupCount(auto254CBA5F_g, c_unitCountAll);
+        for (;; auto254CBA5F_u -= 1) {
+            auto254CBA5F_var = UnitGroupUnitFromEnd(auto254CBA5F_g, auto254CBA5F_u);
+            if (auto254CBA5F_var == null) { break; }
+            UnitSetPosition(auto254CBA5F_var, PointWithOffsetPolar(UnitGetPosition(auto254CBA5F_var), (UnitGetPropertyFixed(auto254CBA5F_var, c_unitPropMovementSpeed, c_unitPropCurrent) / 20.0), UnitGetFacing(auto254CBA5F_var)), true);
+        }
+        auto44924439_g = gv_purpleDrones;
+        auto44924439_u = UnitGroupCount(auto44924439_g, c_unitCountAll);
+        for (;; auto44924439_u -= 1) {
+            auto44924439_var = UnitGroupUnitFromEnd(auto44924439_g, auto44924439_u);
+            if (auto44924439_var == null) { break; }
+            UnitSetPosition(auto44924439_var, PointWithOffsetPolar(UnitGetPosition(auto44924439_var), (UnitGetPropertyFixed(auto44924439_var, c_unitPropMovementSpeed, c_unitPropCurrent) / 20.0), UnitGetFacing(auto44924439_var)), true);
+        }
+        auto65161308_g = gv_zigZags;
+        auto65161308_u = UnitGroupCount(auto65161308_g, c_unitCountAll);
+        for (;; auto65161308_u -= 1) {
+            auto65161308_var = UnitGroupUnitFromEnd(auto65161308_g, auto65161308_u);
+            if (auto65161308_var == null) { break; }
+            UnitSetPosition(auto65161308_var, PointWithOffsetPolar(UnitGetPosition(auto65161308_var), (UnitGetPropertyFixed(auto65161308_var, c_unitPropMovementSpeed, c_unitPropCurrent) / 20.0), UnitGetFacing(auto65161308_var)), true);
+        }
+    }
+    return true;
+}
+
+//--------------------------------------------------------------------------------------------------
+void gt_GreyMovement_Init () {
+    gt_GreyMovement = TriggerCreate("gt_GreyMovement_Func");
+    TriggerAddEventMapInit(gt_GreyMovement);
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -2052,6 +2123,9 @@ bool gt_RemoveRedSilver_Func (bool testConds, bool runActions) {
     unitgroup autoE6BC4AA8_g;
     int autoE6BC4AA8_u;
     unit autoE6BC4AA8_var;
+    unitgroup auto8B01F6A7_g;
+    int auto8B01F6A7_u;
+    unit auto8B01F6A7_var;
 
     // Actions
     if (!runActions) {
@@ -2071,6 +2145,13 @@ bool gt_RemoveRedSilver_Func (bool testConds, bool runActions) {
         autoE6BC4AA8_var = UnitGroupUnitFromEnd(autoE6BC4AA8_g, autoE6BC4AA8_u);
         if (autoE6BC4AA8_var == null) { break; }
         UnitRemove(autoE6BC4AA8_var);
+    }
+    auto8B01F6A7_g = gv_purpleDrones;
+    auto8B01F6A7_u = UnitGroupCount(auto8B01F6A7_g, c_unitCountAll);
+    for (;; auto8B01F6A7_u -= 1) {
+        auto8B01F6A7_var = UnitGroupUnitFromEnd(auto8B01F6A7_g, auto8B01F6A7_u);
+        if (auto8B01F6A7_var == null) { break; }
+        UnitRemove(auto8B01F6A7_var);
     }
     return true;
 }
@@ -2128,9 +2209,10 @@ void InitTriggers () {
     gt_ExampleLVL5Trigger_Init();
     gt_ExampleLevelOutline_Init();
     gt_MyLevelSet_Init();
-    gt_READifyouwant_Init();
+    gt_ClassicHard_Init();
     gt_Initialization_Init();
     gt_KeyPressed_Init();
+    gt_GreyMovement_Init();
     gt_RemoveIdleDrones_Init();
     gt_RemoveRedSilver_Init();
     gt_IdleMoveAgain_Init();
