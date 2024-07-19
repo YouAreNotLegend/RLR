@@ -303,7 +303,6 @@ trigger gt_ExampleLVL5Trigger;
 trigger gt_ClassicNormal;
 trigger gt_ClassicHard;
 trigger gt_ClassicInsane;
-trigger gt_fuckyou;
 trigger gt_Initialization;
 trigger gt_KeyPressed;
 trigger gt_GreyMovement;
@@ -1710,26 +1709,6 @@ void gt_ClassicInsane_Init () {
 }
 
 //--------------------------------------------------------------------------------------------------
-// Trigger: fuckyou
-//--------------------------------------------------------------------------------------------------
-bool gt_fuckyou_Func (bool testConds, bool runActions) {
-    // Automatic Variable Declarations
-    // Actions
-    if (!runActions) {
-        return true;
-    }
-
-    TextTagCreate(StringExternal("Param/Value/ECA053FA"), 10, UnitGetPosition(UnitFromId(462746737)), 1.0, true, false, PlayerGroupAll());
-    return true;
-}
-
-//--------------------------------------------------------------------------------------------------
-void gt_fuckyou_Init () {
-    gt_fuckyou = TriggerCreate("gt_fuckyou_Func");
-    TriggerAddEventTimePeriodic(gt_fuckyou, 1.0, c_timeGame);
-}
-
-//--------------------------------------------------------------------------------------------------
 // Trigger: Initialization
 //--------------------------------------------------------------------------------------------------
 bool gt_Initialization_Func (bool testConds, bool runActions) {
@@ -2248,7 +2227,6 @@ void InitTriggers () {
     gt_ClassicNormal_Init();
     gt_ClassicHard_Init();
     gt_ClassicInsane_Init();
-    gt_fuckyou_Init();
     gt_Initialization_Init();
     gt_KeyPressed_Init();
     gt_GreyMovement_Init();

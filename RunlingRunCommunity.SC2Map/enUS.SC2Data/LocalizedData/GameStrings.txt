@@ -6,7 +6,6 @@ MapInfo/Player00/Name=Neutral
 MapInfo/Player01/Name=Player 1
 MapInfo/Player02/Name=Hostile
 Param/Value/9496FF71=
-Param/Value/ECA053FA=e
 Unit/Name/RedDroneOne=RedDroneOne
 Unit/Name/RedDroneOneActor=Point Defense Drone
 Unit/Name/ShapeCylinder2=Cylinder2

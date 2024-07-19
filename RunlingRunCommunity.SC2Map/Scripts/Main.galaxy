@@ -86,7 +86,7 @@ bool gt_killPlayer_Func (bool testConds, bool runActions) {
         for (; j <= gv_droneSizeArray[0]; j+=1) {
             if ((EventUnitRegion() == gv_deathRegionArray[i][j] && UnitGroupHasUnit(gv_droneSizeGroup[j], EventUnit())) && !gv_safe[i]){
                 RegionSetCenter(gv_rezZone[i], UnitGetPosition(gv_playerCharacter[i]));
-                TextTagCreate(StringToText("why?"), 20, UnitGetPosition(gv_playerCharacter[i]), 2, true, false, gv_allPlayers);
+                TextTagCreate(PlayerName(i), 20, UnitGetPosition(gv_playerCharacter[i]), 2, true, false, gv_allPlayers);
                 libNtve_gf_CreateModelAtPoint("ZergAOECursorSplat", UnitGetPosition(gv_playerCharacter[i]));
                 gv_rezModel[i] = ActorLastCreated();
                 UnitIssueOrder(gv_playerCharacter[i], Order(AbilityCommand("stop", 0)), c_orderQueueReplace);

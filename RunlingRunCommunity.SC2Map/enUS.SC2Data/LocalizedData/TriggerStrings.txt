@@ -252,7 +252,6 @@ Structure/Name/B2C6D440=LevelSet
 Structure/Name/BBF89E89=Cam
 Structure/Name/EF05A0F1=Chaser
 Trigger/Name/01817942=Classic Hard
-Trigger/Name/1E179174=fuckyou
 Trigger/Name/3B474EE4=Classic Insane
 Trigger/Name/6936860C=Example LVL 5 Trigger
 Trigger/Name/8D79D98E=RemoveRed/Silver
