@@ -24,6 +24,7 @@ trigger gt_EndLevel;
 trigger gt_ChaserSpawnTrigger;
 trigger gt_ChaserKillTrigger;
 
+// Note to self: Classic Normal: Set0, Classic Hard: Set1, Classic Insane: Set2
 
 bool gt_HorizontalBounce_Func (bool testConds, bool runActions) {
 
@@ -84,7 +85,19 @@ bool gt_killPlayer_Func (bool testConds, bool runActions) {
     for (; i<= PlayerGroupCount(gv_allPlayers); i+=1) {
         for (; j <= gv_droneSizeArray[0]; j+=1) {
             if ((EventUnitRegion() == gv_deathRegionArray[i][j] && UnitGroupHasUnit(gv_droneSizeGroup[j], EventUnit())) && !gv_safe[i]){
-                UIDisplayMessage(gv_allPlayers, c_messageAreaError, StringToText("Hit Player :" + IntToString(i) ));
+                RegionSetCenter(gv_rezZone[i], UnitGetPosition(gv_playerCharacter[i]));
+                TextTagCreate(StringToText("why?"), 20, UnitGetPosition(gv_playerCharacter[i]), 2, true, false, gv_allPlayers);
+                libNtve_gf_CreateModelAtPoint("ZergAOECursorSplat", UnitGetPosition(gv_playerCharacter[i]));
+                gv_rezModel[i] = ActorLastCreated();
+                UnitIssueOrder(gv_playerCharacter[i], Order(AbilityCommand("stop", 0)), c_orderQueueReplace);
+                libNtve_gf_MakeUnitUncommandable(gv_playerCharacter[i], true);
+                if (gv_autoClicking[i] == true) {
+                    gv_autoClickAtLvlStart[i] = true;
+                }
+                gv_autoClicking[i] = false;
+                gv_autoClickDisable = true; 
+                gv_safe[i] = true;
+                libNtve_gf_ShowHideUnit(gv_playerCharacter[i], false);
             }
         }
     }
@@ -130,9 +143,7 @@ bool gt_Setup_Func (bool testConds, bool runActions) {
     if (!runActions) {
         return true;
     }
-
-    //were there something to be done before anything else, it'd be done here
-
+    
     return true;
 }
 
@@ -172,28 +183,44 @@ void GameStart () {
     // what to do when everyone has hit the ready button or the timer runs out
 
     int i = 1;
+    bank playerbank;
 
     DialogControlSetVisible(gv_openingMenu, gv_allPlayers, false);
     DialogControlSetVisible(gv_chatBox.lv_mainPanel, gv_allPlayers, true);
     VisRevealerCreate(1, RegionEntireMap());
 
+    if (gv_diffVotedFor[1] == 1) {
+        gv_diff = "ClassicNormal";
+        gv_currentSet = "Set0";
+    } else if (gv_diffVotedFor[1] == 2) {
+        gv_diff = "ClassicHard";
+        gv_currentSet = "Set1";
+    } else if (gv_diffVotedFor[1] == 3) {
+        gv_diff = "ClassicInsane";
+        gv_currentSet = "Set2";
+    }
     for (; i <= PlayerGroupCount(gv_allPlayers); i+=1){
         UnitCreate(1, gv_characterSelected[i], c_unitCreateIgnorePlacement, i, PointFromId(1616826619), 0);
         gv_playerCharacter[i] = UnitLastCreated();
         UnitSetPropertyFixed(UnitLastCreated(), c_unitPropMovementSpeed, 10.0);
         CameraLockInput(i, false);
+        playerbank = BankLoad("RUNLINGRUNIUU0m", i);
+        BankValueSetFromInt(playerbank, gv_currentSet, "Games", BankValueGetAsInt(playerbank, gv_currentSet, "Games") + 1);
+        if (!gv_solo) {
+            BankValueSetFromInt(playerbank, gv_currentSet, "1", BankValueGetAsInt(playerbank, gv_currentSet, "1") + 1);
+        } else {
+            BankValueSetFromInt(playerbank, gv_currentSet, "S1", BankValueGetAsInt(playerbank, gv_currentSet, "S1") + 1);
+        }
+        
     }
+
     if (gv_diffVotedFor[1] == 1) {
-        TriggerExecute(gt_ExampleLevelOutline, true, false);
-        gv_diff = "ExampleLevelOutline";
+        TriggerExecute(gt_ClassicNormal, true, false);
     } else if (gv_diffVotedFor[1] == 2){
-        TriggerExecute(gt_MyLevelSet, true, false);
-        gv_diff = "MyLevelSet";
-    } else if (gv_diffVotedFor[1] == 3){
         TriggerExecute(gt_ClassicHard, true, false);
-        gv_diff = "ClassicHard";
+    } else if (gv_diffVotedFor[1] == 3){
+        TriggerExecute(gt_ClassicInsane, true, false);
     }
-    
     gv_gameStarted = true;
     DialogControlSetPosition(gv_chatEditBox, PlayerGroupAll(), c_anchorBottom, 0, -500);
 }
@@ -224,6 +251,91 @@ bool gt_DialogHover_Func (bool testConds, bool runActions) {
     return true;
 }
 
+void StatsUpdate (structref<gs_LevelSet> lp_levelSet, string bankset, int player) {
+    int losses;
+    fixed winpc;
+    int i = 1;
+    fixed j = 100.0;
+    fixed currentchance;
+
+    BankLoad("RUNLINGRUNIUU0m", player);
+
+    losses = BankValueGetAsInt(BankLastCreated(), bankset, "Games") - BankValueGetAsInt(BankLastCreated(), bankset, "Wins");
+    if (losses == 0 && BankValueGetAsInt(BankLastCreated(), bankset, "Wins") == 0) {
+        winpc = 0.0;
+    } else if (losses == 0) {
+        winpc = 100.0;
+    } else {
+        winpc = BankValueGetAsInt(BankLastCreated(), bankset, "Wins") / losses;
+    }
+
+    libNtve_gf_SetDialogItemText(gv_stats.lv_creator, StringToText(lp_levelSet.lv_creator), PlayerGroupSingle(player));
+    libNtve_gf_SetDialogItemText(gv_stats.lv_difficulty, IntToText(lp_levelSet.lv_difficulty), PlayerGroupSingle(player));
+    libNtve_gf_SetDialogItemText(gv_stats.lv_xPMult, StringToText(FixedToString(lp_levelSet.lv_xPMult, 1) + "x"), PlayerGroupSingle(player));
+    libNtve_gf_SetDialogItemText(gv_stats.lv_winningXP, IntToText(lp_levelSet.lv_winningXP), PlayerGroupSingle(player));
+    libNtve_gf_SetDialogItemText(gv_stats.lv_levels, IntToText(lp_levelSet.lv_levels), PlayerGroupSingle(player));
+    libNtve_gf_SetDialogItemText(gv_stats.lv_bosses, IntToText(lp_levelSet.lv_bosses), PlayerGroupSingle(player));
+    libNtve_gf_SetDialogItemText(gv_stats.lv_deaths, IntToText(BankValueGetAsInt(BankLastCreated(), bankset, "Deaths")), PlayerGroupSingle(player));
+    libNtve_gf_SetDialogItemText(gv_stats.lv_saves, IntToText(BankValueGetAsInt(BankLastCreated(), bankset, "Saves")), PlayerGroupSingle(player));
+    libNtve_gf_SetDialogItemText(gv_stats.lv_xP, IntToText(BankValueGetAsInt(BankLastCreated(), bankset, "XP")), PlayerGroupSingle(player));
+    libNtve_gf_SetDialogItemText(gv_stats.lv_xPGame, IntToText(BankValueGetAsInt(BankLastCreated(), bankset, "XPGame")), PlayerGroupSingle(player));
+    libNtve_gf_SetDialogItemText(gv_stats.lv_sTime, IntToText(BankValueGetAsInt(BankLastCreated(), bankset, "STime")), PlayerGroupSingle(player));
+    libNtve_gf_SetDialogItemText(gv_stats.lv_tTime, IntToText(BankValueGetAsInt(BankLastCreated(), bankset, "TTime")), PlayerGroupSingle(player));
+    libNtve_gf_SetDialogItemText(gv_stats.lv_games, IntToText(BankValueGetAsInt(BankLastCreated(), bankset, "Games")), PlayerGroupSingle(player));
+    libNtve_gf_SetDialogItemText(gv_stats.lv_wins, IntToText(BankValueGetAsInt(BankLastCreated(), bankset, "Wins")), PlayerGroupSingle(player));
+    libNtve_gf_SetDialogItemText(gv_stats.lv_losses, IntToText(losses), PlayerGroupSingle(player));
+    libNtve_gf_SetDialogItemText(gv_stats.lv_winPC, FixedToText(winpc, 1), PlayerGroupSingle(player));
+
+    DialogControlRemoveAllDataPoints(gv_graph[1], PlayerGroupSingle(player));
+    DialogControlRemoveAllDataPoints(gv_graph[2], PlayerGroupSingle(player));
+    DialogControlRemoveAllDataPoints(gv_graph[3], PlayerGroupSingle(player));
+    DialogControlRemoveAllDataPoints(gv_graph[4], PlayerGroupSingle(player));
+    for (; i<=lp_levelSet.lv_levels; i+=1) {
+        DialogControlAddDataPoint(gv_graph[1], gv_allPlayers, IntToFixed(i), BankValueGetAsInt(BankLastCreated(), bankset, "S" + IntToString(i)), 3);
+    }
+    i = 1;
+    for (; i<=lp_levelSet.lv_levels; i+=1) {
+        DialogControlAddDataPoint(gv_graph[3], gv_allPlayers, IntToFixed(i), BankValueGetAsInt(BankLastCreated(), bankset, IntToString(i)), 3);
+    }
+    i = 1;
+    for (; i<=lp_levelSet.lv_levels; i+=1) {
+        if (BankValueGetAsInt(BankLastCreated(), bankset, "S" + IntToString(i)) != 0) {
+            currentchance = (IntToFixed(BankValueGetAsInt(BankLastCreated(), bankset, "S" + IntToString(i+1))) / IntToFixed(BankValueGetAsInt(BankLastCreated(), bankset, "S" + IntToString(i)))) * 100.0;
+            DialogControlAddDataPoint(gv_graph[2], PlayerGroupSingle(player), IntToFixed(i), currentchance, 3);
+        } else {
+            currentchance = 0;
+            DialogControlAddDataPoint(gv_graph[2], PlayerGroupSingle(player), IntToFixed(i), 0.0, 3);
+        }
+        DialogControlAddDataPoint(gv_graph[2], PlayerGroupSingle(player), IntToFixed(i), j * (currentchance / 100), 2);
+        j = j * (currentchance / 100);
+    }
+    i = 1;
+    j = 100;
+    for (; i<=lp_levelSet.lv_levels; i+=1) {
+        if (BankValueGetAsInt(BankLastCreated(), bankset, IntToString(i)) != 0) {
+            currentchance = (IntToFixed(BankValueGetAsInt(BankLastCreated(), bankset, IntToString(i+1))) / IntToFixed(BankValueGetAsInt(BankLastCreated(), bankset, IntToString(i)))) * 100.0;
+            DialogControlAddDataPoint(gv_graph[4], PlayerGroupSingle(player), IntToFixed(i), currentchance, 3);
+        } else {
+            currentchance = 0;
+            DialogControlAddDataPoint(gv_graph[4], PlayerGroupSingle(player), IntToFixed(i), 0.0, 3);
+        }
+        DialogControlAddDataPoint(gv_graph[4], PlayerGroupSingle(player), IntToFixed(i), j * (currentchance / 100), 2);
+        j = j * (currentchance / 100);
+    }
+}
+
+void CharSelectClickAlpha (int avoid) {
+    int i;
+
+    for (; i <= 7; i+=1) {
+        if (i != avoid) {
+            DialogControlSetPropertyAsInt(gv_charSelectButtons[i].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
+        } else {
+            DialogControlSetPropertyAsInt(gv_charSelectButtons[i].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), hoverAlpha);
+        }
+    }
+}
+
 bool gt_DialogClick_Func (bool testConds, bool runActions) {
 
     if (!testConds) {
@@ -238,105 +350,49 @@ bool gt_DialogClick_Func (bool testConds, bool runActions) {
         // --- UNIT SELECT BUTTONS
         // I saw there were radio buttons after I did this, might switch over if they work, but this is fine for now
         // Zergling select visual change
-        DialogControlSetPropertyAsInt(gv_charSelectButtons[0].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), hoverAlpha);
-        DialogControlSetPropertyAsInt(gv_charSelectButtons[1].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
-        DialogControlSetPropertyAsInt(gv_charSelectButtons[2].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
-        DialogControlSetPropertyAsInt(gv_charSelectButtons[3].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
-        DialogControlSetPropertyAsInt(gv_charSelectButtons[4].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
-        DialogControlSetPropertyAsInt(gv_charSelectButtons[5].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
-        DialogControlSetPropertyAsInt(gv_charSelectButtons[6].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
-        DialogControlSetPropertyAsInt(gv_charSelectButtons[7].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);    
+        CharSelectClickAlpha(0);
         // Zergling select action
         gv_characterIsSelected[EventPlayer()] = true;
         gv_characterSelected[EventPlayer()] = "Zergling";
     } else if (EventDialogControl() == gv_charSelectButtons[1].lv_dialog && !gv_charSelectButtons[1].lv_isSelected) {
         // Hydralisk select visual change
-        DialogControlSetPropertyAsInt(gv_charSelectButtons[0].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
-        DialogControlSetPropertyAsInt(gv_charSelectButtons[1].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), hoverAlpha);
-        DialogControlSetPropertyAsInt(gv_charSelectButtons[2].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
-        DialogControlSetPropertyAsInt(gv_charSelectButtons[3].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
-        DialogControlSetPropertyAsInt(gv_charSelectButtons[4].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
-        DialogControlSetPropertyAsInt(gv_charSelectButtons[5].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
-        DialogControlSetPropertyAsInt(gv_charSelectButtons[6].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
-        DialogControlSetPropertyAsInt(gv_charSelectButtons[7].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
+        CharSelectClickAlpha(1);
         // Hydralisk select action
         gv_characterIsSelected[EventPlayer()] = true;
         gv_characterSelected[EventPlayer()] = "Hydralisk";
     } else if (EventDialogControl() == gv_charSelectButtons[2].lv_dialog && !gv_charSelectButtons[2].lv_isSelected) {
         // Baneling select visual change
-        DialogControlSetPropertyAsInt(gv_charSelectButtons[0].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
-        DialogControlSetPropertyAsInt(gv_charSelectButtons[1].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
-        DialogControlSetPropertyAsInt(gv_charSelectButtons[2].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), hoverAlpha);
-        DialogControlSetPropertyAsInt(gv_charSelectButtons[3].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
-        DialogControlSetPropertyAsInt(gv_charSelectButtons[4].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
-        DialogControlSetPropertyAsInt(gv_charSelectButtons[5].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
-        DialogControlSetPropertyAsInt(gv_charSelectButtons[6].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
-        DialogControlSetPropertyAsInt(gv_charSelectButtons[7].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
+        CharSelectClickAlpha(2);
         // Baneling select action
         gv_characterIsSelected[EventPlayer()] = true;
         gv_characterSelected[EventPlayer()] = "Baneling";
     } else if (EventDialogControl() == gv_charSelectButtons[3].lv_dialog && !gv_charSelectButtons[3].lv_isSelected) {
         // Ultralisk select visual change
-        DialogControlSetPropertyAsInt(gv_charSelectButtons[0].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
-        DialogControlSetPropertyAsInt(gv_charSelectButtons[1].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
-        DialogControlSetPropertyAsInt(gv_charSelectButtons[2].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
-        DialogControlSetPropertyAsInt(gv_charSelectButtons[3].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), hoverAlpha);
-        DialogControlSetPropertyAsInt(gv_charSelectButtons[4].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
-        DialogControlSetPropertyAsInt(gv_charSelectButtons[5].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
-        DialogControlSetPropertyAsInt(gv_charSelectButtons[6].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
-        DialogControlSetPropertyAsInt(gv_charSelectButtons[7].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
+        CharSelectClickAlpha(3);
         // Ultralisk select action
         gv_characterIsSelected[EventPlayer()] = true;
         gv_characterSelected[EventPlayer()] = "Ultralisk";
     } else if (EventDialogControl() == gv_charSelectButtons[4].lv_dialog && !gv_charSelectButtons[4].lv_isSelected) {
         // Lurker select visual change
-        DialogControlSetPropertyAsInt(gv_charSelectButtons[0].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
-        DialogControlSetPropertyAsInt(gv_charSelectButtons[1].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
-        DialogControlSetPropertyAsInt(gv_charSelectButtons[2].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
-        DialogControlSetPropertyAsInt(gv_charSelectButtons[3].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
-        DialogControlSetPropertyAsInt(gv_charSelectButtons[4].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), hoverAlpha);
-        DialogControlSetPropertyAsInt(gv_charSelectButtons[5].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
-        DialogControlSetPropertyAsInt(gv_charSelectButtons[6].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
-        DialogControlSetPropertyAsInt(gv_charSelectButtons[7].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
+        CharSelectClickAlpha(4);
         // Lurker select action
         gv_characterIsSelected[EventPlayer()] = true;
         gv_characterSelected[EventPlayer()] = "Lurker";
     } else if (EventDialogControl() == gv_charSelectButtons[5].lv_dialog && !gv_charSelectButtons[5].lv_isSelected) {
         // Roach select visual change
-        DialogControlSetPropertyAsInt(gv_charSelectButtons[0].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
-        DialogControlSetPropertyAsInt(gv_charSelectButtons[1].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
-        DialogControlSetPropertyAsInt(gv_charSelectButtons[2].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
-        DialogControlSetPropertyAsInt(gv_charSelectButtons[3].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
-        DialogControlSetPropertyAsInt(gv_charSelectButtons[4].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
-        DialogControlSetPropertyAsInt(gv_charSelectButtons[5].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), hoverAlpha);
-        DialogControlSetPropertyAsInt(gv_charSelectButtons[6].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
-        DialogControlSetPropertyAsInt(gv_charSelectButtons[7].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
+        CharSelectClickAlpha(5);
         // Roach select action
         gv_characterIsSelected[EventPlayer()] = true;
         gv_characterSelected[EventPlayer()] = "Roach";
     } else if (EventDialogControl() == gv_charSelectButtons[6].lv_dialog && !gv_charSelectButtons[6].lv_isSelected) {
         // Infested select visual change
-        DialogControlSetPropertyAsInt(gv_charSelectButtons[0].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
-        DialogControlSetPropertyAsInt(gv_charSelectButtons[1].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
-        DialogControlSetPropertyAsInt(gv_charSelectButtons[2].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
-        DialogControlSetPropertyAsInt(gv_charSelectButtons[3].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
-        DialogControlSetPropertyAsInt(gv_charSelectButtons[4].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
-        DialogControlSetPropertyAsInt(gv_charSelectButtons[5].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
-        DialogControlSetPropertyAsInt(gv_charSelectButtons[6].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), hoverAlpha);
-        DialogControlSetPropertyAsInt(gv_charSelectButtons[7].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
+        CharSelectClickAlpha(6);
         // Infested select action
         gv_characterIsSelected[EventPlayer()] = true;
         gv_characterSelected[EventPlayer()] = "InfestedTerran";
     } else if (EventDialogControl() == gv_charSelectButtons[7].lv_dialog && !gv_charSelectButtons[7].lv_isSelected) {
         // Drone select visual change
-        DialogControlSetPropertyAsInt(gv_charSelectButtons[0].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
-        DialogControlSetPropertyAsInt(gv_charSelectButtons[1].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
-        DialogControlSetPropertyAsInt(gv_charSelectButtons[2].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
-        DialogControlSetPropertyAsInt(gv_charSelectButtons[3].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
-        DialogControlSetPropertyAsInt(gv_charSelectButtons[4].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
-        DialogControlSetPropertyAsInt(gv_charSelectButtons[5].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
-        DialogControlSetPropertyAsInt(gv_charSelectButtons[6].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), normalAlpha);
-        DialogControlSetPropertyAsInt(gv_charSelectButtons[7].lv_normalImage, c_triggerControlPropertyAlpha, PlayerGroupSingle(EventPlayer()), hoverAlpha);
+        CharSelectClickAlpha(7);
         // Drone select action
         gv_characterIsSelected[EventPlayer()] = true;
         gv_characterSelected[EventPlayer()] = "Drone";
@@ -379,6 +435,8 @@ bool gt_DialogClick_Func (bool testConds, bool runActions) {
         gv_gameDiffButtons[2].lv_isSelected = false;
         // Game diff 1-1 action
         gv_diffVotedFor[EventPlayer()] = 1;
+        // Stats Change
+        StatsUpdate(gv_classicNormal, "Set0", EventPlayer());
     } else if (EventDialogControl() == gv_gameDiffButtons[1].lv_dialog && !gv_gameDiffButtons[1].lv_isSelected) {
         // Variable update
         gv_gameDiffButtons[0].lv_isSelected = false;
@@ -386,13 +444,17 @@ bool gt_DialogClick_Func (bool testConds, bool runActions) {
         gv_gameDiffButtons[2].lv_isSelected = false;
         // Game diff 1-2 action
         gv_diffVotedFor[EventPlayer()] = 2;
+        // Stats Change
+        StatsUpdate(gv_classicHard, "Set1", EventPlayer());
     } else if (EventDialogControl() == gv_gameDiffButtons[2].lv_dialog && !gv_gameDiffButtons[2].lv_isSelected) {
         // Variable update
         gv_gameDiffButtons[0].lv_isSelected = false;
         gv_gameDiffButtons[1].lv_isSelected = false;
         gv_gameDiffButtons[2].lv_isSelected = true;
-        // Game diff 1-3 action
+        // Game diff Classic Hard action
         gv_diffVotedFor[EventPlayer()] = 3;
+        // Stats Change
+        StatsUpdate(gv_classicInsane, "Set2", EventPlayer());
     } else if (EventDialogControl() == gv_readyButton.lv_dialog && gv_characterIsSelected[EventPlayer()]) {
         // --- READY BUTTON
         if (gv_readyButton.lv_isSelected == true) {
@@ -535,9 +597,6 @@ bool gt_TextCommands_Func (bool testConds, bool runActions) {
         CameraApplyInfo(EventPlayer(), CameraInfoFromId(1623587201), 0.0, -1, 10.0, true);
     } else if (StringSub(message, 2, 4) == "Spd"){
         UnitSetPropertyFixed(gv_playerCharacter[EventPlayer()], c_unitPropMovementSpeed, StringToFixed(StringSub(message, 5, 6)));
-    } else if (StringSub(message, 2, 5) == "Next"){
-        gv_level += 1;
-        TriggerExecute(gt_ExampleLevelOutline, true, false);
     } else if (StringSub(message, 2, 5) == "Turn"){
         for (; delete < 10; delete += 1) {
             UnitSetFacing(gv_playerCharacter[1], RandomFixed(0.0, 360.0), 0);
@@ -683,6 +742,7 @@ bool gt_UpdateMousePos_Func (bool testConds, bool runActions) {
     }
 
     gv_mouseLocale[EventPlayer()] = Point(EventMouseMovedPosXWorld(), EventMouseMovedPosYWorld());
+    TextTagCreate(StringToText("Here you are!"), 10, Point(EventMouseMovedPosXWorld(), EventMouseMovedPosYWorld()), 1.0, true, false, PlayerGroupAll());
     return true;
 }
 
@@ -700,34 +760,37 @@ bool gt_EndLevel_Func (bool testConds, bool runActions) {
         return true;
     }
 
+    gv_level += 1;
     for (; i <= PlayerGroupCount(gv_allPlayers); i+=1){
         if (i < 10) {
             UnitSetPosition(gv_playerCharacter[i], PointFromName("StartPoint0" + IntToString(i)), false);
         } else {
             UnitSetPosition(gv_playerCharacter[i], PointFromName("StartPoint" + IntToString(i)), false);
         }
-        
-    }
-    i = 1;
-
-    for (; i<=PlayerGroupCount(gv_allPlayers); i+=1){
+        BankLoad("RUNLINGRUNIUU0m", i);
+        if (!gv_solo) {
+            BankValueSetFromInt(BankLastCreated(), gv_currentSet, IntToString(gv_level), BankValueGetAsInt(BankLastCreated(), gv_currentSet, IntToString(gv_level)) + 1);
+        } else {
+            BankValueSetFromInt(BankLastCreated(), gv_currentSet, "S" + IntToString(gv_level), BankValueGetAsInt(BankLastCreated(), gv_currentSet, "S" + IntToString(gv_level)) + 1);
+        }
+        BankSave(BankLastCreated());
         CameraApplyInfo(i, gv_camera[i], 1.0, 10, 3, true);
         UnitIssueOrder(gv_playerCharacter[i], Order(AbilityCommand("stop", 0)), c_orderQueueReplace);
         libNtve_gf_MakeUnitUncommandable(gv_playerCharacter[i], true);
         if (gv_autoClicking[i] == true) {
-            gv_autoClicking[i] = false;
             gv_autoClickAtLvlStart[i] = true;
         }
-        
+        gv_autoClicking[i] = false;
+        gv_autoClickDisable = true; 
     }
+
     // was going to just execute the trigger by name using gv_diff, but it was misbehaving so we get \/ this \/ abomination for now
-    gv_level += 1;
-    if (gv_diff == "ExampleLevelOutline") {
-        TriggerExecute(gt_ExampleLevelOutline, true, false);
-    } else if (gv_diff == "MyLevelSet") {
-        TriggerExecute(gt_MyLevelSet, true, false);
+    if (gv_diff == "ClassicNormal") {
+        TriggerExecute(gt_ClassicNormal, true, false);
     } else if (gv_diff == "ClassicHard") {
         TriggerExecute(gt_ClassicHard, true, false);
+    } else if (gv_diff == "ClassicInsane") {
+        TriggerExecute(gt_ClassicInsane, true, false);
     }
 
     Wait(2, c_timeGame);
@@ -741,6 +804,7 @@ bool gt_EndLevel_Func (bool testConds, bool runActions) {
             gf_AutoClicker(i);
         }
     }
+    gv_autoClickDisable = false; 
     
     return true;
 }
@@ -831,7 +895,7 @@ void main() {
     TriggerAddEventDialogControl(gt_DialogClick, 16, c_invalidDialogControlId, c_triggerControlEventTypeClick);
     TriggerAddEventDialogControl(gt_DialogExit, 16, c_invalidDialogControlId, c_triggerControlEventTypeMouseExit);
     // OTHER 
-    gt_Setup_Func(true, true);
+    TriggerAddEventMapInit(gt_Setup);
     // ------- Chat commands
     TriggerAddEventChatMessage(gt_TextCommands, 16, "#", false);
     // ------- Hit Detection

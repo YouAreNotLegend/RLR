@@ -381,4 +381,273 @@
             <Texture val="Assets\Textures\sc2_ui_glues_bluebuttons_close_hover.dds"/>
         </Frame>
     </Frame>
+
+      <!-- Graph Line Item Template -->
+  <Frame type="GraphLineItemFrame" name="GraphLineItemFrame">
+    <Frame type="Image" name="Image">
+      <Anchor side="Bottom" relative="$parent" pos="Max" offset="0" />
+      <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
+      <Height val="5" />
+      <Width val="2" />
+      <Texture val="@UI/Battlenet_Glue_Ladder_Score_Graphs_Line_01" />
+      <StateGroup name="LineColorState">
+        <!-- Marine Data Set 1 -->
+        <State name="Red">
+          <When type="Property" frame="$parent" ItemSetIndex="0" />
+          <Action type="SetProperty" frame="$this" Color="255,0,0" />
+        </State>
+        <!-- Marauder Data Set 2 -->
+        <State name="Blue">
+          <When type="Property" frame="$parent" ItemSetIndex="1" />
+          <Action type="SetProperty" frame="$this" Color="0,0,202" />
+        </State>
+        <!-- Hide Line For Data Set 3-->
+        <State name="Hidden">
+          <When type="Property" frame="$parent" ItemSetIndex="2" />
+          <Action type="SetProperty" frame="$this" Visible="False" />
+        </State>
+      </StateGroup>
+    </Frame>
+  </Frame>
+  <!-- Graph Point Item Template -->
+  <Frame type="GraphItemFrame" name="GraphPointItemFrame">
+    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0" />
+    <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
+    <Width val="20" />
+    <Height val="20" />
+    <Frame type="Image" name="PointImage">
+      <Anchor relative="$parent" />
+      <Texture val="storm_ui_deathrecap_line_graph_point.dds" />
+    </Frame>
+    <StateGroup name="PointItemState">
+      <!-- Hide Point Image Data Set 3 -->
+      <State name="Hidden">
+        <When type="Property" frame="$this" ItemSetIndex="2" />
+        <Action type="SetProperty" frame="$this" Alpha="0" />
+      </State>
+    </StateGroup>
+  </Frame>
+  <!-- Graph Bar Item Template -->
+  <Frame type="GraphItemFrame" name="GraphBarItemFrame">
+    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0" />
+    <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
+    <Width val="15" />
+    <Alpha val="0" />
+    <Color val="69,165,255"/>
+    <Frame type="Image" name="PointImage">
+      <Anchor relative="$parent" />
+      <Texture val="storm_ui_deathrecap_graph_background.dds" />
+    </Frame>
+    <StateGroup name="BarState">
+      <!-- Only Visible For Data Set 3 -->
+      <State name="Visible">
+        <When type="Property" frame="$this" ItemSetIndex="2" />
+        <Action type="SetProperty" frame="$this" Alpha="150" />
+      </State>
+    </StateGroup>
+  </Frame>
+  <!-- Horizontal Graph Text Template (Y-Axis GameTime) -->
+  <Frame type="GraphTextTickFrame" name="HorizontalTickFrame">
+    <Anchor side="Top" relative="$parent" pos="Min" offset="0" />
+    <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
+    <Width val="125" />
+    <MinFractionDigits val="0" />
+    <MaxFractionDigits val="0" />
+    <ValueFormat val="%value%" />
+    <FormatTime val="False" />
+    <Unclipped val="True" />
+    <Frame type="Image" name="TickImage">
+      <Anchor side="Top" relative="$parent" pos="Min" offset="0" />
+      <Anchor side="Bottom" relative="$parent/Label" pos="Min" offset="-5" />
+      <Anchor side="Left" relative="$parent" pos="Mid" offset="0" />
+      <Anchor side="Right" relative="$parent" pos="Mid" offset="0" />
+      <Width val="2" />
+      <Color val="0,132,255" />
+    </Frame>
+    <Frame type="Label" name="Label">
+      <Anchor side="Left" relative="$parent" pos="Mid" offset="0" />
+      <Anchor side="Right" relative="$parent" pos="Mid" offset="0" />
+      <Anchor side="Bottom" relative="$parent" pos="Max" offset="-66" />
+      <Style val="ScoreScreenGraphTickLabel" />
+      <Color val="59,226,255" />
+    </Frame>
+  </Frame>
+  <!-- Vertical Graph Text Template (X-Axis Amount) -->
+  <Frame type="GraphTextTickFrame" name="VerticalTickFrame">
+    <Anchor side="Top" relative="$parent" pos="Min" offset="0" />
+    <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
+    <Height val="25" />
+    <MinFractionDigits val="0" />
+    <MaxFractionDigits val="0" />
+    <AbsoluteValue val="True" />
+    <Unclipped val="True" />
+    <Frame type="Image" name="TickImage">
+      <Anchor side="Top" relative="$parent" pos="Mid" offset="-2" />
+      <Anchor side="Bottom" relative="$parent" pos="Mid" offset="-2" />
+      <Anchor side="Right" relative="$parent" pos="Max" offset="0" />
+      <Width val="10" />
+      <Height val="2" />
+      <Color val="0,132,255" />
+    </Frame>
+    <Frame type="Label" name="Label">
+      <Anchor side="Top" relative="$parent" pos="Mid" offset="0" />
+      <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0" />
+      <Anchor side="Right" relative="$parent/TickImage" pos="Min" offset="-5" />
+      <Style val="ScoreScreenGraphTickLabel" />
+      <Color val="59,226,255" />
+    </Frame>
+  </Frame>
+  <!-- Vertical Long Graph Text Template (X-Axis Amount) -->
+  <Frame type="GraphTextTickFrame" name="VerticalLongTickFrame">
+    <Anchor side="Top" relative="$parent" pos="Min" offset="0" />
+    <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
+    <Height val="20" />
+    <MinFractionDigits val="0" />
+    <MaxFractionDigits val="0" />
+    <Alpha val="50" />
+    <Frame type="Image" name="TickImage">
+      <Anchor side="Top" relative="$parent" pos="Mid" offset="0" />
+      <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0" />
+      <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
+      <Anchor side="Right" relative="$parent" pos="Max" offset="0" />
+      <Height val="2" />
+      <Color val="0,132,255" />
+    </Frame>
+    <Frame type="Label" name="Label">
+      <Anchor side="Top" relative="$parent" pos="Mid" offset="0" />
+      <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0" />
+      <Anchor side="Left" relative="$parent" pos="Mid" offset="0" />
+      <Anchor side="Right" relative="$parent" pos="Mid" offset="0" />
+      <Style val="ScoreScreenGraphTickLabel" />
+      <Color val="59,226,255" />
+    </Frame>
+    <!-- Hide First Tick -->
+    <StateGroup name="TickPosition">
+      <DefaultState val="Default" />
+      <State name="First">
+        <When type="AnimationState" TickPosition="First" />
+        <Action type="SetProperty" Frame="TickImage" Visible="False" />
+        <Action type="SetProperty" Frame="Label" Visible="False" />
+      </State>
+      <State name="Default">
+        <Action type="SetProperty" Frame="TickImage" Visible="True" />
+        <Action type="SetProperty" Frame="Label" Visible="True" />
+      </State>
+    </StateGroup>
+  </Frame>
+  <!-- Graph Legend Template -->
+  <Frame type="GraphLegendItemFrame" name="GraphLegendItemTemplate">
+    <Height val="25" />
+    <CollapseLayout val="true" />
+    <!-- Item Color/Image -->
+    <Frame type="Image" name="ColorImage">
+      <Anchor side="Top" relative="$parent" pos="Mid" offset="0" />
+      <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0" />
+      <Anchor side="Left" relative="$parent" pos="Min" offset="5" />
+      <Width val="20" />
+      <Height val="20" />
+      <Color val="{$parent/@ItemColor}" />
+    </Frame>
+    <!-- Item Name -->
+    <Frame type="Label" name="NameLabel">
+      <Anchor side="Top" relative="$parent" pos="Mid" offset="0" />
+      <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0" />
+      <Anchor side="Left" relative="$parent/ColorImage" pos="Max" offset="5" />
+      <Anchor side="Right" relative="$parent" pos="Max" offset="0" />
+      <Text val="{$parent/@ItemName}" />
+    </Frame>
+  </Frame>
+  <!-- Graph Template -->
+  <Frame type="GraphFrame" name="GraphFrameTemplate">
+    <Insets top="15" left="0" bottom="-1" right="15" />
+    <MinXVisible val="1"/>
+    <MinYVisible val="0"/>
+    <!-- Inner Background For Graph -->
+    <Frame type="Image" name="Background">
+      <Anchor relative="$parent/LineGraph" />
+      <Color val="0,32,102" />
+      <Alpha val="50"/>
+    </Frame>
+    <!-- Outside Border Image -->
+     <!--
+    <Frame type="Image" name="BackgroundImage">
+      <Anchor relative="$parent" />
+      <Texture val="Assets\Textures\ui_ingame_leaderboard_frame.dds" />
+      <TextureType val="Border" />
+      <Color val="0,153,255" />
+    </Frame>
+    -->
+    <!-- Prints GameTime To X-Axis -->
+    <Frame type="GraphIntervalAxisFrame" name="GraphAxisX">
+      <Anchor side="Left" relative="$parent/GraphAxisY" pos="Max" offset="0" />
+      <Anchor side="Right" relative="$parent" pos="Max" offset="0" />
+      <Anchor side="Bottom" relative="$parent" pos="Max" offset="60" />
+      <Height val="100" />
+      <TickDesc val="Templates/HorizontalTickFrame" />
+      <Vertical val="False" />
+      <TickInterval val="1" />
+      <RenderPriority val="513" />
+    </Frame>
+    <!-- Unit Amount Y Axis -->
+    <Frame type="GraphDistributedAxisFrame" name="GraphAxisY">
+      <Anchor side="Left" relative="$parent" pos="Min" offset="-60" />
+      <Anchor side="Top" relative="$parent" pos="Min" offset="0" />
+      <Anchor side="Bottom" relative="$parent/GraphAxisX" pos="Min" offset="0" />
+      <Width val="100" />
+      <TickDesc val="Templates/VerticalTickFrame" />
+      <TickDistribution val="1" /> <!-- Amount Spacing -->
+      <Vertical val="True" />
+      <RenderPriority val="513" />
+    </Frame>
+    <!-- Unit Amount Y Axis Long (Intermediate Amount)-->
+    <Frame type="GraphIntervalAxisFrame" name="GraphLongAxisY">
+      <Anchor side="Left" relative="$parent/LineGraph" pos="Min" offset="0" />
+      <Anchor side="Right" relative="$parent" pos="Max" offset="0" />
+      <Anchor side="Top" relative="$parent" pos="Min" offset="0" />
+      <Anchor side="Bottom" relative="$parent/GraphAxisX" pos="Min" offset="0" />
+      <TickDesc val="Templates/VerticalLongTickFrame" />
+      <TickInterval val="1000" /> <!-- Amount Spacing -->
+      <Vertical val="True" />
+    </Frame>
+    <!-- Line Graph Frame -->
+    <Frame type="GraphLinePlotFrame" name="LineGraph">
+      <Anchor side="Top" relative="$parent" pos="Min" offset="0" />
+      <Anchor side="Right" relative="$parent" pos="Max" offset="0" />
+      <Anchor side="Left" relative="$parent/GraphAxisY" pos="Max" offset="0" />
+      <Anchor side="Bottom" relative="$parent/GraphAxisX" pos="Min" offset="0" />
+      <ItemDesc val="Templates/GraphLineItemFrame" />
+      <StartOffset val="-1" />
+      <EndOffset val="1" />
+      <ItemCount val="540" />
+      <RenderPriority val="513" />
+    </Frame>
+    <!-- Bar Graph Frame -->
+    <Frame type="GraphBarPlotFrame" name="BarPlotGraph">
+      <Anchor side="Top" relative="$parent" pos="Min" offset="0" />
+      <Anchor side="Right" relative="$parent" pos="Max" offset="0" />
+      <Anchor side="Left" relative="$parent/GraphAxisY" pos="Max" offset="0" />
+      <Anchor side="Bottom" relative="$parent/GraphAxisX" pos="Min" offset="0" />
+      <ItemDesc val="Templates/GraphBarItemFrame" />
+      <ItemCount val="540" />
+    </Frame>
+    <!-- Y Label -->
+    <Frame type="Label" name="YAxisLabel">
+      <Anchor side="Bottom" relative="$parent" pos="Max" offset="-80" />
+      <Anchor side="Left" relative="$parent" pos="Min" offset="25" />
+      <Style val="ScoreScreenGraphAxisLabel" />
+      <Color val="0,183,255" />
+      <Text val="" />
+      <RotationPosition val="MiddleLeft" />
+      <Rotation val="-90" />
+    </Frame>
+    <!-- X Label -->
+    <Frame type="Label" name="XAxisLabel">
+      <Anchor side="Bottom" relative="$parent" pos="Max" offset="-10" />
+      <Anchor side="Right" relative="$parent" pos="Max" offset="-21" />
+      <Style val="ScoreScreenGraphAxisLabel" />
+      <Color val="255,255,255" />
+      <Text val="" />
+    </Frame>
+    <!-- Legend Container -->
+  </Frame>
 </Desc>

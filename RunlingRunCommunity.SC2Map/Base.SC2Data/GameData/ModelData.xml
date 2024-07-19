@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Catalog>
+    <CModel id="ZergAOECursorSplat">
+        <ScaleMax value="0.100000,0.100000,0.100000"/>
+        <ScaleMin value="0.100000,0.100000,0.100000"/>
+    </CModel>
+</Catalog>

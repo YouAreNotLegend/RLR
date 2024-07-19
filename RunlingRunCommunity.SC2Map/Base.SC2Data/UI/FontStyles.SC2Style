@@ -111,6 +111,9 @@
     <Style name="CustomFontThree" font="UI\Sixtyfour-Regular.ttf" height="25" textcolor="004060"/>
     <Style name="TinyFontOne" font="UI\Sixtyfour-Regular.ttf" height="18" textcolor="0070aa"/>
     <Style name="MidFontOne" font="UI\Sixtyfour-Regular.ttf" height="36" textcolor="0070aa"/>
+    <Style name="TinyFontTwo" font="UI\Sixtyfour-Regular.ttf" height="10" textcolor="0070aa"/>
+    <Style name="TinyFontThree" template="ScoreScreenGraphAxisLabel" textcolor="0070aa" hjustify="right" vjustify="Top"/>
+    <Style name="TinyFontFour" template="ScoreScreenGraphAxisLabel" textcolor="0070aa" hjustify="Left" vjustify="Top"/>
 
     <Constant name="MyDialogText" val="#MyColorAqua"/>
     <Constant name="MyDialogHighlight" val="#MyColorLightYellow"/>

@@ -926,7 +926,7 @@
 						<Anchor relative="$parent" side="Left" pos="Min" offset="30"/>
 						<Anchor relative="$parent" side="Right" pos="Max" offset="0"/>
 						<Anchor relative="$parent" side="Bottom" pos="Max" offset="0"/>
-						<Text val="Option1"/>
+						<Text val="Classic"/>
 
 					</Frame>
 
@@ -1057,7 +1057,7 @@
 							<Anchor relative="$parent" side="Left" pos="Min" offset="30"/>
 							<Anchor relative="$parent" side="Right" pos="Max" offset="0"/>
 							<Anchor relative="$parent" side="Bottom" pos="Max" offset="0"/>
-							<Text val="Example"/>
+							<Text val="Normal"/>
 
 						</Frame>
 						<Animation name="ToggleOff">
@@ -1072,12 +1072,12 @@
 						<Animation name="MoveLabelLeft">
 							<Controller type="Anchor" end="Pause" frame="$this/Label" side="Left">
 								<Key type="Curve" time="0.0" value="0"/>
-								<Key type="Curve" time="0.125" value="70"/>
+								<Key type="Curve" time="0.125" value="90"/>
 							</Controller>
 						</Animation>
 						<Animation name="MoveLabelRight">
 							<Controller type="Anchor" end="Pause" frame="$this/Label" side="Left">
-								<Key type="Curve" time="0.0" value="70"/>
+								<Key type="Curve" time="0.0" value="90"/>
 								<Key type="Curve" time="0.125" value="0"/>
 							</Controller>
 						</Animation>
@@ -1094,7 +1094,7 @@
 							<Anchor relative="$parent" side="Left" pos="Min" offset="30"/>
 							<Anchor relative="$parent" side="Right" pos="Max" offset="0"/>
 							<Anchor relative="$parent" side="Bottom" pos="Max" offset="0"/>
-							<Text val="My Set"/>
+							<Text val="Hard"/>
 
 						</Frame>
 						<Animation name="ToggleOff">
@@ -1109,12 +1109,12 @@
 						<Animation name="MoveLabelLeft">
 							<Controller type="Anchor" end="Pause" frame="$this/Label" side="Left">
 								<Key type="Curve" time="0.0" value="0"/>
-								<Key type="Curve" time="0.125" value="85"/>
+								<Key type="Curve" time="0.125" value="100"/>
 							</Controller>
 						</Animation>
 						<Animation name="MoveLabelRight">
 							<Controller type="Anchor" end="Pause" frame="$this/Label" side="Left">
-								<Key type="Curve" time="0.0" value="85"/>
+								<Key type="Curve" time="0.0" value="100"/>
 								<Key type="Curve" time="0.125" value="0"/>
 							</Controller>
 						</Animation>
@@ -1131,7 +1131,7 @@
 							<Anchor relative="$parent" side="Left" pos="Min" offset="30"/>
 							<Anchor relative="$parent" side="Right" pos="Max" offset="0"/>
 							<Anchor relative="$parent" side="Bottom" pos="Max" offset="0"/>
-							<Text val="Hard"/>
+							<Text val="Insane"/>
 
 						</Frame>
 						<Animation name="ToggleOff">
@@ -1146,12 +1146,12 @@
 						<Animation name="MoveLabelLeft">
 							<Controller type="Anchor" end="Pause" frame="$this/Label" side="Left">
 								<Key type="Curve" time="0.0" value="0"/>
-								<Key type="Curve" time="0.125" value="110"/>
+								<Key type="Curve" time="0.125" value="90"/>
 							</Controller>
 						</Animation>
 						<Animation name="MoveLabelRight">
 							<Controller type="Anchor" end="Pause" frame="$this/Label" side="Left">
-								<Key type="Curve" time="0.0" value="110"/>
+								<Key type="Curve" time="0.0" value="90"/>
 								<Key type="Curve" time="0.125" value="0"/>
 							</Controller>
 						</Animation>
@@ -1323,6 +1323,459 @@
 				<Anchor relative="$parent" side="Left" pos="Mid" offset="515"/>
 				<Anchor relative="$parent" side="Right" pos="Max" offset="0"/>
 				<Anchor relative="$parent" side="Bottom" pos="Max" offset="-175"/>
+
+				<Frame type="Label" name="Title">
+					<Anchor relative="$parent" side="Top" pos="Min" offset="50"/>
+					<Anchor relative="$parent" side="Left" pos="Min" offset="233"/>
+					<Anchor relative="$parent" side="Right" pos="Max" offset="0"/>
+					<Anchor relative="$parent" side="Bottom" pos="Max" offset="0"/>
+
+					<Text val="STATS"/>
+					<Style val="TinyFontOne"/>
+				</Frame>
+
+				<!--RIGHT STATS-->
+
+				<Frame type="Label" name="Deaths">
+					<Anchor relative="$parent" side="Top" pos="Min" offset="83"/>
+					<Anchor relative="$parent" side="Left" pos="Min" offset="410"/>
+					<Anchor relative="$parent" side="Right" pos="Max" offset="-25"/>
+					<Anchor relative="$parent" side="Bottom" pos="Min" offset="104"/>
+					
+					<Text val="0"/>
+					<Style val="TinyFontThree" />
+      				<Color val="0,183,255" />
+				</Frame>
+				<Frame type="Label" name="StaticDeaths">
+					<Anchor relative="$parent" side="Top" pos="Min" offset="83"/>
+					<Anchor relative="$parent" side="Left" pos="Min" offset="290"/>
+					<Anchor relative="$parent" side="Right" pos="Max" offset="-140"/>
+					<Anchor relative="$parent" side="Bottom" pos="Min" offset="104"/>
+					
+					<Text val="Deaths"/>
+					<Style val="TinyFontFour" />
+      				<Color val="0,183,255" />
+				</Frame>
+
+				<Frame type="Label" name="Saves">
+					<Anchor relative="$parent" side="Top" pos="Min" offset="101"/>
+					<Anchor relative="$parent" side="Left" pos="Min" offset="410"/>
+					<Anchor relative="$parent" side="Right" pos="Max" offset="-25"/>
+					<Anchor relative="$parent" side="Bottom" pos="Min" offset="122"/>
+					
+					<Text val="0"/>
+					<Style val="TinyFontThree" />
+      				<Color val="0,183,255" />
+				</Frame>
+				<Frame type="Label" name="StaticSaves">
+					<Anchor relative="$parent" side="Top" pos="Min" offset="101"/>
+					<Anchor relative="$parent" side="Left" pos="Min" offset="290"/>
+					<Anchor relative="$parent" side="Right" pos="Max" offset="-140"/>
+					<Anchor relative="$parent" side="Bottom" pos="Min" offset="122"/>
+					
+					<Text val="Saves"/>
+					<Style val="TinyFontFour" />
+      				<Color val="0,183,255" />
+				</Frame>
+
+				<Frame type="Label" name="XP">
+					<Anchor relative="$parent" side="Top" pos="Min" offset="119"/>
+					<Anchor relative="$parent" side="Left" pos="Min" offset="410"/>
+					<Anchor relative="$parent" side="Right" pos="Max" offset="-25"/>
+					<Anchor relative="$parent" side="Bottom" pos="Min" offset="140"/>
+					
+					<Text val="0"/>
+					<Style val="TinyFontThree" />
+      				<Color val="0,183,255" />
+				</Frame>
+				<Frame type="Label" name="StaticXP">
+					<Anchor relative="$parent" side="Top" pos="Min" offset="119"/>
+					<Anchor relative="$parent" side="Left" pos="Min" offset="290"/>
+					<Anchor relative="$parent" side="Right" pos="Max" offset="-140"/>
+					<Anchor relative="$parent" side="Bottom" pos="Min" offset="140"/>
+					
+					<Text val="XP"/>
+					<Style val="TinyFontFour" />
+      				<Color val="0,183,255" />
+				</Frame>
+
+				<Frame type="Label" name="XPGame">
+					<Anchor relative="$parent" side="Top" pos="Min" offset="137"/>
+					<Anchor relative="$parent" side="Left" pos="Min" offset="410"/>
+					<Anchor relative="$parent" side="Right" pos="Max" offset="-25"/>
+					<Anchor relative="$parent" side="Bottom" pos="Min" offset="158"/>
+					
+					<Text val="0"/>
+					<Style val="TinyFontThree" />
+      				<Color val="0,183,255" />
+				</Frame>
+				<Frame type="Label" name="StaticXPGame">
+					<Anchor relative="$parent" side="Top" pos="Min" offset="137"/>
+					<Anchor relative="$parent" side="Left" pos="Min" offset="290"/>
+					<Anchor relative="$parent" side="Right" pos="Max" offset="-140"/>
+					<Anchor relative="$parent" side="Bottom" pos="Min" offset="158"/>
+					
+					<Text val="XP/Game"/>
+					<Style val="TinyFontFour" />
+      				<Color val="0,183,255" />
+				</Frame>
+
+				<Frame type="Label" name="STime">
+					<Anchor relative="$parent" side="Top" pos="Min" offset="155"/>
+					<Anchor relative="$parent" side="Left" pos="Min" offset="410"/>
+					<Anchor relative="$parent" side="Right" pos="Max" offset="-25"/>
+					<Anchor relative="$parent" side="Bottom" pos="Min" offset="176"/>
+					
+					<Text val="0"/>
+					<Style val="TinyFontThree" />
+      				<Color val="0,183,255" />
+				</Frame>
+				<Frame type="Label" name="StaticSTime">
+					<Anchor relative="$parent" side="Top" pos="Min" offset="155"/>
+					<Anchor relative="$parent" side="Left" pos="Min" offset="290"/>
+					<Anchor relative="$parent" side="Right" pos="Max" offset="-140"/>
+					<Anchor relative="$parent" side="Bottom" pos="Min" offset="176"/>
+					
+					<Text val="S Time"/>
+					<Style val="TinyFontFour" />
+      				<Color val="0,183,255" />
+				</Frame>
+
+				<Frame type="Label" name="TTime">
+					<Anchor relative="$parent" side="Top" pos="Min" offset="173"/>
+					<Anchor relative="$parent" side="Left" pos="Min" offset="410"/>
+					<Anchor relative="$parent" side="Right" pos="Max" offset="-25"/>
+					<Anchor relative="$parent" side="Bottom" pos="Min" offset="194"/>
+					
+					<Text val="0"/>
+					<Style val="TinyFontThree" />
+      				<Color val="0,183,255" />
+				</Frame>
+				<Frame type="Label" name="StaticTTime">
+					<Anchor relative="$parent" side="Top" pos="Min" offset="173"/>
+					<Anchor relative="$parent" side="Left" pos="Min" offset="290"/>
+					<Anchor relative="$parent" side="Right" pos="Max" offset="-140"/>
+					<Anchor relative="$parent" side="Bottom" pos="Min" offset="194"/>
+					
+					<Text val="T Time"/>
+					<Style val="TinyFontFour" />
+      				<Color val="0,183,255" />
+				</Frame>
+
+				<Frame type="Label" name="Games">
+					<Anchor relative="$parent" side="Top" pos="Min" offset="191"/>
+					<Anchor relative="$parent" side="Left" pos="Min" offset="410"/>
+					<Anchor relative="$parent" side="Right" pos="Max" offset="-25"/>
+					<Anchor relative="$parent" side="Bottom" pos="Min" offset="212"/>
+					
+					<Text val="0"/>
+					<Style val="TinyFontThree" />
+      				<Color val="0,183,255" />
+				</Frame>
+				<Frame type="Label" name="StaticGames">
+					<Anchor relative="$parent" side="Top" pos="Min" offset="191"/>
+					<Anchor relative="$parent" side="Left" pos="Min" offset="290"/>
+					<Anchor relative="$parent" side="Right" pos="Max" offset="-140"/>
+					<Anchor relative="$parent" side="Bottom" pos="Min" offset="212"/>
+					
+					<Text val="Games"/>
+					<Style val="TinyFontFour" />
+      				<Color val="0,183,255" />
+				</Frame>
+
+				<Frame type="Label" name="Wins">
+					<Anchor relative="$parent" side="Top" pos="Min" offset="209"/>
+					<Anchor relative="$parent" side="Left" pos="Min" offset="410"/>
+					<Anchor relative="$parent" side="Right" pos="Max" offset="-25"/>
+					<Anchor relative="$parent" side="Bottom" pos="Min" offset="230"/>
+					
+					<Text val="0"/>
+					<Style val="TinyFontThree" />
+      				<Color val="0,183,255" />
+				</Frame>
+				<Frame type="Label" name="StaticWins">
+					<Anchor relative="$parent" side="Top" pos="Min" offset="209"/>
+					<Anchor relative="$parent" side="Left" pos="Min" offset="290"/>
+					<Anchor relative="$parent" side="Right" pos="Max" offset="-140"/>
+					<Anchor relative="$parent" side="Bottom" pos="Min" offset="230"/>
+					
+					<Text val="Wins"/>
+					<Style val="TinyFontFour" />
+      				<Color val="0,183,255" />
+				</Frame>
+
+				<Frame type="Label" name="Losses">
+					<Anchor relative="$parent" side="Top" pos="Min" offset="227"/>
+					<Anchor relative="$parent" side="Left" pos="Min" offset="410"/>
+					<Anchor relative="$parent" side="Right" pos="Max" offset="-25"/>
+					<Anchor relative="$parent" side="Bottom" pos="Min" offset="248"/>
+					
+					<Text val="0"/>
+					<Style val="TinyFontThree" />
+      				<Color val="0,183,255" />
+				</Frame>
+				<Frame type="Label" name="StaticLosses">
+					<Anchor relative="$parent" side="Top" pos="Min" offset="227"/>
+					<Anchor relative="$parent" side="Left" pos="Min" offset="290"/>
+					<Anchor relative="$parent" side="Right" pos="Max" offset="-140"/>
+					<Anchor relative="$parent" side="Bottom" pos="Min" offset="248"/>
+					
+					<Text val="Losses"/>
+					<Style val="TinyFontFour" />
+      				<Color val="0,183,255" />
+				</Frame>
+
+				<Frame type="Label" name="WinPC">
+					<Anchor relative="$parent" side="Top" pos="Min" offset="245"/>
+					<Anchor relative="$parent" side="Left" pos="Min" offset="410"/>
+					<Anchor relative="$parent" side="Right" pos="Max" offset="-25"/>
+					<Anchor relative="$parent" side="Bottom" pos="Min" offset="266"/>
+					
+					<Text val="0.0"/>
+					<Style val="TinyFontThree" />
+      				<Color val="0,183,255" />
+				</Frame>
+				<Frame type="Label" name="StaticWinPC">
+					<Anchor relative="$parent" side="Top" pos="Min" offset="245"/>
+					<Anchor relative="$parent" side="Left" pos="Min" offset="290"/>
+					<Anchor relative="$parent" side="Right" pos="Max" offset="-140"/>
+					<Anchor relative="$parent" side="Bottom" pos="Min" offset="266"/>
+					
+					<Text val="Win %"/>
+					<Style val="TinyFontFour" />
+      				<Color val="0,183,255" />
+				</Frame>
+
+				<!--LEFT STATS-->
+
+				<Frame type="Label" name="Creator">
+					<Anchor relative="$parent" side="Top" pos="Min" offset="83"/>
+					<Anchor relative="$parent" side="Left" pos="Min" offset="140"/>
+					<Anchor relative="$parent" side="Right" pos="Max" offset="-285"/>
+					<Anchor relative="$parent" side="Bottom" pos="Min" offset="104"/>
+					
+					<Text val=""/>
+					<Style val="TinyFontThree" />
+      				<Color val="0,183,255" />
+				</Frame>
+				<Frame type="Label" name="StaticCreator">
+					<Anchor relative="$parent" side="Top" pos="Min" offset="83"/>
+					<Anchor relative="$parent" side="Left" pos="Min" offset="30"/>
+					<Anchor relative="$parent" side="Right" pos="Max" offset="-410"/>
+					<Anchor relative="$parent" side="Bottom" pos="Min" offset="104"/>
+					
+					<Text val="Creator"/>
+					<Style val="TinyFontFour" />
+      				<Color val="0,183,255" />
+				</Frame>
+
+				<Frame type="Label" name="Difficulty">
+					<Anchor relative="$parent" side="Top" pos="Min" offset="101"/>
+					<Anchor relative="$parent" side="Left" pos="Min" offset="140"/>
+					<Anchor relative="$parent" side="Right" pos="Max" offset="-285"/>
+					<Anchor relative="$parent" side="Bottom" pos="Min" offset="122"/>
+					
+					<Text val=""/>
+					<Style val="TinyFontThree" />
+      				<Color val="0,183,255" />
+				</Frame>
+				<Frame type="Label" name="StaticDifficulty">
+					<Anchor relative="$parent" side="Top" pos="Min" offset="101"/>
+					<Anchor relative="$parent" side="Left" pos="Min" offset="30"/>
+					<Anchor relative="$parent" side="Right" pos="Max" offset="-410"/>
+					<Anchor relative="$parent" side="Bottom" pos="Min" offset="122"/>
+					
+					<Text val="Difficulty"/>
+					<Style val="TinyFontFour" />
+      				<Color val="0,183,255" />
+				</Frame>
+
+				<Frame type="Label" name="XPMult">
+					<Anchor relative="$parent" side="Top" pos="Min" offset="119"/>
+					<Anchor relative="$parent" side="Left" pos="Min" offset="140"/>
+					<Anchor relative="$parent" side="Right" pos="Max" offset="-285"/>
+					<Anchor relative="$parent" side="Bottom" pos="Min" offset="140"/>
+					
+					<Text val=""/>
+					<Style val="TinyFontThree" />
+      				<Color val="0,183,255" />
+				</Frame>
+				<Frame type="Label" name="StaticXPMult">
+					<Anchor relative="$parent" side="Top" pos="Min" offset="119"/>
+					<Anchor relative="$parent" side="Left" pos="Min" offset="30"/>
+					<Anchor relative="$parent" side="Right" pos="Max" offset="-410"/>
+					<Anchor relative="$parent" side="Bottom" pos="Min" offset="140"/>
+					
+					<Text val="XP Mult"/>
+					<Style val="TinyFontFour" />
+      				<Color val="0,183,255" />
+				</Frame>
+
+				<Frame type="Label" name="WinningXP">
+					<Anchor relative="$parent" side="Top" pos="Min" offset="137"/>
+					<Anchor relative="$parent" side="Left" pos="Min" offset="140"/>
+					<Anchor relative="$parent" side="Right" pos="Max" offset="-285"/>
+					<Anchor relative="$parent" side="Bottom" pos="Min" offset="158"/>
+					
+					<Text val=""/>
+					<Style val="TinyFontThree" />
+      				<Color val="0,183,255" />
+				</Frame>
+				<Frame type="Label" name="StaticWinningXP">
+					<Anchor relative="$parent" side="Top" pos="Min" offset="137"/>
+					<Anchor relative="$parent" side="Left" pos="Min" offset="30"/>
+					<Anchor relative="$parent" side="Right" pos="Max" offset="-410"/>
+					<Anchor relative="$parent" side="Bottom" pos="Min" offset="158"/>
+					
+					<Text val="Winning XP"/>
+					<Style val="TinyFontFour" />
+      				<Color val="0,183,255" />
+				</Frame>
+
+				<Frame type="Label" name="Levels">
+					<Anchor relative="$parent" side="Top" pos="Min" offset="155"/>
+					<Anchor relative="$parent" side="Left" pos="Min" offset="140"/>
+					<Anchor relative="$parent" side="Right" pos="Max" offset="-285"/>
+					<Anchor relative="$parent" side="Bottom" pos="Min" offset="177"/>
+					
+					<Text val=""/>
+					<Style val="TinyFontThree" />
+      				<Color val="0,183,255" />
+				</Frame>
+				<Frame type="Label" name="StaticLevels">
+					<Anchor relative="$parent" side="Top" pos="Min" offset="155"/>
+					<Anchor relative="$parent" side="Left" pos="Min" offset="30"/>
+					<Anchor relative="$parent" side="Right" pos="Max" offset="-410"/>
+					<Anchor relative="$parent" side="Bottom" pos="Min" offset="177"/>
+					
+					<Text val="Levels"/>
+					<Style val="TinyFontFour" />
+      				<Color val="0,183,255" />
+				</Frame>
+
+				<Frame type="Label" name="Bosses">
+					<Anchor relative="$parent" side="Top" pos="Min" offset="173"/>
+					<Anchor relative="$parent" side="Left" pos="Min" offset="140"/>
+					<Anchor relative="$parent" side="Right" pos="Max" offset="-285"/>
+					<Anchor relative="$parent" side="Bottom" pos="Min" offset="194"/>
+					
+					<Text val=""/>
+					<Style val="TinyFontThree" />
+      				<Color val="0,183,255" />
+				</Frame>
+				<Frame type="Label" name="StaticBosses">
+					<Anchor relative="$parent" side="Top" pos="Min" offset="173"/>
+					<Anchor relative="$parent" side="Left" pos="Min" offset="30"/>
+					<Anchor relative="$parent" side="Right" pos="Max" offset="-410"/>
+					<Anchor relative="$parent" side="Bottom" pos="Min" offset="194"/>
+					
+					<Text val="Bosses"/>
+					<Style val="TinyFontFour" />
+      				<Color val="0,183,255" />
+				</Frame>
+
+				<Frame type="Label" name="Achievements">
+					<Anchor relative="$parent" side="Top" pos="Min" offset="191"/>
+					<Anchor relative="$parent" side="Left" pos="Min" offset="140"/>
+					<Anchor relative="$parent" side="Right" pos="Max" offset="-285"/>
+					<Anchor relative="$parent" side="Bottom" pos="Min" offset="213"/>
+					
+					<Text val=""/>
+					<Style val="TinyFontThree" />
+      				<Color val="0,183,255" />
+				</Frame>
+				<Frame type="Label" name="StaticAchievements">
+					<Anchor relative="$parent" side="Top" pos="Min" offset="191"/>
+					<Anchor relative="$parent" side="Left" pos="Min" offset="30"/>
+					<Anchor relative="$parent" side="Right" pos="Max" offset="-410"/>
+					<Anchor relative="$parent" side="Bottom" pos="Min" offset="213"/>
+					
+					<Text val="Achievements"/>
+					<Style val="TinyFontFour" />
+      				<Color val="0,183,255" />
+				</Frame>
+
+				<!--PARTITIONS-->
+
+				<Frame type="Image" name="Partition1">
+					<Anchor relative="$parent" side="Top" pos="Min" offset="280"/>
+					<Anchor relative="$parent" side="Left" pos="Min" offset="30"/>
+					<Anchor relative="$parent" side="Right" pos="Max" offset="-30"/>
+					<Anchor relative="$parent" side="Bottom" pos="Min" offset="290"/>
+
+					<Texture val="Assets\Textures\line_blue1.dds"/>
+					<Alpha val="150"/>
+				</Frame>
+
+				<Frame type="Image" name="Partition2">
+					<Anchor relative="$parent" side="Top" pos="Min" offset="75"/>
+					<Anchor relative="$parent" side="Left" pos="Min" offset="30"/>
+					<Anchor relative="$parent" side="Right" pos="Max" offset="-30"/>
+					<Anchor relative="$parent" side="Bottom" pos="Min" offset="85"/>
+
+					<Texture val="Assets\Textures\line_blue1.dds"/>
+					<Alpha val="150"/>
+				</Frame>
+
+				<!--GRAPHS-->
+
+				<Frame type="GraphFrame" name="SoloTotal" template="Templates/GraphFrameTemplate">
+					<Anchor relative="$parent" side="Top" pos="Mid" offset="-10"/>
+					<Anchor relative="$parent" side="Left" pos="Min" offset="20"/>
+					<Anchor relative="$parent" side="Right" pos="Mid" offset="-5"/>
+					<Anchor relative="$parent" side="Bottom" pos="Max" offset="-160"/>
+
+					<Frame type="Label" name="YAxisLabel">
+						<Text val="S Total"/>
+					</Frame>
+
+				</Frame>
+
+				<Frame type="GraphFrame" name="SoloWinrate" template="Templates/GraphFrameTemplate">
+					<Anchor relative="$parent" side="Top" pos="Mid" offset="-10"/>
+					<Anchor relative="$parent" side="Left" pos="Min" offset="280"/>
+					<Anchor relative="$parent" side="Right" pos="Max" offset="-25"/>
+					<Anchor relative="$parent" side="Bottom" pos="Max" offset="-160"/>
+					<MaxYVisible val="100"/>
+					<Frame type="GraphIntervalAxisFrame" name="GraphLongAxisY">
+						<TickInterval val="20" />
+					</Frame>
+
+					<Frame type="Label" name="YAxisLabel">
+						<Text val="S Win%"/>
+					</Frame>
+
+				</Frame>
+
+				<Frame type="GraphFrame" name="TeamTotal" template="Templates/GraphFrameTemplate">
+					<Anchor relative="$parent" side="Top" pos="Mid" offset="140"/>
+					<Anchor relative="$parent" side="Left" pos="Min" offset="20"/>
+					<Anchor relative="$parent" side="Right" pos="Mid" offset="-5"/>
+					<Anchor relative="$parent" side="Bottom" pos="Max" offset="-10"/>
+
+					<Frame type="Label" name="YAxisLabel">
+						<Text val="T Total"/>
+					</Frame>
+
+				</Frame>
+
+				<Frame type="GraphFrame" name="TeamWinrate" template="Templates/GraphFrameTemplate">
+					<Anchor relative="$parent" side="Top" pos="Mid" offset="140"/>
+					<Anchor relative="$parent" side="Left" pos="Min" offset="280"/>
+					<Anchor relative="$parent" side="Right" pos="Max" offset="-25"/>
+					<Anchor relative="$parent" side="Bottom" pos="Max" offset="-10"/>
+					<MaxYVisible val="100"/>
+					<Frame type="GraphIntervalAxisFrame" name="GraphLongAxisY">
+						<TickInterval val="20" />
+					</Frame>
+
+					<Frame type="Label" name="YAxisLabel">
+						<Text val="T Win%"/>
+					</Frame>
+
+				</Frame>
+
+				<!--Rest of Frame-->
 
 				<Frame type="Image" name="LeftBGGlowPattern">
 					<Anchor relative="$parent" side="Right" pos="Max" offset="0"/>

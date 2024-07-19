@@ -2,4 +2,5 @@
 <Preload>
 <Actor id="SYSTEM_ActorConfig"/>
 <Terrain id="HybridLabInner"/>
+<Unit id="Marine"/>
 </Preload>

@@ -831,4 +831,82 @@
             <quad value="70.1057,70.7543,91.649,86.8435"/>
         </shape>
     </region>
+    <region id="14">
+        <name value="Pad02"/>
+        <shape type="rect">
+            <quad value="128.17,25.1086,136.9003,33.7102"/>
+        </shape>
+    </region>
+    <region id="15">
+        <name value="Pad03"/>
+        <shape type="rect">
+            <quad value="23.0625,25.1762,33.7114,33.772"/>
+        </shape>
+    </region>
+    <region id="16">
+        <name value="Pad05"/>
+        <shape type="rect">
+            <quad value="120.0595,116.1838,127.0703,122.93"/>
+        </shape>
+    </region>
+    <region id="17">
+        <name value="Pad06"/>
+        <shape type="rect">
+            <quad value="120.4357,35.0812,126.8562,41.8088"/>
+        </shape>
+    </region>
+    <region id="18">
+        <name value="Pad07"/>
+        <shape type="rect">
+            <quad value="34.7507,35.1506,41.7312,41.803"/>
+        </shape>
+    </region>
+    <region id="19">
+        <name value="Pad09"/>
+        <shape type="rect">
+            <quad value="110.2917,106.1494,118.9785,114.9123"/>
+        </shape>
+    </region>
+    <region id="20">
+        <name value="Pad10"/>
+        <shape type="rect">
+            <quad value="110.3017,43.123,118.9011,51.859"/>
+        </shape>
+    </region>
+    <region id="21">
+        <name value="Pad11"/>
+        <shape type="rect">
+            <quad value="42.8117,43.159,51.7272,51.6462"/>
+        </shape>
+    </region>
+    <region id="22">
+        <name value="Pad13"/>
+        <shape type="rect">
+            <quad value="102.0427,98.1577,109.0673,104.99"/>
+        </shape>
+    </region>
+    <region id="23">
+        <name value="Pad14"/>
+        <shape type="rect">
+            <quad value="102.2998,53.0102,108.8864,59.7148"/>
+        </shape>
+    </region>
+    <region id="24">
+        <name value="Pad15"/>
+        <shape type="rect">
+            <quad value="52.7246,53.1516,59.8867,59.727"/>
+        </shape>
+    </region>
+    <region id="46">
+        <name value="Pad17"/>
+        <shape type="rect">
+            <quad value="92.1787,88.1711,100.8874,96.9118"/>
+        </shape>
+    </region>
+    <region id="50">
+        <name value="Pad18"/>
+        <shape type="rect">
+            <quad value="92.352,61.128,100.852,69.8127"/>
+        </shape>
+    </region>
 </Regions>
